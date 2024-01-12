@@ -1,3 +1,178 @@
 baseURL = '01100100.github.io'
-languageCode = 'en-us'
-title = 'Data Dave Blog'
+languageCode = 'en'
+title = "Data Dave's Blog"
+defaultContentLanguage = "en"
+theme = "DoIt"
+
+[menu]
+[[menu.main]]
+identifier = "posts"
+# you can add extra information before the name (HTML format is supported), such as icons
+pre = ""
+# you can add extra information after the name (HTML format is supported), such as icons
+post = ""
+name = "Posts"
+url = "/posts/"
+# title will be shown when you hover on this menu link
+title = ""
+weight = 1
+
+[params]
+gitRepo = "https://github.com/01100100/"
+
+
+[params.home.profile]
+enable = true
+# URL of avatar shown in home page
+avatarURL = "images/transbalkans.jpg"
+# URL the avatar links to
+avatarLinkURL = ""
+# title = "This is me riding the TransBalkanRace in 2023"
+# subtitle shown in home page
+subtitle = "Geodata Engineer passionate about clean code, cycling and exploring nature 🌎💻🚵‍♂️🌲"
+# whether to use typeit animation for subtitle
+typeit = false
+# whether to show social links
+social = true
+# DoIt NEW | 0.2.0 disclaimer (HTML format is supported)
+
+# Footer config
+[params.footer]
+enable = false
+
+# Social config about the author
+[params.social]
+GitHub = "01100100"
+Linkedin = ""
+Twitter = ""
+Instagram = ""
+Facebook = ""
+Telegram = ""
+Medium = ""
+Gitlab = ""
+Youtubelegacy = ""
+Youtubecustom = ""
+Youtubechannel = ""
+Tumblr = ""
+Quora = ""
+Keybase = ""
+Pinterest = ""
+Reddit = ""
+Codepen = ""
+FreeCodeCamp = ""
+Bitbucket = ""
+Stackoverflow = ""
+Weibo = ""
+Odnoklassniki = ""
+VK = ""
+Flickr = ""
+Xing = ""
+Snapchat = ""
+Soundcloud = ""
+Spotify = ""
+Bandcamp = ""
+Paypal = ""
+Fivehundredpx = ""
+Mix = ""
+Goodreads = ""
+Lastfm = ""
+Foursquare = ""
+Hackernews = ""
+Kickstarter = ""
+Patreon = ""
+Steam = ""
+Twitch = ""
+Strava = "17866884"
+Skype = ""
+Whatsapp = ""
+Zhihu = ""
+Douban = ""
+Angellist = ""
+Slidershare = ""
+Jsfiddle = ""
+Deviantart = ""
+Behance = ""
+Dribbble = ""
+Wordpress = ""
+Vine = ""
+Googlescholar = ""
+Researchgate = ""
+Mastodon = ""
+Thingiverse = ""
+Devto = ""
+Gitea = ""
+XMPP = ""
+Matrix = ""
+Bilibili = ""
+ORCID = ""
+Liberapay = ""
+Ko-Fi = ""
+BuyMeACoffee = ""
+Linktree = ""
+QQ = ""
+QQGroup = ""
+Email = "davidwhittingham94@gmail.com"
+RSS = true
+
+[params.header]
+themeChangeMode = "switch"
+[params.header.title]
+# URL of the LOGO
+logo = ""
+# title name
+name = "Data Dave's Blog"
+# you can add extra information before the name (HTML format is supported), such as icons
+pre = ">"
+# you can add extra information after the name (HTML format is supported), such as icons
+post = ""
+# DoIt NEW | 0.2.5 whether to use typeit animation for title name
+typeit = true
+
+[params.typeit]
+# typing speed between each step (measured in milliseconds)
+speed = 100
+# blinking speed of the cursor (measured in milliseconds)
+cursorSpeed = 1000
+# character used for the cursor (HTML format is supported)
+cursorChar = "|"
+# cursor duration after typing finishing (measured in milliseconds, "-1" means unlimited)
+duration = -1
+
+[params.page]
+# DoIt NEW | 0.2.0 whether to hide a page from home page
+hiddenFromHomePage = false
+# DoIt NEW | 0.2.0 whether to hide a page from search results
+hiddenFromSearch = false
+# DoIt NEW | 0.2.0 whether to enable twemoji
+twemoji = false
+# whether to enable lightgallery
+lightgallery = false
+# DoIt NEW | 0.2.0 whether to enable the ruby extended syntax
+ruby = true
+# DoIt NEW | 0.2.0 whether to enable the fraction extended syntax
+fraction = true
+# DoIt NEW | 0.2.0 whether to enable the fontawesome extended syntax
+fontawesome = true
+# whether to show link to Raw Markdown content of the content
+linkToMarkdown = true
+# DoIt NEW | 0.2.14 configure the link to the source file of the post
+linkToSource = false
+# "https://github.com/user/repo/blob/main/{path}"
+# DoIt NEW | 0.2.13 configure the link to edit the post
+linkToEdit = false
+# "https://github.com/user/repo/edit/main/{path}"
+# "https://gitlab.com/user/repo/-/edit/main/{path}"
+# "https://bitbucket.org/user/repo/src/main/{path}?mode=edit"
+# DoIt NEW | 0.2.14 configure the link to report issue for the post
+linkToReport = false
+# "https://github.com/user/repo/issues/new?title=[bug]%20{title}&body=|Field|Value|%0A|-|-|%0A|Title|{title}|%0A|Url|{url}|%0A|Filename|https://github.com/user/repo/blob/main/{path}|"
+# DoIt NEW | 0.2.4 whether to show the full text content in RSS
+rssFullText = false
+# DoIt NEW | 0.2.13 whether to enable series navigation
+seriesNavigation = true
+# whether to enable last modified time
+enableLastMod = false
+# whether to enable word count
+enableWordCount = false
+# whether to enable reading time estimation
+enableReadingTime = false
