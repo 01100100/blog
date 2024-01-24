@@ -1,10 +1,9 @@
 ---
 title: "Kreuzungen"
-subtitle: ""
+subtitle: "Where open geospatial data and cycling intersect one another"
 date: 2024-01-11T21:41:55+01:00
 lastmod: 2024-01-11T21:41:55+01:00
 draft: false
-authors: []
 description: ""
 
 tags: []
@@ -25,7 +24,7 @@ lightgallery: false
 license: ""
 ---
 
-# Kreuzungen
+{{< figure src="<https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Gaoliang_Bridge.JPG/512px-Gaoliang_Bridge.JPG>" title="Lighthouse (figure)" >}}
 
 <a title="Hennessy, CC BY-SA 1.0 &lt;https://creativecommons.org/licenses/by-sa/1.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Gaoliang_Bridge.JPG"><img width="512" alt="Gaoliang Bridge" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Gaoliang_Bridge.JPG/512px-Gaoliang_Bridge.JPG"></a>
 
@@ -69,9 +68,49 @@ ref: [https://en.wikipedia.org/wiki/GPS_Exchange_Format](https://en.wikipedia.or
 
 TODO: add example .gpx code
 
+```xml
+
+```
+
 ### .geojson
 
-TODO: add example geojson code
+[Specification](https://geojson.org/)
+
+[geojson.io](http://geojson.io)
+
+[Wiki](https://en.wikipedia.org/wiki/GeoJSON)
+
+```json
+{
+  "type": "Feature",
+  "properties": {},
+  "geometry": {
+    "coordinates": [
+      [
+        13.3957,
+        52.4771
+      ],
+      [
+        13.3965,
+        52.4715
+      ],
+      [
+        13.4005,
+        52.4741
+      ],
+      [
+        13.4081,
+        52.4722
+      ],
+      [
+        13.4103,
+        52.4687
+      ]
+    ],
+    "type": "LineString"
+  }
+}
+```
 
 ### .OSM
 
@@ -80,6 +119,8 @@ TODO: add example openstreetmap code
 ## Converting between the formats
 
 ### Why?
+
+By converting the OSM and route geographic data to the geojson, I could use turf.js to do all spatial analytics in the js code, the computing would be compl
 
 ### Libraries
 
@@ -100,13 +141,11 @@ This API reduces the problem to simply encoding the gpx file as a polyline, cons
 TODO: explain overpass turbo
 [https://overpass-turbo.eu/](https://overpass-turbo.eu/)
 
-
-
 NB: I have come across the polyline format before when working with geospatial data, usually the term referees to the **encoded polyline format** which abides to the [spec from google maps](https://developers.google.com/maps/documentation/utilities/polylineutility). There are good libraries available that deal with this in JS [https://github.com/mapbox/polyline](https://github.com/mapbox/polyline) and Python [https://pypi.org/project/polyline/](https://pypi.org/project/polyline/). The Overpass query langauge expects a decoded format.
 
 TODO: add the query and explain it
 
-```
+```js
 async function fetchRivers(bbox) {
   const response = await fetch(
     "https://www.overpass-api.de/api/interpreter?",
@@ -116,7 +155,7 @@ async function fetchRivers(bbox) {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: `rel["waterway"](${bbox[1]},${bbox[0]},${bbox[3]},${bbox[2]});way["waterway"](${bbox[1]},${bbox[0]},${bbox[3]},${bbox[2]});out geom;`,
+      body: `rel["waterway"](${bbox[1]},${bbox[0]},${bbox[3]},${bbox[2]});out geom;`,
     }
   );
   return await response.text();
@@ -125,20 +164,4 @@ async function fetchRivers(bbox) {
 
 ## Frontend
 
-Everything should be done on the client side, to avoid the need of hosting any backend. Therefore we will use the language of the browser, javascript.
-
-- Upload by drag and drop
-
-[https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications#selecting_files_using_drag_and_drop](https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications#selecting_files_using_drag_and_drop)
-
-- Display gpx file on a map
-
-[https://github.com/mpetazzoni/leaflet-gpx](https://github.com/mpetazzoni/leaflet-gpx)
-
-- Parse gpx file
-
-[https://github.com/Luuka/GPXParser.js](https://github.com/Luuka/GPXParser.js)
-
-- Construct OverpassQL
-
-- Parse results
+Although I am most comfortable programmng in python, I wanted everything to run locally on the client. Everything should be done on the client side, to avoid the need of hosting any backend. Therefore we will use the language of the browser, javascript.
