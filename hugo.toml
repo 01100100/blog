@@ -40,6 +40,7 @@ social = true
 [params.footer]
 enable = false
 
+
 # Social config about the author
 [params.social]
 GitHub = "01100100"
@@ -180,29 +181,46 @@ enableReadingTime = false
 
 # Markup related config in Hugo
 [markup]
-  # Syntax Highlighting
-  [markup.highlight]
-    codeFences = true
-    guessSyntax = true
-    lineNos = true
-    lineNumbersInTable = true
-    # false is a necessary configuration
-    # (https://github.com/dillonzq/LoveIt/issues/158)
-    noClasses = false
-  # Goldmark is from Hugo 0.60 the default library used for Markdown
-  [markup.goldmark]
-    [markup.goldmark.extensions]
-      definitionList = true
-      footnote = true
-      linkify = true
-      strikethrough = true
-      table = true
-      taskList = true
-      typographer = true
-    [markup.goldmark.renderer]
-      # whether to use HTML tags directly in the document
-      unsafe = true
-  # Table Of Contents settings
-  [markup.tableOfContents]
-    startLevel = 2
-    endLevel = 6
+# Syntax Highlighting
+[markup.highlight]
+codeFences = true
+guessSyntax = true
+lineNos = true
+lineNumbersInTable = true
+# false is a necessary configuration
+# (https://github.com/dillonzq/LoveIt/issues/158)
+noClasses = false
+# Goldmark is from Hugo 0.60 the default library used for Markdown
+[markup.goldmark]
+[markup.goldmark.extensions]
+definitionList = true
+footnote = true
+linkify = true
+strikethrough = true
+table = true
+taskList = true
+typographer = true
+[markup.goldmark.renderer]
+# whether to use HTML tags directly in the document
+unsafe = true
+# Table Of Contents settings
+[markup.tableOfContents]
+startLevel = 2
+endLevel = 6
+
+# DoIt NEW | 0.2.0 Table of the contents config
+[params.page.toc]
+# whether to enable the table of the contents
+enable = true
+# DoIt NEW | 0.2.9 whether to keep the static table of the contents in front of the post
+keepStatic = true
+# whether to make the table of the contents in the sidebar automatically collapsed
+auto = true
+# DoIt CHANGED | 0.2.0 KaTeX mathematical formulas
+[params.page.math]
+
+enable = true
+# KaTeX extension copy_tex
+copyTex = true
+# KaTeX extension mhchem
+mhchem = true

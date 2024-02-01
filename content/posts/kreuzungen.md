@@ -1,10 +1,10 @@
 ---
-title: "Kreuzungen"
+title: "Kreuzungen 🗺️"
 subtitle: "Where open geospatial data and cycling intersect."
 date: 2024-01-11T21:41:55+01:00
 lastmod: 2024-01-11T21:41:55+01:00
 draft: false
-description: ""
+description: "Where open geospatial data and cycling intersect."
 
 tags: []
 categories: []
@@ -16,15 +16,12 @@ hiddenFromSearch: false
 featuredImage: ""
 featuredImagePreview: ""
 
-toc:
-  enable: true
-  auto: true
-math:
-  enable: false
+
+math: true
 lightgallery: false
 license: ""
 ---
-
+<!--more-->
 {{< figure src="<https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Gaoliang_Bridge.JPG/512px-Gaoliang_Bridge.JPG>" title="Lighthouse (figure)" >}}
 
 <a title="Hennessy, CC BY-SA 1.0 &lt;https://creativecommons.org/licenses/by-sa/1.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Gaoliang_Bridge.JPG"><img width="512" alt="Gaoliang Bridge" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Gaoliang_Bridge.JPG/512px-Gaoliang_Bridge.JPG"></a>
@@ -80,7 +77,27 @@ TODO: link to and explain the points from: https://wiki.openstreetmap.org/wiki/W
 
 ### Talk about time complexity, as the route size grows.
 
-TODO: explain that the intersection computation is quadratic time complexity. So a key is to keep the number of inputs small.
+Finding out which rivers intersect with the uploaded route is taken care of by turf.js, using the [`booleanIntersects()`](https://github.com/Turfjs/turf/tree/master/packages/turf-boolean-intersects) function.
+
+```js
+function filterIntersectingWaterways(waterwaysGeoJSON, routeGeoJSON) {
+  return waterwaysGeoJSON.features.filter((feature) =>
+    turf.booleanIntersects(feature, routeGeoJSON)
+  );
+}
+```
+
+The `turf.booleanIntersects()` implementation uses the [sweepline-intersections](https://github.com/rowanwins/sweepline-intersections?tab=readme-ov-file#algorithm-steps) algorithm, and although it is optimized to blaze through co-ordinate pairs super fast, it has quadratic [time complexity](https://en.wikipedia.org/wiki/Time_complexity).
+
+$$ \mathcal{O}(n^2) $$
+
+
+{{< admonition type=tip open=true >}}
+That's a fancy way of saying as the input data gets big (number of waterways to check for intersections), the time is takes to compute gets realllllly big.
+{{< /admonition >}}
+
+The key to solving the problem involves keeping the input data "somewhat" small such that device doing the computation does not melt and crash.
+
 
 TODO: explain about the size of the OSM planet-files, and that they are rather large (currently over 60GB), and that a big part of solving this problem is filtering for as little data as possible before running the computations.
 
