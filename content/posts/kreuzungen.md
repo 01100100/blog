@@ -32,7 +32,7 @@ Kreuzungen is the German word for crossings.
 
 > [https://de.wiktionary.org/wiki/Kreuzung](https://de.wiktionary.org/wiki/Kreuzung)
 
-## Website
+## Show me the good stuff!
 
 {{< admonition type=example >}}
 
@@ -50,19 +50,71 @@ I used [Komoot](https://www.komoot.com) to navigate and record my ride. Komoot i
 
 The ride took a few days and let me think about the world. I crossed many rivers, which I paid little attention to which until a thought was triggered... "How cool would it be to have the statistics of how many rivers I crossed along the way... much like the stats you can see in a video game". Realizing that I was recording data of the ride, had the great asset of open street maps at my fingertips, and was in the geo-spatial-data tech bubble, I put a plan together.
 
+The problem was to answer the question "Which rivers did I cross based on this .gpx file?"
+
 I would write a program that could be fed with the .gpx file created by Komoot and output the list of rivers that were crossed along the ride from London to Berlin.
 
 This program could easily be extended to give back a list of other landmarks I passed on my ride, all thanks to the free OSM data provided by the community (Thanks to everyone who contributed!!).
 
-I could wrap this all up in a little web app, that lets users upload a .gpx file, and displays the stats for landmarks passed as well as a map showing the route and passed landmarks.
+I could wrap this all up in a little web app, that lets users upload a .gpx file, and displays the stats for landmarks passed as well as a map showing the route and higlighting the passed landmarks.
 
-As a geospatial data engineer, and a endurance cyclist, the problem doesn't sound so hard.
+As a geospatial data engineer, and a endurance cyclist, the problem doesn't sound so hard. It turns out that it was much more interesting then I first thought.
 
 ## What is Geospatial Data
 
-TODO: explain what geospatial data is (a file representing real world objects on a globe using co-ordinates and metadata)
+Geospatial data in its simplest form is information that describes a object on earth. It has two parts, one describes the "where" and the other describes the "what". The "where" part has information about the geometry of the object and its location, while the "what" part has information about the non-geometric properties/attributes of the object, which bring meaning to the objects.
+
+### Example: Dicke Marie
+
+If you go into Tegel Forest in the east of Berlin, you might bump into the so called "Fat Marie". This is the name given to a really old, award winning Oak tree, estimated to be over 800 years old.
+
+<a title="Quaster64, CC BY-SA 4.0 &lt;https://creativecommons.org/licenses/by-sa/4.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Dicke_Marie_01.jpg"><img width="256" alt="Dicke Marie 01" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Dicke_Marie_01.jpg/256px-Dicke_Marie_01.jpg"></a>
+
+<!-- https://commons.wikimedia.org/wiki/File:Dicke_Marie_01.jpg -->
+Let's imagine what the geospatial data would look like that describes this great tree...
+
+First we can define the location or the "where" with a single set of co-ordinates `(52.5935770, 13.2649068)` which define the point centre of the tree trunk coming out of the ground.
+
+Now we can add some "what" properties describe Fat Marie. Perhaps we can add the properties `type=tree`, `name=Dicke Marie`, `species=Quercus robur` and `height=23` and maybe we could add a link to the wikipedia article `wikipedia=https://de.wikipedia.org/wiki/de:Dicke Marie`
+
+As a geojson, the data could be written like this
+
+```json
+{
+    "type": "Feature",
+    "properties": {
+        "name": "Dicke Marie",
+        "natural": "tree",
+        "species": "Quercus robur",
+        "height": "23",
+        "wikipedia": "de:Dicke Marie"
+    },
+    "geometry": {
+        "type": "Point",
+        "coordinates": [
+            13.2649068,
+            52.593577
+        ]
+    }
+}
+```
+
+
+
+
+[https://www.openstreetmap.org/node/205066401](https://www.openstreetmap.org/node/205066401)
+
+### Geometry
+
 
 TODO: explain that a point, string, and polygon combined with a map projection are the building blocks of geo data.
+
+The primitive types of geometry are points, lines and polygons. The are the building blocks of geospatial data.
+
+The
+
+TODO: explain what geospatial data is (a file representing real world objects on a globe using co-ordinates and metadata)
+
 
 ## What is a river?
 
@@ -72,8 +124,35 @@ TODO: explain what a real world river is and how its different from a stream, an
 
 TODO: explain about open street maps and how great it is to have a community resource and that this was not available 25 years ago. Explain how a waterway relation is available for all main rivers from contributors, explain the problem about getting the smaller waterways, and querying osm for ways as well as relations.
 
-TODO: link to and explain the points from: https://wiki.openstreetmap.org/wiki/Waterways, explain about the tags and properties of a OSM data type
+TODO: link to and explain the points from: https://wiki.openstreetmap.org/wiki/Waterways, explain about the tags used for waterways and properties of a OSM data type.
 
+TODO: explain about the difference between the [https://wiki.openstreetmap.org/wiki/Relation:waterway](https://wiki.openstreetmap.org/wiki/Relation:waterway) and 
+
+TODO: add examples of the different waterways
+
+```text
+waterway=river
+waterway=stream
+waterway=tidal_channel
+waterway=canal
+waterway=ditch
+waterway=drain
+waterway=pressurised
+natural=water
+water=* 
+```
+
+## Open Street Maps
+
+TODO: explain what OSM is, in terms of a dataset, open data, community driven. Talk about contributions from users like wikipedia for maps. Talk about apps like street complete and how most mapping providers use OSM data.
+
+### OSM Elements
+
+TODO: explain about the different elements and how they map to the primative geometry types [https://wiki.openstreetmap.org/wiki/Elements](https://wiki.openstreetmap.org/wiki/Elements)
+
+### OSM tagging 
+
+TODO: explain about OSM tagging [https://wiki.openstreetmap.org/wiki/Tags](https://wiki.openstreetmap.org/wiki/Tags)
 
 ### Talk about time complexity, as the route size grows.
 
@@ -101,11 +180,12 @@ The key to solving the problem involves keeping the input data "somewhat" small 
 
 TODO: explain about the size of the OSM planet-files, and that they are rather large (currently over 60GB), and that a big part of solving this problem is filtering for as little data as possible before running the computations.
 
-Once the newest planet-file is on the openrouteservice-servers, it needs to be preprocessed before the openrouteservice can start building the graphs used for routing.
-
-The build process in itself is rather resource-intensive. It takes roughly two days for any one of the nine profiles. For the mentioned resource requirements, this means that it will take roughly a week for all profiles to be re-built.
-
 ## Not all geo data files are created equally
+
+TODO: explain about differences between geodata formats and the tradeoff's different formats make. 
+
+### WKT 
+
 
 ### .gpx
 
@@ -170,15 +250,15 @@ TODO: link to https://wiki.openstreetmap.org/wiki/OSM_XML
 
 ### Why?
 
-By converting the OSM and route geographic data to the geojson, I could use turf.js to do all spatial analytics in the js code, the computing would be done client side. Meaning no backend is needed.
+By converting the OSM and route geographic data to geojson, I could use turf.js to do all spatial analytics in the js code, meaning the computing would be done client side and no backend would be required! Being in geojson format also means that it can be easily added to the map using [https://maplibre.org/maplibre-style-spec/sources/#geojson]()
 
-### Libraries
+### Ok enough theory, lets solve the problem.
 
 ## How to get the open data on rivers
 
 ### OpenStreetMaps (aka OSM)
 
-TODO: talk about the OSM data model https://wiki.openstreetmap.org/wiki/Elements and how they map to points, linestrings, polygons.
+TODO: talk about the OSM data model elements https://wiki.openstreetmap.org/wiki/Elements and how they map to points, linestrings, polygons.
 
 
 ### OSM Overpass API
@@ -194,7 +274,7 @@ This API reduces the problem to simply encoding the gpx file as a polyline, cons
 TODO: explain overpass turbo
 [https://overpass-turbo.eu/](https://overpass-turbo.eu/)
 
-TODO: add the query and explain it
+TODO: explain the following query
 
 ```js
 async function fetchRivers(bbox) {
@@ -213,19 +293,49 @@ async function fetchRivers(bbox) {
 }
 ```
 
+TODO: explain how when we have a bigger region, we want to look at the ways and relations.
+
 TODO: talk about the response https://wiki.openstreetmap.org/wiki/OSM_XML#Overpass_API_out_geom
 
-## Frontend
+## Application
 
 Although I am most comfortable programming in python, I wanted everything to run locally on the client. Everything should be done on the client side, to avoid the need of hosting any backend. Therefore we will use the language of the browser, javascript.
 
 ### Maplibre gl
 
-<!-- TODO: write about slippy maps, how good maplibre is because of vector tiles, allowing for zooming in and out without pixelation and ability to render features conditionally on the client side -->
+TODO: write about slippy maps, how good maplibre is because of vector tiles, allowing for zooming in and out without pixelation and ability to render features conditionally on the client side.
+
+TODO: include some history of webmaps.
+
+TODO: talk about the tradeoffs between vector and raster maps, and explain why vector maps are the best for this project.
+
+### Upload file
+
+### Creating a high quality user experience 
+
+TODO: talk about being happy with the look and feel of maplibre, and reusing the css for displaying info.
+
+#### Custom controllers
+
+TODO: talk about the code to make the upload and strava controller.
+
+#### Contain yourself
+
+### Killer feature: Strava integration
+
+TODO: explain that while some people do, most people don't know what a .gpx file is and don'
+t have files laying stored on there local device. The typical cyclist/hiker would likely have activities on strava. Explain that you implemented a "connect with strava" button and wrote the code to fetch activities from strava and display them in a menu withing the app. Explain how this lets users circumvent  needing to know what a .gpx file or uploading anything and leads to a streamlined experiance for the user. 
+
+###
+
+### Answering the community**: Sharing
+
 
 ---
 
 #### Diving deeper with the style color
+
+https://maplibre.org/maputnik/
 
 <!-- TODO: write about how to rivers are rendered from the tiles. That the blue river is made up of a way which is a polygon, and a linestring that is the waterway relation or way
 
