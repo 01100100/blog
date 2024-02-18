@@ -59,7 +59,7 @@ This program could easily be extended to give back a list of other landmarks I p
 I could wrap this all up in a little web app, that lets users upload a .gpx file, and displays the stats for landmarks passed as well as a map showing the route and higlighting the passed landmarks.
 
 As a geospatial data engineer, and a endurance cyclist, the problem doesn't sound so hard. It turns out that it was much more interesting then I first thought.
-
+, as the route size grows.
 ## What is Geospatial Data
 
 Geospatial data in its simplest form is information that describes a object on earth. It has two parts, one describes the "where" and the other describes the "what". The "where" part has information about the geometry of the object and its location, while the "what" part has information about the non-geometric properties/attributes of the object, which bring meaning to the objects.
@@ -73,7 +73,7 @@ If you go into Tegel Forest in the east of Berlin, you might bump into the so ca
 <!-- https://commons.wikimedia.org/wiki/File:Dicke_Marie_01.jpg -->
 Let's imagine what the geospatial data would look like that describes this great tree...
 
-First we can define the location or the "where" with a single set of co-ordinates `(52.5935770, 13.2649068)` which define the point centre of the tree trunk coming out of the ground.
+First we should define the location or the "where" of Dicke Marie. We could use words to do this, prehaps "North East of Berlin" or "about 300m south.." However we can do much better if we define with the position with a single set of co-ordinates `(52.5935770, 13.2649068)` locating the point where the centre of the tree trunk comes out of the ground. These numbers are much more powerful then the wordy descriptions. It fixes it to a set position in the world, and the numbers can be quickly and efficiently compared to other geospatial data types to answer questions like.. "How far is this point east of point x" "Does this point lie within polygon z?". Ohhh, I feel the power of this geospatial stuff.
 
 Now we can add some "what" properties describe Fat Marie. Perhaps we can add the properties `type=tree`, `name=Dicke Marie`, `species=Quercus robur` and `height=23` and maybe we could add a link to the wikipedia article `wikipedia=https://de.wikipedia.org/wiki/de:Dicke Marie`
 
@@ -99,8 +99,7 @@ As a geojson, the data could be written like this
 }
 ```
 
-
-
+Infact someone already defined Dicke Marie using geospatial data and added it to Open Street Maps
 
 [https://www.openstreetmap.org/node/205066401](https://www.openstreetmap.org/node/205066401)
 
@@ -117,6 +116,12 @@ TODO: explain what geospatial data is (a file representing real world objects on
 
 
 ## What is a river?
+
+A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities.
+
+When working with geospatial data, it's important to distinguish between different types of watercourses based on their scale and characteristics. For example, major rivers like the Amazon or the Nile are considered distinct rivers at a global scale. However, when zooming in to a specific region, smaller watercourses such as streams, canals, and even ditches may also be identified as rivers.
+
+The level of precision and detail required for identifying rivers depends on the context and purpose. In the case of a long-distance cycling route from London to Berlin, the focus may be on major rivers rather than smaller waterways. However, for a hike around a small town, even tiny streams or ditches could be of interest.
 
 TODO: explain what a real world river is and how its different from a stream, and how as your mental geographical model "zoom out" you don't need so much precision with the smaller waterways. Eg when you thinking of a route the whole way across england, you probably don't care for all the tiny streams and ditches you went over, but in contrast if you do a hike around a small town, you might be interested in each of the tiny streams you went over.
 
@@ -146,6 +151,8 @@ water=*
 
 TODO: explain what OSM is, in terms of a dataset, open data, community driven. Talk about contributions from users like wikipedia for maps. Talk about apps like street complete and how most mapping providers use OSM data.
 
+TODO: link to the OSM iceberg meme [https://www.openstreetmap.org/user/Xvtn/diary/403236](https://www.openstreetmap.org/user/Xvtn/diary/403236) and explainer 
+
 ### OSM Elements
 
 TODO: explain about the different elements and how they map to the primative geometry types [https://wiki.openstreetmap.org/wiki/Elements](https://wiki.openstreetmap.org/wiki/Elements)
@@ -154,7 +161,7 @@ TODO: explain about the different elements and how they map to the primative geo
 
 TODO: explain about OSM tagging [https://wiki.openstreetmap.org/wiki/Tags](https://wiki.openstreetmap.org/wiki/Tags)
 
-### Talk about time complexity, as the route size grows.
+### Let's talk about time complexity
 
 Finding out which rivers intersect with the uploaded route is taken care of by turf.js, using the [`booleanIntersects()`](https://github.com/Turfjs/turf/tree/master/packages/turf-boolean-intersects) function.
 
@@ -305,9 +312,15 @@ Although I am most comfortable programming in python, I wanted everything to run
 
 TODO: write about slippy maps, how good maplibre is because of vector tiles, allowing for zooming in and out without pixelation and ability to render features conditionally on the client side.
 
+eg)
+
+> Vector tiles represent a significant advancement in how map data is processed and presented. Unlike traditional raster tiles, which are static images with pixels, vector tiles are like the ‘SVGs’ of the mapping world: you get lines and points. This stores geodata in a format that allows for dynamic styling and interactivity, enabling the user to adapt the visual appearance of the map without altering the data. If that sounds like what you’ve seen on other maps, you are right! Vector tiles have become industry standard in interactive maps that, unlike openstreetmap.org, don’t get updated often, and where you can simply recalculate your whole database occasionally.
+
 TODO: include some history of webmaps.
 
 TODO: talk about the tradeoffs between vector and raster maps, and explain why vector maps are the best for this project.
+
+TODO: Link to and explain that even OSM are going to vector based maps this year because they are so much better. [https://blog.openstreetmap.org/2024/02/11/2024-announcing-the-year-of-the-openstreetmap-vector-maps/](https://blog.openstreetmap.org/2024/02/11/2024-announcing-the-year-of-the-openstreetmap-vector-maps/)
 
 ### Upload file
 
@@ -326,8 +339,125 @@ TODO: talk about the code to make the upload and strava controller.
 TODO: explain that while some people do, most people don't know what a .gpx file is and don'
 t have files laying stored on there local device. The typical cyclist/hiker would likely have activities on strava. Explain that you implemented a "connect with strava" button and wrote the code to fetch activities from strava and display them in a menu withing the app. Explain how this lets users circumvent  needing to know what a .gpx file or uploading anything and leads to a streamlined experiance for the user. 
 
-###
+### Strava Oauth
 
+TODO: talk about the decision/impossible to avoid situation of adding a backend to implement strava oauth. Explain that it is needed to hide the client secret from being leaked. Explain how you keep it as lightweight as possible, and much could be improved.
+
+TODO: talk about using flask and cors, and serving it with waitress because security reasons.
+
+```python
+import requests
+from flask import Flask, request
+from waitress import serve
+
+from config import get_config_values, get_logger
+
+### SET UP ENVIRONMENT ###
+logger = get_logger()
+CONFIG = get_config_values()
+
+app = Flask(__name__)
+
+
+@app.after_request
+def after_request(response):
+    # TODO: restrict this to only the hosted origin.
+    # https://01100100.github.io/kreuzungen/index.html
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS")
+    return response
+
+
+@app.route("/oauth", methods=["POST"])
+def oauth_callback():
+    code = request.form.get("code")
+    response = requests.post(
+        f"{CONFIG.STRAVA_API_URL}/oauth/token",
+        data={
+            "client_id": CONFIG.STRAVA_CLIENT_ID,
+            "client_secret": CONFIG.STRAVA_API_CLIENT_SECRET,
+            "code": code,
+            "grant_type": "authorization_code",
+        },
+    )
+    if response.status_code != 200:
+        raise Exception(
+            f"Error fetching access token, status code {response.status_code}"
+        )
+    response.json()
+
+    return response.json()
+
+
+@app.route("/reoauth", methods=["POST"])
+def refresh_token():
+    refresh_token = request.form.get("refreshToken")
+    response = requests.post(
+        f"{CONFIG.STRAVA_API_URL}/oauth/token",
+        data={
+            "client_id": CONFIG.STRAVA_CLIENT_ID,
+            "client_secret": CONFIG.STRAVA_API_CLIENT_SECRET,
+            "refresh_token": refresh_token,
+            "grant_type": "refresh_token",
+        },
+    )
+    if response.status_code != 200:
+        raise Exception(
+            f"Error refreshing access token, status code {response.status_code}"
+        )
+    response.json()
+
+    return response.json()
+
+
+if __name__ == "__main__":
+    serve(app, listen="*:8080")
+```
+
+TODO: talk about using this dockerfile to build the backend service
+
+```Dockerfile
+FROM python:3.11-slim-buster
+
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+COPY src src
+
+ENTRYPOINT ["python", "src/auth.py"]
+```
+
+TODO: talk about deploying this on fly.io using the following config
+
+```toml
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'kreuzungen'
+primary_region = 'ams'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 256
+```
+
+TODO: talk about how you set the secrets on fly.io using the commands
+
+``` bash
+fly secrets set STRAVA_API_CLIENT_SECRET=$STRAVA_API_CLIENT_SECRET
+fly secrets set STRAVA_REDIRECT_URI=$STRAVA_REDIRECT_URI
+fly deploy
+```
 ### Answering the community**: Sharing
 
 
@@ -348,3 +478,13 @@ https://www.openstreetmap.org/way/307632376#map=16/52.4725/13.4564
   ![Screen shot of river geometry intersection](image.png)
   <https://www.openstreetmap.org/way/307632376> is the polygon for the osm water body
   <https://www.openstreetmap.org/way/160175124> is the linestring for the osm waterway way
+
+
+### Shout outs
+
+[https://www.paulnorman.ca/](https://www.paulnorman.ca/)
+
+### Future imrpovements
+
+Use this lib for having gpx and osm stuff straight onto the map.
+[https://github.com/jimmyrocks/maplibre-gl-vector-text-protocol](https://github.com/jimmyrocks/maplibre-gl-vector-text-protocol)
