@@ -13,8 +13,12 @@ series: []
 hiddenFromHomePage: false
 hiddenFromSearch: false
 
-featuredImage: ""
+featuredImage: "/images/oil_crossings.jpeg"
 featuredImagePreview: ""
+
+toc:
+  enable: true
+  auto: false
 
 
 math: true
@@ -22,9 +26,6 @@ lightgallery: false
 license: ""
 ---
 <!--more-->
-{{< figure src="<https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Gaoliang_Bridge.JPG/512px-Gaoliang_Bridge.JPG>" title="Lighthouse (figure)" >}}
-
-<a title="Hennessy, CC BY-SA 1.0 &lt;https://creativecommons.org/licenses/by-sa/1.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Gaoliang_Bridge.JPG"><img width="512" alt="Gaoliang Bridge" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Gaoliang_Bridge.JPG/512px-Gaoliang_Bridge.JPG"></a>
 
 ## Naming
 
@@ -32,13 +33,12 @@ Kreuzungen is the German word for crossings.
 
 > [https://de.wiktionary.org/wiki/Kreuzung](https://de.wiktionary.org/wiki/Kreuzung)
 
-## Show me the good stuff!
+## Show me the good stuff
 
-{{< admonition type=example >}}
+{{< admonition type=example title="Check this out!" >}}
 
 [https://01100100.github.io/kreuzungen/](https://01100100.github.io/kreuzungen/)
 {{< /admonition >}}
-
 
 Repository [https://github.com/01100100/kreuzungen](https://github.com/01100100/kreuzungen)
 
@@ -60,6 +60,7 @@ I could wrap this all up in a little web app, that lets users upload a .gpx file
 
 As a geospatial data engineer, and a endurance cyclist, the problem doesn't sound so hard. It turns out that it was much more interesting then I first thought.
 , as the route size grows.
+
 ## What is Geospatial Data
 
 Geospatial data in its simplest form is information that describes a object on earth. It has two parts, one describes the "where" and the other describes the "what". The "where" part has information about the geometry of the object and its location, while the "what" part has information about the non-geometric properties/attributes of the object, which bring meaning to the objects.
@@ -105,7 +106,6 @@ Infact someone already defined Dicke Marie using geospatial data and added it to
 
 ### Geometry
 
-
 TODO: explain that a point, string, and polygon combined with a map projection are the building blocks of geo data.
 
 The primitive types of geometry are points, lines and polygons. The are the building blocks of geospatial data.
@@ -114,10 +114,9 @@ The
 
 TODO: explain what geospatial data is (a file representing real world objects on a globe using co-ordinates and metadata)
 
+## First things first what even is a river?
 
-## What is a river?
-
-A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities.
+A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. A river produces a natural boundary for the land it separates. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities.
 
 When working with geospatial data, it's important to distinguish between different types of watercourses based on their scale and characteristics. For example, major rivers like the Amazon or the Nile are considered distinct rivers at a global scale. However, when zooming in to a specific region, smaller watercourses such as streams, canals, and even ditches may also be identified as rivers.
 
@@ -131,7 +130,7 @@ TODO: explain about open street maps and how great it is to have a community res
 
 TODO: link to and explain the points from: https://wiki.openstreetmap.org/wiki/Waterways, explain about the tags used for waterways and properties of a OSM data type.
 
-TODO: explain about the difference between the [https://wiki.openstreetmap.org/wiki/Relation:waterway](https://wiki.openstreetmap.org/wiki/Relation:waterway) and 
+TODO: explain about the difference between the [https://wiki.openstreetmap.org/wiki/Relation:waterway](https://wiki.openstreetmap.org/wiki/Relation:waterway) and
 
 TODO: add examples of the different waterways
 
@@ -151,13 +150,13 @@ water=*
 
 TODO: explain what OSM is, in terms of a dataset, open data, community driven. Talk about contributions from users like wikipedia for maps. Talk about apps like street complete and how most mapping providers use OSM data.
 
-TODO: link to the OSM iceberg meme [https://www.openstreetmap.org/user/Xvtn/diary/403236](https://www.openstreetmap.org/user/Xvtn/diary/403236) and explainer 
+TODO: link to the OSM iceberg meme [https://www.openstreetmap.org/user/Xvtn/diary/403236](https://www.openstreetmap.org/user/Xvtn/diary/403236) and explainer
 
 ### OSM Elements
 
 TODO: explain about the different elements and how they map to the primative geometry types [https://wiki.openstreetmap.org/wiki/Elements](https://wiki.openstreetmap.org/wiki/Elements)
 
-### OSM tagging 
+### OSM tagging
 
 TODO: explain about OSM tagging [https://wiki.openstreetmap.org/wiki/Tags](https://wiki.openstreetmap.org/wiki/Tags)
 
@@ -177,22 +176,19 @@ The `turf.booleanIntersects()` implementation uses the [sweepline-intersections]
 
 $$ \mathcal{O}(n^2) $$
 
-
 {{< admonition type=tip open=true >}}
 That's a fancy way of saying as the input data gets big (number of waterways to check for intersections), the time is takes to compute gets realllllly big.
 {{< /admonition >}}
 
 The key to solving the problem involves keeping the input data "somewhat" small such that device doing the computation does not melt and crash.
 
-
 TODO: explain about the size of the OSM planet-files, and that they are rather large (currently over 60GB), and that a big part of solving this problem is filtering for as little data as possible before running the computations.
 
 ## Not all geo data files are created equally
 
-TODO: explain about differences between geodata formats and the tradeoff's different formats make. 
+TODO: explain about differences between geodata formats and the tradeoff's different formats make.
 
-### WKT 
-
+### WKT
 
 ### .gpx
 
@@ -257,16 +253,15 @@ TODO: link to https://wiki.openstreetmap.org/wiki/OSM_XML
 
 ### Why?
 
-By converting the OSM and route geographic data to geojson, I could use turf.js to do all spatial analytics in the js code, meaning the computing would be done client side and no backend would be required! Being in geojson format also means that it can be easily added to the map using [https://maplibre.org/maplibre-style-spec/sources/#geojson]()
+By converting the OSM and route geographic data to geojson, I could use turf.js to do all spatial analytics in the js code, meaning the computing would be done client side and no backend would be required! Being in geojson format also means that it can be easily added to the map using [https://maplibre.org/maplibre-style-spec/sources/#geojson](https://maplibre.org/maplibre-style-spec/sources/#geojson)
 
-### Ok enough theory, lets solve the problem.
+### Ok enough theory, lets solve the problem
 
 ## How to get the open data on rivers
 
 ### OpenStreetMaps (aka OSM)
 
 TODO: talk about the OSM data model elements https://wiki.openstreetmap.org/wiki/Elements and how they map to points, linestrings, polygons.
-
 
 ### OSM Overpass API
 
@@ -324,7 +319,7 @@ TODO: Link to and explain that even OSM are going to vector based maps this year
 
 ### Upload file
 
-### Creating a high quality user experience 
+### Creating a high quality user experience
 
 TODO: talk about being happy with the look and feel of maplibre, and reusing the css for displaying info.
 
@@ -337,11 +332,16 @@ TODO: talk about the code to make the upload and strava controller.
 ### Killer feature: Strava integration
 
 TODO: explain that while some people do, most people don't know what a .gpx file is and don'
-t have files laying stored on there local device. The typical cyclist/hiker would likely have activities on strava. Explain that you implemented a "connect with strava" button and wrote the code to fetch activities from strava and display them in a menu withing the app. Explain how this lets users circumvent  needing to know what a .gpx file or uploading anything and leads to a streamlined experiance for the user. 
+t have files laying stored on there local device. The typical cyclist/hiker would likely have activities on strava. Explain that you implemented a "connect with strava" button and wrote the code to fetch activities from strava and display them in a menu withing the app. Explain how this lets users circumvent  needing to know what a .gpx file or uploading anything and leads to a streamlined experiance for the user.
 
 ### Strava Oauth
 
-TODO: talk about the decision/impossible to avoid situation of adding a backend to implement strava oauth. Explain that it is needed to hide the client secret from being leaked. Explain how you keep it as lightweight as possible, and much could be improved.
+TODO: we want users to connect with strava and then request the activites data from Strava. talk about the decision/impossible to avoid situation of adding a backend to implement strava oauth. Explain that a backend is needed to hold the client secret and avoid it being in the front end and thus leaked into the world. Explain how you keep the backend as lightweight as possible using flask and point to the codein `src/auth.py`, and mention much could be improved.
+
+> All developers need to register their application before getting started. A registered application will be assigned a client ID and client secret. The secret is used for authentication and should never be shared.
+- https://developers.strava.com/docs/authentication/
+
+Putting the client secret in the frontend would compromise the security of the application.
 
 TODO: talk about using flask and cors, and serving it with waitress because security reasons.
 
@@ -458,8 +458,50 @@ fly secrets set STRAVA_API_CLIENT_SECRET=$STRAVA_API_CLIENT_SECRET
 fly secrets set STRAVA_REDIRECT_URI=$STRAVA_REDIRECT_URI
 fly deploy
 ```
-### Answering the community**: Sharing
 
+### Answering the community**: Make it easy to share the good stuff
+
+A beta-tester (you know who you are) gave me some feedback that he wanted to share the site with friends which gave me a few ideas:
+
+- Have the website preview displayed nicely when shared in a messaging app or on social media by using the [Open Graph protocol](https://ogp.me/)
+- Have a share-with-social-media* button.
+- Create a url link to a actual activity from a user which they could send to a mate to explore.
+  - Encode the a users activity into a string.
+  - Add it to a sharable link with a url parameter.
+  - Parse the route and decode it on the new client.
+  - maybe use polyline.
+
+#### What the OPG?
+
+> The Open Graph protocol enables any web page to become a rich object in a social graph**
+
+That sounds pretty good! Basically you can add some specific `<meta>` tags to the `<head>` of a website, and when you share a url in social-media/messaging apps will render the content and display a little preview.
+
+This was a easy one to implement after reading the spec on [https://ogp.me](https://ogp.me). I looked up the optimal image dimensions and according to *reasons* this was **1200px x 630px**. The result was added in the following code
+
+```html {linenos=table,hl_lines=["4-10"],linenostart=4}
+<head>
+  <title>Kreuzungen 🗺️</title>
+  <!-- Metadata -->
+  <meta property="og:title" content="Kreuzungen 🗺️" />
+  <meta property="og:description" content="Upload a GPX file and see which waterways were crossed." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://01100100.github.io/kreuzungen/" />
+  <meta property="og:image" content="https://01100100.github.io/kreuzungen/img/screenshot.jpg" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+```
+
+At first the image was not being displayed when I shared it via whatsapp, however a quick stackoverflowing later explained your WhatsApp will render images less than 300kb in size.
+
+Everything worked, the internet is magic sometimes!
+
+{{< admonition type=tip >}}
+https://opengraph.dev is a nice site to test out how the content is rendered on different platforms.
+{{< /admonition >}}
+
+###
 
 ---
 
@@ -479,7 +521,6 @@ https://www.openstreetmap.org/way/307632376#map=16/52.4725/13.4564
   <https://www.openstreetmap.org/way/307632376> is the polygon for the osm water body
   <https://www.openstreetmap.org/way/160175124> is the linestring for the osm waterway way
 
-
 ### Shout outs
 
 [https://www.paulnorman.ca/](https://www.paulnorman.ca/)
@@ -488,3 +529,14 @@ https://www.openstreetmap.org/way/307632376#map=16/52.4725/13.4564
 
 Use this lib for having gpx and osm stuff straight onto the map.
 [https://github.com/jimmyrocks/maplibre-gl-vector-text-protocol](https://github.com/jimmyrocks/maplibre-gl-vector-text-protocol)
+
+#### Known issues
+
+When asking OSM for ways and joining together ways with the same name, there might be some common name used for them both (), meaning there will be a .
+
+![](image-1.png)
+
+### TODO:
+
+[ ] - add diagrams https://hugodoit.pages.dev/create-diagrams/#complicated
+[ ] - add contents on the right hand side
