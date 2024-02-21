@@ -469,7 +469,6 @@ A beta-tester (you know who you are) gave me some feedback that he wanted to sha
   - Encode the a users activity into a string.
   - Add it to a sharable link with a url parameter.
   - Parse the route and decode it on the new client.
-  - maybe use polyline.
 
 #### What the OPG?
 
@@ -493,7 +492,7 @@ This was a easy one to implement after reading the spec on [https://ogp.me](http
 
 ```
 
-At first the image was not being displayed when I shared it via whatsapp, however a quick stackoverflowing later explained your WhatsApp will render images less than 300kb in size.
+At first the image was not being displayed when I shared it via whatsapp, however a [quick stackoverflowing](https://stackoverflow.com/a/39182227) explained WhatsApponly supports images less than 300kb in size.
 
 Everything worked, the internet is magic sometimes!
 
@@ -501,7 +500,9 @@ Everything worked, the internet is magic sometimes!
 https://opengraph.dev is a nice site to test out how the content is rendered on different platforms.
 {{< /admonition >}}
 
-###
+### Share button
+
+
 
 ---
 
@@ -533,6 +534,8 @@ Use this lib for having gpx and osm stuff straight onto the map.
 #### Known issues
 
 When asking OSM for ways and joining together ways with the same name, there might be some common name used for them both (), meaning there will be a .
+
+Sometimes the name fo the relation willbe different from the ways resulting in two unique objects.
 
 ![](image-1.png)
 
