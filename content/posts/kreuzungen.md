@@ -26,6 +26,9 @@ lightgallery: false
 license: ""
 ---
 <!--more-->
+{{< figure src="<https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Gaoliang_Bridge.JPG/512px-Gaoliang_Bridge.JPG>" title="Lighthouse (figure)" >}}
+
+<a title="Hennessy, CC BY-SA 1.0 &lt;https://creativecommons.org/licenses/by-sa/1.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Gaoliang_Bridge.JPG"><img width="512" alt="Gaoliang Bridge" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Gaoliang_Bridge.JPG/512px-Gaoliang_Bridge.JPG"></a>
 
 ## Naming
 
@@ -33,12 +36,13 @@ Kreuzungen is the German word for crossings.
 
 > [https://de.wiktionary.org/wiki/Kreuzung](https://de.wiktionary.org/wiki/Kreuzung)
 
-## Show me the good stuff
+## Show me the good stuff!
 
 {{< admonition type=example title="Check this out!" >}}
 
 [https://01100100.github.io/kreuzungen/](https://01100100.github.io/kreuzungen/)
 {{< /admonition >}}
+
 
 Repository [https://github.com/01100100/kreuzungen](https://github.com/01100100/kreuzungen)
 
@@ -60,7 +64,6 @@ I could wrap this all up in a little web app, that lets users upload a .gpx file
 
 As a geospatial data engineer, and a endurance cyclist, the problem doesn't sound so hard. It turns out that it was much more interesting then I first thought.
 , as the route size grows.
-
 ## What is Geospatial Data
 
 Geospatial data in its simplest form is information that describes a object on earth. It has two parts, one describes the "where" and the other describes the "what". The "where" part has information about the geometry of the object and its location, while the "what" part has information about the non-geometric properties/attributes of the object, which bring meaning to the objects.
@@ -106,6 +109,7 @@ Infact someone already defined Dicke Marie using geospatial data and added it to
 
 ### Geometry
 
+
 TODO: explain that a point, string, and polygon combined with a map projection are the building blocks of geo data.
 
 The primitive types of geometry are points, lines and polygons. The are the building blocks of geospatial data.
@@ -114,9 +118,12 @@ The
 
 TODO: explain what geospatial data is (a file representing real world objects on a globe using co-ordinates and metadata)
 
-## First things first what even is a river?
+TODO: talk about invalid geometries and problems around holes (https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule vs https://en.wikipedia.org/wiki/Nonzero-rule) ect... link to https://mapshaper.org
 
-A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. A river produces a natural boundary for the land it separates. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities.
+
+## What is a river?
+
+A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities.
 
 When working with geospatial data, it's important to distinguish between different types of watercourses based on their scale and characteristics. For example, major rivers like the Amazon or the Nile are considered distinct rivers at a global scale. However, when zooming in to a specific region, smaller watercourses such as streams, canals, and even ditches may also be identified as rivers.
 
@@ -130,7 +137,7 @@ TODO: explain about open street maps and how great it is to have a community res
 
 TODO: link to and explain the points from: https://wiki.openstreetmap.org/wiki/Waterways, explain about the tags used for waterways and properties of a OSM data type.
 
-TODO: explain about the difference between the [https://wiki.openstreetmap.org/wiki/Relation:waterway](https://wiki.openstreetmap.org/wiki/Relation:waterway) and
+TODO: explain about the difference between the [https://wiki.openstreetmap.org/wiki/Relation:waterway](https://wiki.openstreetmap.org/wiki/Relation:waterway) and 
 
 TODO: add examples of the different waterways
 
@@ -150,13 +157,13 @@ water=*
 
 TODO: explain what OSM is, in terms of a dataset, open data, community driven. Talk about contributions from users like wikipedia for maps. Talk about apps like street complete and how most mapping providers use OSM data.
 
-TODO: link to the OSM iceberg meme [https://www.openstreetmap.org/user/Xvtn/diary/403236](https://www.openstreetmap.org/user/Xvtn/diary/403236) and explainer
+TODO: link to the OSM iceberg meme [https://www.openstreetmap.org/user/Xvtn/diary/403236](https://www.openstreetmap.org/user/Xvtn/diary/403236) and explainer 
 
 ### OSM Elements
 
 TODO: explain about the different elements and how they map to the primative geometry types [https://wiki.openstreetmap.org/wiki/Elements](https://wiki.openstreetmap.org/wiki/Elements)
 
-### OSM tagging
+### OSM tagging 
 
 TODO: explain about OSM tagging [https://wiki.openstreetmap.org/wiki/Tags](https://wiki.openstreetmap.org/wiki/Tags)
 
@@ -176,19 +183,22 @@ The `turf.booleanIntersects()` implementation uses the [sweepline-intersections]
 
 $$ \mathcal{O}(n^2) $$
 
+
 {{< admonition type=tip open=true >}}
 That's a fancy way of saying as the input data gets big (number of waterways to check for intersections), the time is takes to compute gets realllllly big.
 {{< /admonition >}}
 
 The key to solving the problem involves keeping the input data "somewhat" small such that device doing the computation does not melt and crash.
 
+
 TODO: explain about the size of the OSM planet-files, and that they are rather large (currently over 60GB), and that a big part of solving this problem is filtering for as little data as possible before running the computations.
 
 ## Not all geo data files are created equally
 
-TODO: explain about differences between geodata formats and the tradeoff's different formats make.
+TODO: explain about differences between geodata formats and the tradeoff's different formats make. 
+TODO: include points about human readability, compression, metadata 
+### WKT 
 
-### WKT
 
 ### .gpx
 
@@ -249,13 +259,38 @@ TODO: add example openstreetmap code
 
 TODO: link to https://wiki.openstreetmap.org/wiki/OSM_XML
 
+### .parquet
+
+### Polyline
+
+https://developers.google.com/maps/documentation/utilities/polylinealgorithm
+
+https://www.twistedape.me.uk/2014/04/20/google-polyline-encoding/
+
+### ProtoMap tiles
+
+The new kid on the block.
+
+This is cutting edge stuff. New take on serving vector content involving classic comp sci and math concepts (range headers,). Includes some cool ideas from my fave space filling curve from German Mathmatician Mr Hillbert
+### Vector tiles
+
+> Compared to a tiled raster map, data transfer is also greatly reduced, as vector data is typically much smaller than a rendered bitmap. Also, styling can be applied later in the process, or even in the browser itself, allowing much greater flexibility in how data is presented. It is also easy to provide interactivity with map features, as their vector representation already exists within the client.[2] Yet another benefit is that less centralised server processing power is required, since rasterisation can be performed directly in the client. This has been described as making "rendering ... a last-mile problem, with fast, high-quality GPU[s] in everyone’s pocket".[3]
+
+https://en.wikipedia.org/wiki/Vector_tiles
+
+https://github.com/protomaps/PMTiles/blob/master/spec/v3/spec.md
+
+### Geoparquet
+
+TODO: link to https://geoparquet.org/
+
 ## Converting between the formats
 
 ### Why?
 
-By converting the OSM and route geographic data to geojson, I could use turf.js to do all spatial analytics in the js code, meaning the computing would be done client side and no backend would be required! Being in geojson format also means that it can be easily added to the map using [https://maplibre.org/maplibre-style-spec/sources/#geojson](https://maplibre.org/maplibre-style-spec/sources/#geojson)
+By converting the OSM and route geographic data to geojson, I could use turf.js to do all spatial analytics in the js code, meaning the computing would be done client side and no backend would be required! Being in geojson format also means that it can be easily added to the map using [https://maplibre.org/maplibre-style-spec/sources/#geojson]()
 
-### Ok enough theory, lets solve the problem
+### Ok enough theory, lets solve the problem.
 
 ## How to get the open data on rivers
 
@@ -263,17 +298,20 @@ By converting the OSM and route geographic data to geojson, I could use turf.js 
 
 TODO: talk about the OSM data model elements https://wiki.openstreetmap.org/wiki/Elements and how they map to points, linestrings, polygons.
 
+
 ### OSM Overpass API
 
 [http://overpass-api.de](http://overpass-api.de)
 
-We can use the Overpass Query langauge to search for OSM features in the proximity of a polyline [https://dev.overpass-api.de/overpass-doc/en/full_data/polygon.html](https://dev.overpass-api.de/overpass-doc/en/full_data/polygon.html).
+OpenStreetMap offer a read-only public API called the Overpass API, perfect for this project.
+
+Its possible to use the Overpass Query langauge to search for OSM features in the proximity of a polyline [https://dev.overpass-api.de/overpass-doc/en/full_data/polygon.html](https://dev.overpass-api.de/overpass-doc/en/full_data/polygon.html).
 
 This API reduces the problem to simply encoding the gpx file as a polyline, constructing a valid overpass query, and parsing the response.
 
 #### Overpass Turbo
 
-TODO: explain overpass turbo
+TODO: explain overpass turbo and how its useful for testing out queries.
 [https://overpass-turbo.eu/](https://overpass-turbo.eu/)
 
 TODO: explain the following query
@@ -311,15 +349,65 @@ eg)
 
 > Vector tiles represent a significant advancement in how map data is processed and presented. Unlike traditional raster tiles, which are static images with pixels, vector tiles are like the ‘SVGs’ of the mapping world: you get lines and points. This stores geodata in a format that allows for dynamic styling and interactivity, enabling the user to adapt the visual appearance of the map without altering the data. If that sounds like what you’ve seen on other maps, you are right! Vector tiles have become industry standard in interactive maps that, unlike openstreetmap.org, don’t get updated often, and where you can simply recalculate your whole database occasionally.
 
+> Background¶
+  What are raster tiles?¶
+
+  As we mentioned in the intro, map tiles can be broadly classified as either raster or vector. Raster tiles are the simplest to understand, as they are just PNG or JPG images that get stitched together in a grid, so we'll start here.
+  Advantages¶
+
+  Raster tiles have been around for a long time, and even today, they have a number of unique advantages.
+
+      Simplicity - Just about every device can render a PNG or JPG image, and it's very easy to build a performant renderer around these. Additionally, raster tiles don't require any other resources (such as fonts or icons) or special logic to render.
+      Specificity - Map tiles simplify a lot of data into a form that's useful for the user. If you are working with a minimalist map style (like our Alidade Smooth family), raster tiles can be more bandwidth efficient, as they only contain the raw visible pixels.
+
+  Limitations¶
+
+  While raster tiles are battle tested and supported pretty much everywhere, they also have some inherent limitations.
+
+  Inflexibility - You cannot change much about raster tiles. If you want to hide a certain layer, change the language of labels, or do just about anything else to alter the appearance of the tiles, you're out of luck.
+  Scalability - Raster map tiles cannot be scaled up and down, meaning you need to send 4x as many pixels over the network for your maps to look good on modern "high DPI" displays. This problem also shows up when zooming in to a raster map as the tiles become blurry until the new ones are loaded.
+
+  What are vector tiles?¶
+
+  Vector tiles are a newer development, and are broadly viewed as the future of digital interactive maps. Rather than pixels, vector tiles contain a mathematical description of the geometry as well as structured data about each feature on the map.
+  Advantages¶
+
+  Flexibility - Vector tiles aren't just raw pixels; the actual data is preserved in the tile. This means that you can seamlessly change the language of text labels, change the color scheme to suit your brand, or even switch styles dynamically based on the time of day or the user's device preferences. You can even completely change the camera angle for a 3D perspective.
+  Scalability - Since vector shapes are expressed in mathematical terms, they can be scaled up and down smoothly. For example, when the user zooms in, they'll get a smooth scale-in without any pixelation. This is especially relevant on mobile devices, where users are used to continuous zoom for most applications rather than discrete steps.
+  Cost - Many vendors, including Stadia Maps, charge per tile request. Switching to vector tiles can mean significant savings, as vector tiles cover a larger area. On average, we see users switching to vector making approximately 60% fewer tile requests.
+
+  A vector map showing a 3D perspective view of Midtown, Atlanta
+  Limitations¶
+
+  Complexity - While vector tiles provide a lot of flexibility, this comes at the cost of complexity. Tiles need to be rendered client-side, and this may create performance concerns for older or embedded applications. Additionally, since vector maps require additional resources to be present, the initial map load typically involves a greater number of network requests.
+  Size - For applications only requiring a low level of detail that don't utilize any of the 3D perspective features of vector tiles, the vector tiles can weigh a bit more. However, this is somewhat offset since all zooming past level 14 can use the information in the z14 tile.
+
+  Recap: Which should I use?¶
+
+  We've covered a lot of ground. To summarize, vector tiles offer greater flexibility, look great on any screen, and typically reduce costs by around 60%. However, if your application is targeting older devices or doesn't need a high level of detail (for example, our Alidade Smooth and Alidade Smooth Dark styles), raster tiles are not necessarily a bad option.
+
 TODO: include some history of webmaps.
+
+
+https://en.wikipedia.org/wiki/Web_mapping 
 
 TODO: talk about the tradeoffs between vector and raster maps, and explain why vector maps are the best for this project.
 
 TODO: Link to and explain that even OSM are going to vector based maps this year because they are so much better. [https://blog.openstreetmap.org/2024/02/11/2024-announcing-the-year-of-the-openstreetmap-vector-maps/](https://blog.openstreetmap.org/2024/02/11/2024-announcing-the-year-of-the-openstreetmap-vector-maps/)
 
+### Vector tile provider 
+
+TODO: talk about how it would be possible to generate these using open data and a machine, but it is not needed as there are many shops offering this product, in a way thats been optimally distibuted (CDN)
+
+eg) The complete OSM vector tile data set is >110gb https://data.maptiler.com/downloads/dataset/osm.
+
+https://wiki.openstreetmap.org/wiki/Vector_tiles#Providers
+
+TODO: Talk about maptiler and stadia maps both offering free tiers for serving vector map tiles. Maptiler give 100,000 requests per month for free. 
+
 ### Upload file
 
-### Creating a high quality user experience
+### Creating a high quality user experience 
 
 TODO: talk about being happy with the look and feel of maplibre, and reusing the css for displaying info.
 
@@ -332,7 +420,7 @@ TODO: talk about the code to make the upload and strava controller.
 ### Killer feature: Strava integration
 
 TODO: explain that while some people do, most people don't know what a .gpx file is and don'
-t have files laying stored on there local device. The typical cyclist/hiker would likely have activities on strava. Explain that you implemented a "connect with strava" button and wrote the code to fetch activities from strava and display them in a menu withing the app. Explain how this lets users circumvent  needing to know what a .gpx file or uploading anything and leads to a streamlined experiance for the user.
+t have files laying stored on there local device. The typical cyclist/hiker would likely have activities on strava. Explain that you implemented a "connect with strava" button and wrote the code to fetch activities from strava and display them in a menu withing the app. Explain how this lets users circumvent  needing to know what a .gpx file or uploading anything and leads to a streamlined experiance for the user. 
 
 ### Strava Oauth
 
@@ -461,7 +549,7 @@ fly deploy
 
 ### Answering the community**: Make it easy to share the good stuff
 
-A beta-tester (you know who you are) gave me some feedback that he wanted to share the site with friends which gave me a few ideas:
+A *beta-tester* (you know who you are) gave me some feedback that he wanted to share the site with friends which gave me a few ideas:
 
 - Have the website preview displayed nicely when shared in a messaging app or on social media by using the [Open Graph protocol](https://ogp.me/)
 - Have a share-with-social-media* button.
@@ -492,7 +580,7 @@ This was a easy one to implement after reading the spec on [https://ogp.me](http
 
 ```
 
-At first the image was not being displayed when I shared it via whatsapp, however a [quick stackoverflowing](https://stackoverflow.com/a/39182227) explained WhatsApponly supports images less than 300kb in size.
+At first the image was not being displayed when I shared it via whatsapp, however a [quick stackoverflowing](https://stackoverflow.com/a/39182227) explained WhatsApp only supports images less than 300kb in size.
 
 Everything worked, the internet is magic sometimes!
 
@@ -502,6 +590,210 @@ https://opengraph.dev is a nice site to test out how the content is rendered on 
 
 ### Share button
 
+> Thousands of candles can be lit from a single candle, And the life of the candle will not be shortened. Happiness never decreases by being shared. - The Buddha
+
+I wanted to have a nice and easy way for people to share the map, because happiness is good. to implement this I created another control with the well known [share icon](https://en.wikipedia.org/wiki/Share_icon).
+
+{{< admonition type=note>}}
+
+TODO: put in the many different share icons that people are used to... talk about standardizing this [share icon](https://en.wikipedia.org/wiki/Share_icon)
+
+{{</ admonition >}}
+
+When the control is clicked on, it should expand and show different options for quickly sharing on different platforms using as well as having a copy button that will copy the url to the clipboard.
+
+The clickingaround-test showed that the copy-to-clipboard didn't feel like it was working because there was no user feedback. To fix that I implemented a message to signify that the copy action has been done, it fades out after 0.5s.
+
+```js
+class ShareControl {
+      onAdd(map) {
+        this._map = map;
+        this._container = document.createElement('div');
+        this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+        this._container.style.margin = '0 10px'
+
+        const urlButton = document.createElement('button');
+        urlButton.id = 'urlButton'
+        urlButton.type = 'button';
+        urlButton.style.display = 'none'
+        urlButton.title = 'Copy url to clipboard';
+        urlButton.style.borderRadius = "4px";
+        urlButton.onclick = () => {
+          navigator.clipboard.writeText(shareableUrl)
+            .then(() => {
+              console.log('URL copied to clipboard: ' + shareableUrl);
+              const mapContainer = document.getElementById("map");
+              const messageContainer = document.createElement("div");
+              messageContainer.className = "url-copied-message";
+              const icon = document.createElement("i");
+              icon.className = "fa-solid fa-link";
+              const text = document.createTextNode("URL copied to clipboard.");
+              messageContainer.appendChild(icon);
+              messageContainer.appendChild(text);
+              mapContainer.appendChild(messageContainer);
+
+              // Fade out the message by setting opacity to 0
+              setTimeout(() => {
+                messageContainer.style.opacity = 0;
+                setTimeout(() => {
+                  mapContainer.removeChild(messageContainer);
+                }, 500); // Fade out for 500 milliseconds
+              }, 500); // Displayed solid for 500 milliseconds
+            })
+            .catch(err => {
+              console.error('Unable to copy URL to clipboard', err);
+            });
+        };
+
+        const urlIcon = document.createElement('i');
+        urlIcon.className = 'fa-solid fa-link';
+        urlButton.appendChild(urlIcon);
+
+        const emailButton = this.createShareButton('email', 'fa-solid fa-envelope');
+        emailButton.addEventListener('click', () => {
+          window.open(`mailto:?subject=Check out what has been crossed on my latest adventure!&amp;body=Check out this site ${shareableUrl}`, '_blank');
+        });
+        const whatsappButton = this.createShareButton('whatsapp', 'fa-brands fa-whatsapp');
+        whatsappButton.addEventListener('click', () => {
+          // https://faq.whatsapp.com/5913398998672934
+          if (isRouteDisplayed) {
+            var whatsappMessage = `Check out the waters I crossed on a recent adventure.. ${shareableUrl}`
+          } else { var whatsappMessage = `Check out this site for you recent adventures.. ${shareableUrl}` }
+          let whatsappShareLink = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`
+          window.open(whatsappShareLink, '_blank');
+        });
+        const facebookButton = this.createShareButton('facebook', 'fa-brands fa-facebook');
+        facebookButton.addEventListener('click', () => {
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareableUrlEncoded}`, '_blank');
+        });
+        const twitterButton = this.createShareButton('twitter', 'fa-brands fa-twitter');
+        // https://developer.twitter.com/en/docs/twitter-for-websites/tweet-button/guides/web-intent
+        twitterButton.addEventListener('click', () => {
+          if (isRouteDisplayed) {
+            var twitterMessage = `Check out the waters I crossed on a recent adventure..`
+          } else { var twitterMessage = `Check out this site for you recent adventures..` }
+          window.open(`https://twitter.com/intent/tweet?url=${shareableUrlEncoded}&text=${twitterMessage}`, '_blank');
+        });
+        this._container.appendChild(urlButton);
+        this._container.appendChild(emailButton);
+        this._container.appendChild(whatsappButton);
+        this._container.appendChild(facebookButton);
+        this._container.appendChild(twitterButton);
+
+        const shareButton = document.createElement('button');
+        shareButton.type = 'button';
+        shareButton.title = 'Share';
+        shareButton.style.borderRadius = "4px";
+        shareButton.onclick = () => {
+          if (isShareExpanded) { this.minimizeShareControl() } else { this.expandShareControl(); }
+        };
+
+        const shareIcon = document.createElement('i');
+        shareIcon.className = 'fa-solid fa-share-nodes'; // Assuming you are using FontAwesome for icons
+        shareButton.appendChild(shareIcon);
+
+        this._container.appendChild(shareButton);
+
+        return this._container;
+      }
+
+      createShareButton(id, faIcon) {
+        const button = document.createElement('button');
+        button.id = `${id}Button`
+        button.type = 'button';
+        button.style.display = 'none'
+        button.title = id;
+        button.style.borderRadius = "4px";
+        const icon = document.createElement('i');
+        icon.className = faIcon;
+        button.appendChild(icon);
+        return button;
+      }
+
+      minimizeShareControl() {
+        const urlButton = document.getElementById("urlButton");
+        urlButton.style.display = 'none';
+        const emailButton = document.getElementById("emailButton");
+        emailButton.style.display = 'none';
+        const whatsappButton = document.getElementById("whatsappButton");
+        whatsappButton.style.display = 'none';
+        const twitterButton = document.getElementById("twitterButton");
+        twitterButton.style.display = 'none';
+        const facebookButton = document.getElementById("facebookButton");
+        facebookButton.style.display = 'none';
+        isShareExpanded = false
+      }
+
+      expandShareControl() {
+        const urlButton = document.getElementById("urlButton");
+        urlButton.style.display = 'block';
+        const emailButton = document.getElementById("emailButton");
+        emailButton.style.display = 'block';
+        const whatsappButton = document.getElementById("whatsappButton");
+        whatsappButton.style.display = 'block';
+        const twitterButton = document.getElementById("twitterButton");
+        twitterButton.style.display = 'block';
+        const facebookButton = document.getElementById("facebookButton");
+        facebookButton.style.display = 'block';
+        isShareExpanded = true
+      }
+
+      onRemove() {
+        this._container.parentNode.removeChild(this._container);
+        this._map = undefined;
+      }
+    }
+```
+
+Going deeper
+
+### ✨ Route shared with magic link ✨
+
+I want to avoid adding a backend and having to deal with user data storage. So this must be done on the client side. The site so far is stateless, so the problem is simply how to share the route data from one user to another.
+
+One way is to enocde it and add it to the url parameters. The polyline format is a perfect choice for this for this, it enocodes a line, or more specifically a series of coordinates into a single string
+
+
+Let have a look at how the walk from Brandenburg Tor to the Reichstag would be encoded.
+```json
+{
+  "type": "LineString",
+  "coordinates": [
+    [
+      13.37749,
+      52.51626
+    ],
+    [
+      13.3772,
+      52.51624
+    ],
+    [
+      13.37703,
+      52.5164
+    ],
+    [
+      13.37651,
+      52.51638
+    ],
+    [
+      13.37674,
+      52.51664
+    ],
+    [
+      13.37442,
+      52.51769
+    ]
+  ]
+}
+```
+
+```text
+sap_IixspABx@_@`@BfBs@m@qEnM
+```
+
+That looks much better. This is almost good enough to be used in a url that someone could share through an app. To improve things a little I will avoid them messy characters 
+
+TODO: add codesandbox to let the reader play around.
 
 
 ---
@@ -521,6 +813,14 @@ https://www.openstreetmap.org/way/307632376#map=16/52.4725/13.4564
   ![Screen shot of river geometry intersection](image.png)
   <https://www.openstreetmap.org/way/307632376> is the polygon for the osm water body
   <https://www.openstreetmap.org/way/160175124> is the linestring for the osm waterway way
+
+
+### Speeding things up.
+
+I want this app to be as fast as possible. Everything feels better when there is a instant reaction, and in the modern "short-attention-span" age, it's kind of a given that things should work quickly and if not people assume something is broken.
+
+#### First things first, lets profile
+
 
 ### Shout outs
 
