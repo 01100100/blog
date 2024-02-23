@@ -26,47 +26,55 @@ lightgallery: false
 license: ""
 ---
 <!--more-->
-{{< figure src="<https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Gaoliang_Bridge.JPG/512px-Gaoliang_Bridge.JPG>" title="Lighthouse (figure)" >}}
 
-<a title="Hennessy, CC BY-SA 1.0 &lt;https://creativecommons.org/licenses/by-sa/1.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Gaoliang_Bridge.JPG"><img width="512" alt="Gaoliang Bridge" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Gaoliang_Bridge.JPG/512px-Gaoliang_Bridge.JPG"></a>
+{{< admonition type=abstract title="Revealing Kreuzungen 🗺️" >}}
+I recently made a website that reveals rivers and streams encountered on recent cycling or hiking adventures.
+{{% center %}}
+[https://01100100.github.io/kreuzungen](https://01100100.github.io/kreuzungen/index.html)
+{{% /center %}}
 
-## Naming
+The site is powered by OpenStreetMap data and open source technologies.
 
-Kreuzungen is the German word for crossings.
+All source code is available in this [github repository](https://github.com/01100100/kreuzungen)
 
-> [https://de.wiktionary.org/wiki/Kreuzung](https://de.wiktionary.org/wiki/Kreuzung)
+{{< /admonition >}}
 
-## Show me the good stuff!
+## Introduction
 
-{{< admonition type=example title="Check this out!" >}}
+Last year I embarked on a ride bike from a [geo-spatial-data-conference](spatial-data-science-conference.com) in London to my home in Berlin.
 
-[https://01100100.github.io/kreuzungen/](https://01100100.github.io/kreuzungen/)
+I relied on [Komoot](https://www.komoot.com) to plan, navigate and record my journey. I set my start point as my hotel in London and my end point as Berlin, with intermediate points being the international ferry ports of Harwich and Hook of Holland. I choose "Road cycling" as my preferred style of riding and hit the "Let's go" button. Life is easy! I am a big fan of the [Komoot](https://www.komoot.com) app and highly recommend it.
+
+During my multi-day ride, crossing various rivers, a thought struck me: "How many waterways have I crossed and what are their names?". Realizing that I had recorded data of the ride, had the great asset of open street maps at my fingertips, and the geo-spatial-data know how, I put a plan together... 
+
+I would develop a webapp that could be fed with the .gpx recording and then display a map with the journey, highlighting any crossed waterways.
+
+As a geospatial data engineer, and a lover of cycling in really remote places, the challenge doesn't sound so hard.
+
+Little did I know that this project this project would turn out to be much more interesting than first expected, just like the bike journey.
+
+{{< admonition type=tip title=Naming >}}
+The word "Kreuzungen" is German for "crossings"...
+
+{{% center %}}
+[https://de.wiktionary.org/wiki/Kreuzung](https://de.wiktionary.org/wiki/Kreuzung)
+{{% /center %}}
 {{< /admonition >}}
 
 
-Repository [https://github.com/01100100/kreuzungen](https://github.com/01100100/kreuzungen)
+## Geospatial Data 101
 
-## Preface
+Geospatial data, in its simplest form, refers to information that describes an object in space.
 
-Last year I rode my bike home (Berlin) from a [geo-spatial-data-conference](spatial-data-science-conference.com) in London.
+It consists of two parts: the "where" and the "what". The "where" part includes spatial information describing the geometry and location of an object, while the "what" part includes non-geometric properties/attributes that describe and give meaning to an object.
 
-I used [Komoot](https://www.komoot.com) to navigate and record my ride. Komoot is a great app that, among other things, allows you to super easily calculate a route between given points and adheres to your riding style preference. I set the start from my hotel in London, set the endpoint to Berlin (with intermediate points being the ferry ports of Harwich and Hook of Holland), choose "Road cycling" as my preferred style of riding and hit the "Let's go" button. Life is easy in 2023! Komoot offer a free version and a paid for premium version with many useful features including offline maps and weather forecasts. I am a big fan of this app and highly recommend it to all my friends.
+### Geometry
 
-The ride took a few days and let me think about the world. I crossed many rivers, which I paid little attention to which until a thought was triggered... "How cool would it be to have the statistics of how many rivers I crossed along the way... much like the stats you can see in a video game". Realizing that I was recording data of the ride, had the great asset of open street maps at my fingertips, and was in the geo-spatial-data tech bubble, I put a plan together.
+The spatial part of geospatial data is composed of different types of geometries. The three main types of geometries used in geospatial data are:
 
-The problem was to answer the question "Which rivers did I cross based on this .gpx file?"
-
-I would write a program that could be fed with the .gpx file created by Komoot and output the list of rivers that were crossed along the ride from London to Berlin.
-
-This program could easily be extended to give back a list of other landmarks I passed on my ride, all thanks to the free OSM data provided by the community (Thanks to everyone who contributed!!).
-
-I could wrap this all up in a little web app, that lets users upload a .gpx file, and displays the stats for landmarks passed as well as a map showing the route and higlighting the passed landmarks.
-
-As a geospatial data engineer, and a endurance cyclist, the problem doesn't sound so hard. It turns out that it was much more interesting then I first thought.
-, as the route size grows.
-## What is Geospatial Data
-
-Geospatial data in its simplest form is information that describes a object on earth. It has two parts, one describes the "where" and the other describes the "what". The "where" part has information about the geometry of the object and its location, while the "what" part has information about the non-geometric properties/attributes of the object, which bring meaning to the objects.
+- A Points: A point represents a specific location on the Earth's surface, defined by its latitude and longitude coordinates. It is often used to mark a specific spot, such as a landmark or a city.
+- A LineSting: A line is just a series of connected points that form a path. Eg. A road or a river.
+- A Polygon: A polygon is a closed shape formed by a series of vertices represented as connected points. It is used to represent areas like countries, cities, or lakes. Polygons are defined by a list of coordinates that outline their boundaries.
 
 ### Example: Dicke Marie
 
@@ -77,7 +85,7 @@ If you go into Tegel Forest in the east of Berlin, you might bump into the so ca
 <!-- https://commons.wikimedia.org/wiki/File:Dicke_Marie_01.jpg -->
 Let's imagine what the geospatial data would look like that describes this great tree...
 
-First we should define the location or the "where" of Dicke Marie. We could use words to do this, prehaps "North East of Berlin" or "about 300m south.." However we can do much better if we define with the position with a single set of co-ordinates `(52.5935770, 13.2649068)` locating the point where the centre of the tree trunk comes out of the ground. These numbers are much more powerful then the wordy descriptions. It fixes it to a set position in the world, and the numbers can be quickly and efficiently compared to other geospatial data types to answer questions like.. "How far is this point east of point x" "Does this point lie within polygon z?". Ohhh, I feel the power of this geospatial stuff.
+First we should define the location or the "where" of Dicke Marie. We could use words to do this, perhaps "North East of Berlin" or "about 300m south.." However we can do much better if we define with the position with a single set of co-ordinates `(52.5935770, 13.2649068)` locating the point where the centre of the tree trunk comes out of the ground. These numbers are much more powerful then the wordy descriptions. It fixes it to a set position in the world, and the numbers can be quickly and efficiently compared to other geospatial data types to answer questions like.. "How far is this point east of point x" "Does this point lie within polygon z?". Ohhh, I feel the power of this geospatial stuff.
 
 Now we can add some "what" properties describe Fat Marie. Perhaps we can add the properties `type=tree`, `name=Dicke Marie`, `species=Quercus robur` and `height=23` and maybe we could add a link to the wikipedia article `wikipedia=https://de.wikipedia.org/wiki/de:Dicke Marie`
 
@@ -103,7 +111,7 @@ As a geojson, the data could be written like this
 }
 ```
 
-Infact someone already defined Dicke Marie using geospatial data and added it to Open Street Maps
+In fact someone already defined Dicke Marie using geospatial data and added it to Open Street Maps
 
 [https://www.openstreetmap.org/node/205066401](https://www.openstreetmap.org/node/205066401)
 
@@ -114,8 +122,6 @@ TODO: explain that a point, string, and polygon combined with a map projection a
 
 The primitive types of geometry are points, lines and polygons. The are the building blocks of geospatial data.
 
-The
-
 TODO: explain what geospatial data is (a file representing real world objects on a globe using co-ordinates and metadata)
 
 TODO: talk about invalid geometries and problems around holes (https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule vs https://en.wikipedia.org/wiki/Nonzero-rule) ect... link to https://mapshaper.org
@@ -123,7 +129,7 @@ TODO: talk about invalid geometries and problems around holes (https://en.wikipe
 
 ## What is a river?
 
-A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities.
+A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities. 
 
 When working with geospatial data, it's important to distinguish between different types of watercourses based on their scale and characteristics. For example, major rivers like the Amazon or the Nile are considered distinct rivers at a global scale. However, when zooming in to a specific region, smaller watercourses such as streams, canals, and even ditches may also be identified as rivers.
 
@@ -197,6 +203,12 @@ TODO: explain about the size of the OSM planet-files, and that they are rather l
 
 TODO: explain about differences between geodata formats and the tradeoff's different formats make. 
 TODO: include points about human readability, compression, metadata 
+
+| datatype | Description |
+|:------:| -----------:|
+| data   | path to data files to supply the data that will be passed into templates. |
+| engine | engine to be used for processing templates. Handlebars is the default. |
+| ext    | extension to be used for dest files. |
 ### WKT 
 
 
@@ -594,7 +606,7 @@ https://opengraph.dev is a nice site to test out how the content is rendered on 
 
 I wanted to have a nice and easy way for people to share the map, because happiness is good. to implement this I created another control with the well known [share icon](https://en.wikipedia.org/wiki/Share_icon).
 
-{{< admonition type=note>}}
+{{< admonition type=note >}}
 
 TODO: put in the many different share icons that people are used to... talk about standardizing this [share icon](https://en.wikipedia.org/wiki/Share_icon)
 
@@ -753,7 +765,6 @@ I want to avoid adding a backend and having to deal with user data storage. So t
 
 One way is to enocde it and add it to the url parameters. The polyline format is a perfect choice for this for this, it enocodes a line, or more specifically a series of coordinates into a single string
 
-
 Let have a look at how the walk from Brandenburg Tor to the Reichstag would be encoded.
 ```json
 {
@@ -791,9 +802,36 @@ Let have a look at how the walk from Brandenburg Tor to the Reichstag would be e
 sap_IixspABx@_@`@BfBs@m@qEnM
 ```
 
-That looks much better. This is almost good enough to be used in a url that someone could share through an app. To improve things a little I will avoid them messy characters 
 
 TODO: add codesandbox to let the reader play around.
+
+That looks much better. This is almost good enough to be used in a url that someone could share through an app. To improve things a little I will avoid them pesky characters `backticks` that mess up the url displaying in whatsapp.
+
+Anytime a route is processed I update the `shareableUrl` variable with a `route` parameter equal to the encoded polyline.
+
+```js
+shareableUrl = `https://01100100.github.io/kreuzungen/index.html?route=${encodeURIComponent(polyline.fromGeoJSON(displayedRouteGeoJSON))}`
+```
+Then 
+```js
+if (urlParams.has('route')) {
+  var route = urlParams.get('route')
+  coordinates = polyline.decode(route);
+  geojson =  polyline.toGeoJSON(route)
+  geojson.properties = { "name":  "✨ Route shared with magic link ✨"};
+  // Ensure the map style is loaded before processing the route.
+  if (mapInstance.isStyleLoaded()) {
+      processGeojson(geojson);
+    } else {
+      mapInstance.once('style.load', () => {
+        processGeojson(geojson);
+      });
+    }
+}
+```
+
+### But how long can a url be?
+
 
 
 ---
