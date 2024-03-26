@@ -27,10 +27,11 @@ license: ""
 ---
 <!--more-->
 
-{{< admonition type=abstract title="Revealing Kreuzungen 🗺️" >}}
+{{< admonition type=abstract title="Introducing Kreuzungen 🗺️" >}}
 I recently made a website that reveals rivers and streams encountered on recent cycling or hiking adventures.
+![](/images/screenshot_frame.png)
 {{% center %}}
-[https://01100100.github.io/kreuzungen](https://01100100.github.io/kreuzungen/index.html)
+[https://kreuzungen.world](https://kreuzungen.world)
 {{% /center %}}
 
 The site is powered by OpenStreetMap data and open source technologies.
@@ -43,15 +44,29 @@ All source code is available in this [github repository](https://github.com/0110
 
 Last year I embarked on a ride bike from a [geo-spatial-data-conference](spatial-data-science-conference.com) in London to my home in Berlin.
 
-I relied on [Komoot](https://www.komoot.com) to plan, navigate and record my journey. I set my start point as my hotel in London and my end point as Berlin, with intermediate points being the international ferry ports of Harwich and Hook of Holland. I choose "Road cycling" as my preferred style of riding and hit the "Let's go" button. Life is easy! I am a big fan of the [Komoot](https://www.komoot.com) app and highly recommend it.
+I used [Komoot](https://www.komoot.com) to plan, navigate and record my journey. I set my start point to the Royal Albert hall in London and my end point to Brandenburg Tor in Berlin, with intermediate points being the international ferry ports of Harwich and Hook of Holland. I choose "Road cycling" as my preferred style of riding and hit the "Let's go" button. It was that easy! I am a huge fan of the [Komoot](https://www.komoot.com) app and highly recommend it.
 
-During my multi-day ride, crossing various rivers, a thought struck me: "How many waterways have I crossed and what are their names?". Realizing that I had recorded data of the ride, had the great asset of open street maps at my fingertips, and the geo-spatial-data know how, I put a plan together... 
+![Komoot Screenshot](/images/komoot_screenshot.png)
 
-I would develop a webapp that could be fed with the .gpx recording and then display a map with the journey, highlighting any crossed waterways.
+During my multi-day ride, crossing various rivers, a thought struck me:
 
-As a geospatial data engineer, and a lover of cycling in really remote places, the challenge doesn't sound so hard.
+{{% center %}}
+***How many waterways have I crossed and what are they called?***
+{{% /center %}}
 
-Little did I know that this project this project would turn out to be much more interesting than first expected, just like the bike journey.
+Realizing that I had recorded data of the ride, had the great asset of open street maps at my fingertips, and the geo-spatial-data know how, I put a plan together...
+
+{{< admonition type=tip title="The Plan" >}}
+
+{{% center %}}
+**To develop a tool that could be fed with a .gpx recording. It should list all the waterways crossed en route and display a map with the journey and highlight all crossed waterways.**
+
+{{% /center %}}
+{{< /admonition >}}
+
+As a geospatial data engineer, and a lover of long cycles in really remote places, this challenge doesn't sound too hard.
+
+Little did I know that this project would turn out to be much more interesting than first expected and lead me down many new roads, just like the bike journey.
 
 {{< admonition type=tip title=Naming >}}
 The word "Kreuzungen" is German for "crossings"...
@@ -61,7 +76,6 @@ The word "Kreuzungen" is German for "crossings"...
 {{% /center %}}
 {{< /admonition >}}
 
-
 ## Geospatial Data 101
 
 Geospatial data, in its simplest form, refers to information that describes an object in space.
@@ -70,22 +84,31 @@ It consists of two parts: the "where" and the "what". The "where" part includes 
 
 ### Geometry
 
-The spatial part of geospatial data is composed of different types of geometries. The three main types of geometries used in geospatial data are:
+The spatial part is composed of different types of geometries. The primitive types of geometry are points, lines and polygons. These are the building blocks of geospatial data, and out of them we can build some amazing things.
 
-- A Points: A point represents a specific location on the Earth's surface, defined by its latitude and longitude coordinates. It is often used to mark a specific spot, such as a landmark or a city.
-- A LineSting: A line is just a series of connected points that form a path. Eg. A road or a river.
-- A Polygon: A polygon is a closed shape formed by a series of vertices represented as connected points. It is used to represent areas like countries, cities, or lakes. Polygons are defined by a list of coordinates that outline their boundaries.
+- A Point: represents a specific location on the Earth's surface, defined by its latitude and longitude coordinates. It is often used to mark a point of interest, such as a atm, traffic light or water fountain.
+- A LineSting: represents a path made up of a ordered series of connected points. A hiking path, road or a river.
+- A Polygon: A polygon is a closed shape with the vertices defined by a ordered series of points. It is used to represent areas like countries, cities, or lakes. Polygons are defined by a list of coordinates that outline their boundaries.
 
-### Example: Dicke Marie
 
-If you go into Tegel Forest in the east of Berlin, you might bump into the so called "Fat Marie". This is the name given to a really old, award winning Oak tree, estimated to be over 800 years old.
+```goat
+                             *-----*
+    *    *---*-*            /       \ 
+                \          /         \
+                 *---*    *-----------*
+```
 
-<a title="Quaster64, CC BY-SA 4.0 &lt;https://creativecommons.org/licenses/by-sa/4.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Dicke_Marie_01.jpg"><img width="256" alt="Dicke Marie 01" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Dicke_Marie_01.jpg/256px-Dicke_Marie_01.jpg"></a>
+### An Example: Dicke Marie (Fat Mary)
 
-<!-- https://commons.wikimedia.org/wiki/File:Dicke_Marie_01.jpg -->
+If you go into Tegel Forest in the east of Berlin, you might bump into the so called "Fat Mary". This is the name given to a really old, award winning Oak tree, estimated to be over 800 years old.
+
+
+[https://berlindoodleblog.blogspot.com/2015/02/dicke-marie.html](https://berlindoodleblog.blogspot.com/2015/02/dicke-marie.html)
+
+![Dicke Marie](/images/dickemarie.jpg)
 Let's imagine what the geospatial data would look like that describes this great tree...
 
-First we should define the location or the "where" of Dicke Marie. We could use words to do this, perhaps "North East of Berlin" or "about 300m south.." However we can do much better if we define with the position with a single set of co-ordinates `(52.5935770, 13.2649068)` locating the point where the centre of the tree trunk comes out of the ground. These numbers are much more powerful then the wordy descriptions. It fixes it to a set position in the world, and the numbers can be quickly and efficiently compared to other geospatial data types to answer questions like.. "How far is this point east of point x" "Does this point lie within polygon z?". Ohhh, I feel the power of this geospatial stuff.
+First we should define the location or the "where" of Dicke Marie. We could use words to do this, perhaps "North East of Berlin", "" or "about 300m south of " However we can do much better if we define with the position with a single set of co-ordinates `(52.5935770, 13.2649068)` locating the point where the centre of the tree trunk comes out of the ground. These numbers are much more powerful then the wordy descriptions. It fixes it to a set position in the world, and the numbers can be quickly and efficiently compared to other geospatial data types to answer questions like.. "How far is this point east of point x" "Does this point lie within polygon z?". Ohhh, I feel the power of this geospatial stuff.
 
 Now we can add some "what" properties describe Fat Marie. Perhaps we can add the properties `type=tree`, `name=Dicke Marie`, `species=Quercus robur` and `height=23` and maybe we could add a link to the wikipedia article `wikipedia=https://de.wikipedia.org/wiki/de:Dicke Marie`
 
@@ -118,10 +141,6 @@ In fact someone already defined Dicke Marie using geospatial data and added it t
 ### Geometry
 
 
-TODO: explain that a point, string, and polygon combined with a map projection are the building blocks of geo data.
-
-The primitive types of geometry are points, lines and polygons. The are the building blocks of geospatial data.
-
 TODO: explain what geospatial data is (a file representing real world objects on a globe using co-ordinates and metadata)
 
 TODO: talk about invalid geometries and problems around holes (https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule vs https://en.wikipedia.org/wiki/Nonzero-rule) ect... link to https://mapshaper.org
@@ -130,6 +149,10 @@ TODO: talk about invalid geometries and problems around holes (https://en.wikipe
 ## What is a river?
 
 A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities. 
+
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/episode/2Azu2f93hikPGcwQJ876QK?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/episode/2Azu2f93hikPGcwQJ876QK?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 
 When working with geospatial data, it's important to distinguish between different types of watercourses based on their scale and characteristics. For example, major rivers like the Amazon or the Nile are considered distinct rivers at a global scale. However, when zooming in to a specific region, smaller watercourses such as streams, canals, and even ditches may also be identified as rivers.
 
@@ -284,6 +307,7 @@ https://www.twistedape.me.uk/2014/04/20/google-polyline-encoding/
 The new kid on the block.
 
 This is cutting edge stuff. New take on serving vector content involving classic comp sci and math concepts (range headers,). Includes some cool ideas from my fave space filling curve from German Mathmatician Mr Hillbert
+
 ### Vector tiles
 
 > Compared to a tiled raster map, data transfer is also greatly reduced, as vector data is typically much smaller than a rendered bitmap. Also, styling can be applied later in the process, or even in the browser itself, allowing much greater flexibility in how data is presented. It is also easy to provide interactivity with map features, as their vector representation already exists within the client.[2] Yet another benefit is that less centralised server processing power is required, since rasterisation can be performed directly in the client. This has been described as making "rendering ... a last-mile problem, with fast, high-quality GPU[s] in everyone’s pocket".[3]
@@ -291,6 +315,8 @@ This is cutting edge stuff. New take on serving vector content involving classic
 https://en.wikipedia.org/wiki/Vector_tiles
 
 https://github.com/protomaps/PMTiles/blob/master/spec/v3/spec.md
+
+There is a really good paper which benchmarks and compares the loading and interaction time of vector and raster basemaps [Performance Testing on Vector vs. Raster Map Tiles—Comparative Study on Load Metrics](https://www.mdpi.com/634908)
 
 ### Geoparquet
 
@@ -436,7 +462,7 @@ t have files laying stored on there local device. The typical cyclist/hiker woul
 
 ### Strava Oauth
 
-TODO: we want users to connect with strava and then request the activites data from Strava. talk about the decision/impossible to avoid situation of adding a backend to implement strava oauth. Explain that a backend is needed to hold the client secret and avoid it being in the front end and thus leaked into the world. Explain how you keep the backend as lightweight as possible using flask and point to the codein `src/auth.py`, and mention much could be improved.
+TODO: we want users to connect with strava and then request the activites data from Strava. give a brief explination of what a oauth flow is and  explain why it is impossible to avoid situation of adding a backend to implement strava oauth. Explain that a backend is needed to hold the client secret and avoid it being in the front end and thus leaked into the world. Explain the intention to keep the backend as lightweight as possible using flask and point to the codein `src/auth.py`, and mention much could be improved.
 
 > All developers need to register their application before getting started. A registered application will be assigned a client ID and client secret. The secret is used for authentication and should never be shared.
 - https://developers.strava.com/docs/authentication/
@@ -461,8 +487,6 @@ app = Flask(__name__)
 
 @app.after_request
 def after_request(response):
-    # TODO: restrict this to only the hosted origin.
-    # https://01100100.github.io/kreuzungen/index.html
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
     response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS")
@@ -561,7 +585,7 @@ fly deploy
 
 ### Answering the community**: Make it easy to share the good stuff
 
-A *beta-tester* (you know who you are) gave me some feedback that he wanted to share the site with friends which gave me a few ideas:
+A *early-beta-tester* (you know who you are) gave me some feedback that they would like to share the site with friends. This  which gave me a few ideas:
 
 - Have the website preview displayed nicely when shared in a messaging app or on social media by using the [Open Graph protocol](https://ogp.me/)
 - Have a share-with-social-media* button.
@@ -585,14 +609,14 @@ This was a easy one to implement after reading the spec on [https://ogp.me](http
   <meta property="og:title" content="Kreuzungen 🗺️" />
   <meta property="og:description" content="Upload a GPX file and see which waterways were crossed." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://01100100.github.io/kreuzungen/" />
-  <meta property="og:image" content="https://01100100.github.io/kreuzungen/img/screenshot.jpg" />
+  <meta property="og:url" content="https://kreuzungen.world/" />
+  <meta property="og:image" content="https://kreuzungen.world/img/screenshot.jpg" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 ```
 
-At first the image was not being displayed when I shared it via whatsapp, however a [quick stackoverflowing](https://stackoverflow.com/a/39182227) explained WhatsApp only supports images less than 300kb in size.
+At first the image was not being displayed when I shared it via whatsapp, however a [quick stackoverflowing](https://stackoverflow.com/a/39182227) explained WhatsApp only supports images less than 300kb in size so I added a compressed image.
 
 Everything worked, the internet is magic sometimes!
 
@@ -810,7 +834,7 @@ That looks much better. This is almost good enough to be used in a url that some
 Anytime a route is processed I update the `shareableUrl` variable with a `route` parameter equal to the encoded polyline.
 
 ```js
-shareableUrl = `https://01100100.github.io/kreuzungen/index.html?route=${encodeURIComponent(polyline.fromGeoJSON(displayedRouteGeoJSON))}`
+shareableUrl = `https://kreuzungen.world/index.html?route=${encodeURIComponent(polyline.fromGeoJSON(displayedRouteGeoJSON))}`
 ```
 Then 
 ```js
@@ -859,6 +883,61 @@ I want this app to be as fast as possible. Everything feels better when there is
 
 #### First things first, lets profile
 
+## Build it and they will come, right?
+
+Ok so the app is built, and it's working. The next step is to share it with the world, and ensure that people can find it when they are looking for it.
+
+### Memorable domain name
+
+I already settled on the name Kreuzungen. It's a German word that means "crossings" or "intersections". It's subjectively short, easy to remember, and it's meaning  is used in the context of the app.
+
+To no surprise, the domain kreuzungen.com was already taken and a short call to the owner assured me that it was not up for sale, ces't la internet.
+
+I looked at what other top level domains were not taken, and although there was not `.en` top level domain so that I could do the cool thing where the fully qualified domain is the world (like `bit.ly`, `redd.it`) I saw that **`krezungen.world`** was available. I liked the way it sounded, so I bought it.
+
+### DNS
+
+Setting up github pages with my new shiny domain was pretty easy. I followed the [docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) and configured my DNS with some A records pointing to github servers.
+
+After waiting a few mins, I checked that the records had propagated through the network.
+
+```bash
+➜  ~ dig kreuzungen.world +noall +answer -t A
+kreuzungen.world.	195	IN	A	185.199.109.153
+kreuzungen.world.	195	IN	A	185.199.110.153
+kreuzungen.world.	195	IN	A	185.199.108.153
+kreuzungen.world.	195	IN	A	185.199.111.153
+```
+
+Then I updated the github repo with the custom domain and all seemed good.
+
+![Github notification saying "Your site is live at https://kreuzungen.world/"](/images/github_pages_custom_domain.png)
+
+A last sanity check with the browser showed that [https://kreuzungen.world](https://kreuzungen.world) was live!
+
+### SEO
+
+I am no SEO expert, and everything I implement was based on a few google searches, if any SEO pro's are reading and have some tips, I would love to hear them.
+
+#### Google
+
+It is 2024 and people google things, that is a fact of life and if I want people to be able to find my site, I need to make sure it is displayed on google. Therefore I need to get google to crawl and index it!
+
+{{< admonition type=tip title="Google 101" >}}
+Generally, google finds all website and will automatically index them, but this can take time
+
+There are a few things you can do to speed up the process.
+{{< /admonition >}}
+
+#### Crawl first before you walk
+
+I added the site to the [google search console](https://search.google.com/search-console/about) and verified that I was the owner of the domain by adding a TXT record to my DNS.
+
+TODO: add a screen shot of it on google.
+
+#### Description
+
+TODO: talk about how you imrpoved the description/snippet [https://developers.google.com/search/docs/appearance/snippet](https://developers.google.com/search/docs/appearance/snippet)
 
 ### Shout outs
 
