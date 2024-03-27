@@ -338,7 +338,88 @@ All source code is available in this [github repository](https://github.com/0110
 | StadiaMaps - Stamen Watercolor | 709.0999999996275 |
 | StadiaMaps - OSM Bright | 2848.9000000003725 |
 
-TODO: add a graph
+{{< echarts >}}
+{
+  "dataset": [
+    {
+      "dimensions": ["style", "time"],
+      "source": [
+        [2692, "MapTiler - backdrop"],
+        [2324, "MapTiler - basic"],
+        [3005, "Maptiler - bright"],
+        [1702, "Maptiler - dataviz"],
+        [4513, "Maptiler - landscape"],
+        [3679, "Maptiler - ocean"],
+        [2954, "Maptiler - openstreetmap"],
+        [4030, "Maptiler - outdoor"],
+        [2368, "Maptiler - satellite"],
+        [2694, "Maptiler - streets"],
+        [2156, "Maptiler - toner"],
+        [4629, "Maptiler - topo"],
+        [5827, "Maptiler - winter"],
+        [2181, "StadiaMaps - Alidade Smooth"],
+        [3169, "StadiaMaps - Alidade Smooth Dark"],
+        [2990, "StadiaMaps - Stadia Outdoors"],
+        [2573, "StadiaMaps - Stamen Toner"],
+        [5670, "StadiaMaps - Stamen Terrain"],
+        [709, "StadiaMaps - Stamen Watercolor"],
+        [2848, "StadiaMaps - OSM Bright"]
+      ]
+    },
+    {
+      "transform": {
+        "type": "sort",
+        "config": { "dimension": "style", "order": "desc" }
+      }
+    }
+  ],
+  "xAxis": {
+    "name": "loading time (ms)",
+    "nameLocation": "center",
+    "nameGap": 30,
+    "type": "value",
+    "max": 8000,
+    "splitNumber": 8
+  },
+  "yAxis": {
+    "type": "category",
+    "show": true,
+    "axisTick": {
+      "show": false
+    }
+  },
+  "series": {
+    "type": "bar",
+    "encode": { "x": "style", "y": "time" },
+    "datasetIndex": 1,
+    "label": {
+          "show": true,
+          "precision": 1,
+          "position": "right",
+          "valueAnimation": true,
+          "fontFamily": "monospace",
+          "formatter": "{b}"
+    }
+  },
+  "grid": {
+    "left": "1%",
+    "right": "1%",
+    "bottom": "10%",
+    "top": "0%"
+  },
+  "visualMap": {
+    "show": false,
+    "min": 1000,
+    "max": 5000,
+    "dimension": 0,
+    "inRange": {
+      "color": ["#65B581", "#FFCE34", "#FD665F"]
+    }
+  },
+  "tooltip": {
+  }
+}
+{{< /echarts >}}
 
 ## Conclusion
 
