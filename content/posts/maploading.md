@@ -27,7 +27,7 @@ license: ""
 <!--more-->
 ## Introduction
 
-When using a map on a digital device, it is important that it is fast to load and that the interactions are seamless. A fast loading map will go by unnoticed as "everything works" leading to a natural feeling experience. A slow loading map will get in the way of a good user experience, leading to frustration, grief and a bad taste in the mouth.
+When using a map on a digital device, it is important that it is fast to load and the map interactions are seamlessly smooth. A fast loading map will go by unnoticed as "everything works" leading to a natural feeling experience. A slow loading map will get in the way of a good user experience, leading to frustration, grief and a bad taste in the mouth.
 
 ![GIF of a slow loading map](/images/maploading/slowloading.gif)
 
@@ -35,9 +35,9 @@ Vector maps are being used more and more on the web. They offer a faster and mor
 
 {{< admonition type=question title="What is a vector map?" >}}
 
-Vector maps use vector data, made up of points, lines and polygons with accompanying meta-data. Vector data is downloaded to the device and the map you end up seeing on the screen, is as a result of rendering on the client side and styling instructions.
+Vector maps use vector data, made up of points, lines and polygons with accompanying meta-data. This is downloaded to the device and the map you end up seeing on the screen, is as a result of rendering on the client side and certain styling instructions.
 
-Vector maps are the opposite of raster maps, which are made up of pixel data already rendered on a server. Raster maps are harder to manipulate and style.
+Vector maps are the opposite of raster maps, which are made up of pixel data pre-rendered on a server. Raster maps are harder to manipulate and style.
 
 The best resource out there to to have a refresh on web maps is [mapschool.io](https://mapschool.io/). It explains the difference between raster and vector maps and much more.
 
@@ -47,17 +47,17 @@ I am using [`maplibre-gl`](https://maplibre.org/maplibre-gl-js/docs/), which is 
 
 ### Map drawing 101
 
-A vector map library needs a recipe to draw a map on the screen. The recipe will have instructions telling the mapping library **where to request** the vector data from and **how to render** that data to the screen. Rendering instructions include what parts of the data to draw, what colors to use and what order to draw the layers of data in.
+A vector map library needs a _recipe_ to draw a map on the screen. The _recipe_ will have instructions telling the mapping library **where to request** the vector data from and **how to render** that data to the screen. Rendering instructions include what parts of the data to draw, what colors to use and what order to draw the layers of data in.
 
-When you pan and zoom to a specific part of a vector map, the library will know based on this recipe, where to request the body of data that should fill up the screen and how to style it.
+When you pan and zoom to a specific part of a vector map, the library will know based on this _recipe_, where to request the body of data that should fill up the screen and how to style it.
 
 {{< admonition type=tip title="What else is it called?" >}}
 
-This recipe is often called a `style` document, which is usually a json file conforming to a specification (in my case the [Maplibre style spec](https://maplibre.org/maplibre-style-spec/)).
+This _recipe_ is often called a `style` document, which is usually a json file conforming to a specification (in my case the [Maplibre style spec](https://maplibre.org/maplibre-style-spec/)).
 
 {{</admonition >}}
 
-A good designer aka a cartograpaher, will design this style in a way that it shows off the best parts of the data with certain balance of space and color, producing something that looks appalling and allows easy reading of the data.
+A good designer aka a cartograpaher, will design a style in a way that it shows off the best parts of the data with certain balance of space and color, producing something that looks appealing and allows easy reading of the data.
 
 ![A artist painting a map](/images/maploading/painting_map.jpeg)
 
@@ -69,13 +69,15 @@ It makes sense that a style that is simple and requests a little data from somew
 
 #### A Peek inside a Style document
 
-Here is a taste of a style à la MapTiler Basic (note: I have omitted some parts for brevity)
+Here is a taste of a style à la MapTiler Basic Light**
+
+(note: I have omitted most parts to simplify the example)
 
 ```json
 {
   "version": 8,
   "id": "basic",
-  "name": "Basic",
+  "name": "Basic Light**",
   "sources": {
     "openmaptiles": {
       "url": "https://api.maptiler.com/tiles/v3/tiles.json?key={YOUR_API_KEY}",
@@ -137,17 +139,20 @@ Here is a taste of a style à la MapTiler Basic (note: I have omitted some parts
 }
 ```
 
-It is a simple style that shows the basic features of a map. It has a background color, grass and wood areas, water, buildings and some text.
+It a very simple style that only shows a few of the features you would expect of a map. It has a background color, grass and wood areas, water, buildings and some text.
 
 There are two sources of data, one for the map data and one for the attribution. This informs the library where to request data from the tile server with address `https://api.maptiler.com/tiles/v3/tiles.json?key={YOUR_API_KEY}`.
 
-The layers key is where the rendering instructions are. Each layer has an id, a type, a source (in our case it is always the `openmaptiles` source explained above) and some paint instructions. 
+The layers key is where the rendering instructions are. Each layer has an id, a type, a source (in our case it is always the single `openmaptiles` source) and some paint instructions.
 
-Some of these paint instructions can get quite complex, like the water layer which has a filter to only show water that is not intermittent or a tunnel. Other things that can be controlled are the size lines, opacity of fills and the font of the text.
+
+The background gets loaded, polygons of grass gets drawn with a opaque green, water gets drawn in blue, but not when it goes through a tunnel, building footprints rise up.
+
+Paint instructions can get quite complex, and contain many conditional rules and transformations. Things that can be controlled are the size lines, opacity of fills and the font of the text.
 
 {{< admonition type=info title="The combination of vector and raster" >}}
 
-Vector maps can also contain raster data. This is data that is pre-rendered and is ready to be drawn on the screen. This is useful for things like satellite imagery, where the data is too complex to be drawn on the fly.
+Vector maps can also contain raster data layers. The raster data is delivered pre-rendered and is ready to be drawn on the screen. This is useful for things like satellite imagery, where the data is too complex to be drawn on the fly.
 
 {{< /admonition >}}
 
@@ -460,7 +465,7 @@ All code is available in the [mapStyleProfile github repository](https://github.
 
 Now there are some numbers to quantify the different map styles speed.
 
-Remember speed isn't everything, and a good map experience is a combination of many things. A fast loading map is just one part of the puzzle and compromises may have to be made to get the best overall experience.
+Remember speed isn't everything, and a good map experience is a combination of many things. A fast loading map is just one part of the puzzle, along with space and color, compromises may have to be made to get the best overall experience.
 
 ## Don't just take my word for it, test styles out yourself online now!
 
@@ -484,11 +489,7 @@ This was a simple experiment to get some numbers on the different map styles, on
 
 There are a few things that could be done to improve the experiment:
 
-
 - [ ] Add more styles from different providers to get a better idea of the landscape.
-
 - [ ] Profile the different parts of the map loading process to break down ingload time
-
 - [ ] Add more "real world" interactions to the experiment and see how the  styles perform under different conditions.
-
 - [ ] Set up a github action to run the experiment on pull requests and provided a central place to see the results.
