@@ -436,28 +436,29 @@ All code is available in the [mapStyleProfile github repository](https://github.
 {{< /echarts >}}
 
 {{< admonition type=abstract title="The Results Table" open=false >}}
-| Provider - Style   | Time to load (ms) |
-| ------------------ | ------------ |
-| MapTiler - Backdrop | 2692 |
-| MapTiler - Basic | 2324 |
-| Maptiler - Bright | 3005 |
-| Maptiler - Dataviz | 1702 |
-| Maptiler - Landscape | 4513 |
-| Maptiler - Ocean | 3679 |
-| Maptiler - OpenStreetMap | 2954 |
-| Maptiler - Outdoor | 4030 |
-| Maptiler - Satellite | 2368 |
-| Maptiler - Streets | 2694 |
-| Maptiler - Toner | 2156 |
-| Maptiler - Topo | 4629 |
-| Maptiler - Winter | 5827 |
-| StadiaMaps - Alidade Smooth | 2181 |
-| StadiaMaps - Alidade Smooth Dark | 3169 |
-| StadiaMaps - Stadia Outdoors | 2990 |
-| StadiaMaps - Stamen Toner | 2573 |
-| StadiaMaps - Stamen Terrain | 5670 |
-| StadiaMaps - Stamen Watercolor | 709 |
-| StadiaMaps - OSM Bright | 2848 |
+
+| Provider - Style                 | Time to load (ms) |
+|----------------------------------|-------------------|
+| StadiaMaps - Stamen Watercolor   | 709               |
+| Maptiler - Dataviz               | 1702              |
+| Maptiler - Toner                 | 2156              |
+| StadiaMaps - Alidade Smooth      | 2181              |
+| MapTiler - Basic                 | 2324              |
+| Maptiler - Satellite             | 2368              |
+| StadiaMaps - Stamen Toner        | 2573              |
+| MapTiler - Backdrop              | 2692              |
+| Maptiler - Streets               | 2694              |
+| StadiaMaps - OSM Bright          | 2848              |
+| Maptiler - OpenStreetMap         | 2954              |
+| StadiaMaps - Stadia Outdoors     | 2990              |
+| Maptiler - Bright                | 3005              |
+| StadiaMaps - Alidade Smooth Dark | 3169              |
+| Maptiler - Ocean                 | 3679              |
+| Maptiler - Outdoor               | 4030              |
+| Maptiler - Landscape             | 4513              |
+| Maptiler - Topo                  | 4629              |
+| StadiaMaps - Stamen Terrain      | 5670              |
+| Maptiler - Winter                | 5827              |
 
 {{< /admonition >}}
 
