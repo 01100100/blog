@@ -182,7 +182,7 @@ There are many different places to get vector map styles. Providers offer them. 
 
 Different providers offer different styles and it is not always clear which one is the fastest, the Usain Bolt of map styles.
 
-It is also possible to write a custom style, and there are many tools out there that can help you. Maplibre-gl has a [style spec](https://github.com/maplibre/maplibre-style-spec) that you can use to write your own style. MapTiler has a [online style editor](https://cloud.maptiler.com/maps/editor) that you can use to create your own style.
+It is also possible to write a custom style, and there are many tools out there that can help you. Maplibre-gl has a [style spec](https://github.com/maplibre/maplibre-style-spec) that you can use to write your own style. MapTiler has a [online style editor](https://www.maptiler.com/cloud/customize/) that you can use to create your own style.
 
 ## The Experiment
 
