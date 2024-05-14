@@ -29,7 +29,7 @@ license: ""
 
 {{< admonition type=abstract title="Introducing Kreuzungen 🗺️" >}}
 I recently made a website that reveals rivers and streams encountered on recent cycling or hiking adventures.
-![](/images/screenshot_frame.png)
+![Screenshot of https://kreuzungen.world](/images/screenshot_frame.png)
 {{% center %}}
 [https://kreuzungen.world](https://kreuzungen.world)
 {{% /center %}}
@@ -42,7 +42,7 @@ All source code is available in this [github repository](https://github.com/0110
 
 ## Introduction
 
-Last year I embarked on a ride bike from a [geo-spatial-data-conference](spatial-data-science-conference.com) in London to my home in Berlin.
+Last year I embarked on a bike ride from a [geo-spatial-data-conference](spatial-data-science-conference.com) in London to my home in Berlin.
 
 I used [Komoot](https://www.komoot.com) to plan, navigate and record my journey. I set my start point to the Royal Albert hall in London and my end point to Brandenburg Tor in Berlin, with intermediate points being the international ferry ports of Harwich and Hook of Holland. I choose "Road cycling" as my preferred style of riding and hit the "Let's go" button. It was that easy! I am a huge fan of the [Komoot](https://www.komoot.com) app and highly recommend it.
 
@@ -66,10 +66,10 @@ Realizing that I had recorded data of the ride, had the great asset of open stre
 
 As a geospatial data engineer, and a lover of long cycles in really remote places, this challenge doesn't sound too hard.
 
-Little did I know that this project would turn out to be much more interesting than first expected and lead me down many new roads, just like the bike journey.
+Little did I know that this project would turn out to be much more interesting than first expected, just like the bike journey. I just started and didn't know where it would take me but simply started out in a single direction, and looking back I am quite chuffed with how far I have come and what I have achieved.
 
-{{< admonition type=tip title=Naming >}}
-The word "Kreuzungen" is German for "crossings"...
+{{< admonition type=info title=Naming >}}
+The word "Kreuzungen" is German for "crossings" or "intersections"...
 
 {{% center %}}
 [https://de.wiktionary.org/wiki/Kreuzung](https://de.wiktionary.org/wiki/Kreuzung)
@@ -90,7 +90,6 @@ The spatial part is composed of different types of geometries. The primitive typ
 - A LineSting: represents a path made up of a ordered series of connected points. A hiking path, road or a river.
 - A Polygon: A polygon is a closed shape with the vertices defined by a ordered series of points. It is used to represent areas like countries, cities, or lakes. Polygons are defined by a list of coordinates that outline their boundaries.
 
-
 ```goat
                              *-----*
     *    *---*-*            /       \ 
@@ -98,19 +97,30 @@ The spatial part is composed of different types of geometries. The primitive typ
                  *---*    *-----------*
 ```
 
+**Any geometry combined with non-geometric properties is a geometric feature.**
+
+TODO: explain about multi line strings and feature collections
+
 ### An Example: Dicke Marie (Fat Mary)
 
 If you go into Tegel Forest in the east of Berlin, you might bump into the so called "Fat Mary". This is the name given to a really old, award winning Oak tree, estimated to be over 800 years old.
-
 
 [https://berlindoodleblog.blogspot.com/2015/02/dicke-marie.html](https://berlindoodleblog.blogspot.com/2015/02/dicke-marie.html)
 
 ![Dicke Marie](/images/dickemarie.jpg)
 Let's imagine what the geospatial data would look like that describes this great tree...
 
-First we should define the location or the "where" of Dicke Marie. We could use words to do this, perhaps "North East of Berlin", "" or "about 300m south of " However we can do much better if we define with the position with a single set of co-ordinates `(52.5935770, 13.2649068)` locating the point where the centre of the tree trunk comes out of the ground. These numbers are much more powerful then the wordy descriptions. It fixes it to a set position in the world, and the numbers can be quickly and efficiently compared to other geospatial data types to answer questions like.. "How far is this point east of point x" "Does this point lie within polygon z?". Ohhh, I feel the power of this geospatial stuff.
+First we should define the location or the "where" of Dicke Marie. We could use words to do this, perhaps "North East of Berlin", "In Tegel" or "about 300m south of Tegel Schloss" However we can do much better if we define with the position with a single set of co-ordinates `(52.5935770, 13.2649068)` locating the point where the centre of the tree trunk comes out of the ground. These numbers are much more powerful then the wordy descriptions. It fixes it to a set position on a grid of the world, and the numeric values can be quickly and efficiently compared to other geospatial data types to answer questions like.. "How far is this point east of point x" "Does this point lie within polygon z?". Ohhh, I feel the power of this geospatial stuff.
 
-Now we can add some "what" properties describe Fat Marie. Perhaps we can add the properties `type=tree`, `name=Dicke Marie`, `species=Quercus robur` and `height=23` and maybe we could add a link to the wikipedia article `wikipedia=https://de.wikipedia.org/wiki/de:Dicke Marie`
+Now we can add some "what" properties describe Fat Marie. Perhaps we can add the following properties:
+
+| Property | Value |
+|----------|-------|
+| type     | tree  |
+| name     | Dicke Marie |
+| species  | Quercus robur |
+| height   | 23    |
+| wikipedia | [https://de.wikipedia.org/wiki/de:Dicke_Marie](https://de.wikipedia.org/wiki/de:Dicke_Marie) |
 
 As a geojson, the data could be written like this
 
@@ -138,65 +148,238 @@ In fact someone already defined Dicke Marie using geospatial data and added it t
 
 [https://www.openstreetmap.org/node/205066401](https://www.openstreetmap.org/node/205066401)
 
-### Geometry
-
-
-TODO: explain what geospatial data is (a file representing real world objects on a globe using co-ordinates and metadata)
-
-TODO: talk about invalid geometries and problems around holes (https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule vs https://en.wikipedia.org/wiki/Nonzero-rule) ect... link to https://mapshaper.org
-
+<!-- TODO: add a map with a symbol for Dicke Marie and properties when you click it -->
+<!-- <iframe width="425" height="350" src="https://www.openstreetmap.org/export/embed.html?bbox=13.261943757534029%2C52.59276736525819%2C13.267200887203218%2C52.59438693697444&amp;layer=mapnik" style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/#map=19/52.59358/13.26457">View Larger Map</a></small> -->
 
 ## What is a river?
 
-A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities. 
+The big question. A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities. There is a hour long podcast that dives into this in more depth.
 
 <iframe style="border-radius:12px" src="https://open.spotify.com/embed/episode/2Azu2f93hikPGcwQJ876QK?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/episode/2Azu2f93hikPGcwQJ876QK?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+This a very interesting question to think about, but actually it doesn't mater for this project. A better question would be "Where to get the river data from?"
 
-When working with geospatial data, it's important to distinguish between different types of watercourses based on their scale and characteristics. For example, major rivers like the Amazon or the Nile are considered distinct rivers at a global scale. However, when zooming in to a specific region, smaller watercourses such as streams, canals, and even ditches may also be identified as rivers.
+## OpenStreetMap
 
-The level of precision and detail required for identifying rivers depends on the context and purpose. In the case of a long-distance cycling route from London to Berlin, the focus may be on major rivers rather than smaller waterways. However, for a hike around a small town, even tiny streams or ditches could be of interest.
+![OpenStreetMap logo](/images/oslogo.svg.png)
+TODO: link to OSM iceberg meme
 
-TODO: explain what a real world river is and how its different from a stream, and how as your mental geographical model "zoom out" you don't need so much precision with the smaller waterways. Eg when you thinking of a route the whole way across england, you probably don't care for all the tiny streams and ditches you went over, but in contrast if you do a hike around a small town, you might be interested in each of the tiny streams you went over.
+[OpenStreetMap](https://www.openstreetmap.org/) (OSM) is an incredible resource, akin to the Wikipedia of maps. It's a collaborative project where a community of mappers from around the world contribute to creating a free and editable map of the world. This was not possible 25 years ago, and the existence of such a resource today is a testament to the power of community and open source efforts.
 
-### Where to get the river data from?
+The data is freely available under an open license, and it's maintained and updated by volunteers. This means that the data is constantly being updated, reflecting changes in the real world.
 
-TODO: explain about open street maps and how great it is to have a community resource and that this was not available 25 years ago. Explain how a waterway relation is available for all main rivers from contributors, explain the problem about getting the smaller waterways, and querying osm for ways as well as relations.
+Everyone can make use of this data and create applications scaling to cover the whole world. OSM already powers many of the maps you see on the web today.
 
-TODO: link to and explain the points from: https://wiki.openstreetmap.org/wiki/Waterways, explain about the tags used for waterways and properties of a OSM data type.
+{{< admonition type=info title="Street Complete" >}}
 
-TODO: explain about the difference between the [https://wiki.openstreetmap.org/wiki/Relation:waterway](https://wiki.openstreetmap.org/wiki/Relation:waterway) and 
+[StreetComplete](https://streetcomplete.app) is an Android app that allows users to easily edit and improve OpenStreetMap data without any specific knowledge of OSM tagging schemes. It asks simple questions and uses the answers to directly edit the map. It's designed for users who want to contribute to OpenStreetMap but don't have expertise in OSM.
 
-TODO: add examples of the different waterways
+{{</ admonition >}}
 
-```text
-waterway=river
-waterway=stream
-waterway=tidal_channel
-waterway=canal
-waterway=ditch
-waterway=drain
-waterway=pressurised
-natural=water
-water=* 
+One of the key features of OSM is the ability to tag different elements with various attributes. For this project, the 'waterway' key is particularly useful [https://wiki.openstreetmap.org/wiki/Key:waterway](https://wiki.openstreetmap.org/wiki/Key:waterway)
+. This key is used to describe natural or artificial water flows like rivers, streams or canals, as well as elements which control the water flow such as dams and weirs. Sounds exactly what I am looking for to work out which rivers I crossed.
+
+Here are examples of different waterways in OSM:
+
+| Waterway Type | Description | Example |
+|---------------|-------------|---------|
+| River         | A large natural waterway | The River Thames |
+| Stream        | A small natural waterway | A stream in your local park |
+| Canal         | A man-made waterway used for transportation, irrigation, or drainage | The Suez Canal |
+
+
+### OpenStreetMaps data model
+
+OpenStreetMap's data model is quite simple and consists of three main elements
+
+- **Nodes**: These are individual points on the map. Each node has a latitude and longitude. For example, a node could represent a park bench or a water fountain. A node corresponds to a **POINT**.
+
+- **Ways**: These are ordered lists of nodes, representing a polyline on the map. Ways are used for longer features that cover more distance, like roads or rivers. A way corresponds to a **LineString**.
+
+- **Relations**: These are groups of nodes, ways, and other relations that define a larger entity. For example, a relation could represent a cycle route that consists of many different ways. A relation corresponds to a MultiLineString or a Polygon, depending on the nature of the relation.
+
+#### Tagging
+
+Each of these elements can have tags, which are key-value pairs used to store metadata about the element. For example, a way representing a road could have a tag `highway=residential` indicating it's a residential road.
+
+For more information, visit the [OpenStreetMap Elements page](https://wiki.openstreetmap.org/wiki/Elements).
+
+#### Waterways
+
+When we query OSM for waterways, we get back a line or multiline string representing the waterway in OSM format.
+
+There is a difference between the waterway [**way**](https://wiki.openstreetmap.org/wiki/Way) in OSM and the greater [waterway **relation**](https://wiki.openstreetmap.org/wiki/Relation:waterway).  A waterway **way** is a single segment of a waterway. A waterway **relation** is a group of the smaller ways to form a larger entity, like a big river can be made from many smaller streams.
+
+Most "main" rivers in Europe are tagged as relations, while almost all smaller rivers and streams are represented as ways.
+
+You can visit [this link](https://wiki.openstreetmap.org/wiki/Waterways). It provides detailed explanations about the tags used for waterways and the properties associated.
+
+### Overpass API
+
+The OSM database is huge. [Planet.osm](https://wiki.openstreetmap.org/wiki/Planet.osm) is a single file containing all OpenStreetMap data (currently over 1902.6 gb uncompressed and growing), and it's not practical to download and process the entire dataset every time you want to work with a few features.
+
+OpenStreetMap offer a read-only public API with [http://overpass-api.de](http://overpass-api.de). tT has a usage policy: You can safely assume that you don't disturb other users when you do less than 10,000 queries per day and download less than 1 GB data per day[1]. 
+
+This API makes it easy to request data and work with it programmatically, and by providing a query language called Overpass QL, which is similar to SQL, which allows you to get exactly what you need from a truly vast amount of geospatial data. This is perfect for this project.
+
+{{< admonition type=info title="Overpass Turbo" >}}
+
+[Overpass Turbo](https://overpass-turbo.eu/) is a web-based data filtering tool for OpenStreetMap. It's a great tool for testing out queries because it provides a visual interface for constructing and running Overpass API queries. It also displays the results on a map, making it easy to verify the queries.
+
+![Load of rivers on overpass!](/images/overpassturbo.png)
+
+{{</ admonition >}}
+
+TODO: talk about how a big part of the problem is filtering the data to as little as possible before running the computations, and you should do as much of this upstream as possible with the overpass api.
+
+## Ok enough theory, lets solve the problem.
+
+Breaking it down there are a few parts to the tool I want to make:
+
+1. Uploading a route.
+1. Fetching river data from OSM
+1. Calculating the intersections
+1. Visualizing the results
+
+A little website could work well for this. The browser can take care of the the route uploading with the [FILE API](https://developer.mozilla.org/en-US/docs/Web/API/File_API), requesting OSM data can depend on the [FETCH API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), and visualizing it with the help of [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs). Processing the route and computing intersection can be done natively in language of the browser, javascript, with high grade geospatial functionality being imported from [turf.js](https://turfjs.org/). By depending on the browser, I should be able to avoid the need of hosting any backend and reduce the complexity of the project.
+
+### Design
+
+The website should be simple and easy to use. Easier said then implemented!
+
+When the user navigates to [https://kreuzungen.world](https://kreuzungen.world) I want them to see a map. There should be a container with text explaining the site, and a button to upload a route from there device. When the user uploads a .gpx file, it should be displayed on the map. Then the site should fetch the waterway data in the background and compute the intersecting waterways before highlighting them on the map and listing the river names. The user should be able to explore the map and river data using intuitive interactions, there should be information shown for every river with its properties and a link to the data source.
+
+### The build
+
+### The body of the machine
+
+The html should be quite simple. Let's start basic with a input for the file handling and a div for the map. The map should take up the whole screen. Inside the map should be a couple be containers for the displaying of text information. A "info-container" will explain how to use the site, and another which is initially set to not be displayed, but will later show information from the uploaded route.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+  <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
+  <style>
+    html {
+      height: 100%;
+    }
+
+    body {
+      height: 100%;
+    }
+
+    #map {
+      min-height: 100%;
+      max-height: 100%
+    }
+  </style>
+</head>
+<body>
+  <!-- File input and map container -->
+  <input type="file" id="fileInput" accept=".gpx" />
+  <div id="map">
+    <div id="info" class="info-container">
+      <div class="help-message">
+        <h2 style="text-align: center">Welcome! 🌍🚴‍♂️</h2>
+      </div>
+    </div>
+    <div id="source" class="source-container" style="display: none;"></div>
+  </div>
+
+</body>
+<script>
+  // create map
+
+  // create event handler to load gpx file on the map
+</script>
 ```
 
-## Open Street Maps
 
-TODO: explain what OSM is, in terms of a dataset, open data, community driven. Talk about contributions from users like wikipedia for maps. Talk about apps like street complete and how most mapping providers use OSM data.
+I will use MapLibre GL JS to render the map. It's a great library that allows you to create interactive maps with vector tiles. It's based on WebGL, which means it can render maps quickly and efficiently in the browser.
 
-TODO: link to the OSM iceberg meme [https://www.openstreetmap.org/user/Xvtn/diary/403236](https://www.openstreetmap.org/user/Xvtn/diary/403236) and explainer 
+MapLibre  will inject a map into the div with the id "map". The map will be centered on the [natural center of the world in Greenwich](https://en.wikipedia.org/wiki/Prime_meridian_(Greenwich)#history), and have a zoom level of 10. The map will have a "outdoor-sy" style from [MapTiler](https://www.maptiler.com/), a company that provides vector tiles for maps.
 
-### OSM Elements
+### Error! DataFormat Unknown
 
-TODO: explain about the different elements and how they map to the primative geometry types [https://wiki.openstreetmap.org/wiki/Elements](https://wiki.openstreetmap.org/wiki/Elements)
+If you ran the above code, you would have unfortunately noticed a nice error message. In life, things don't always work out first try... That's ok, we can look into the error, and we can fix it. Here you'll see that MapLibre is expected at Geojson and not the gpx file that the user uploaded. We are very fortunate that there is a great library out there that will convert between these from MapBox. So let's Plug that in and get things up and running.
 
-### OSM tagging 
 
-TODO: explain about OSM tagging [https://wiki.openstreetmap.org/wiki/Tags](https://wiki.openstreetmap.org/wiki/Tags)
+```typescript
+export async function parseGPXToGeoJSON(GPXContents: string) {
+  const doc = new DOMParser().parseFromString(GPXContents, "text/xml");
+  return toGeoJSON.gpx(doc);
+}
+```
 
-### Let's talk about time complexity
+
+```html
+
+### Uploading a route
+
+I added a hidden [file input](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file) to the html to facilitate the file upload. The user can then click on a button to trigger the file input, or 
+
+The user can then select a file, and the file input will emit a change event. I added an event listener to the file input to listen for the change event and read the file.
+
+```js
+
+```html
+<!-- File input and map container -->
+<input type="file" id="fileInput" style="display: none;" />
+<div id="map">
+  <div id="faq" class="faq-container" style="display: none;">
+    <%= require('./faq.md') %>
+  </div>
+  <div id="info" class="info-container">
+    ...
+  </div>
+</div>
+``
+
+#### Why convert?
+
+By converting the OSM and route geographic data to geojson, I could use turf.js to do all spatial analytics in the js code, meaning the computing would be done client side and no backend would be required! 
+
+TODO:
+
+### Fetching river data from OSM
+
+I can use the Overpass API to fetch all the waterways within a bounding box. The query I used looks like this
+
+```
+[out:json];(rel["waterway"]({{bbox}});way["waterway"]({{bbox}});)->._;out geom;
+```
+
+This has three parts to it, and aims to capture all potentially intersecting waterways, while keeping the data as small as possible.
+
+* `[out:json]` - specifies that the output should be in JSON format.
+* `(rel["waterway"]({{bbox}});way["waterway"]({{bbox}});)->._` selects all the relations and ways tagged as "waterway" within the bounding box and combines the result. The `{{bbox}}` part is a placeholder that gets replaced with the actual bounding box coordinates.
+* `out geom;` means that [the geometry of the selected elements](https://wiki.openstreetmap.org/wiki/OSM_XML#Overpass_API_out_geom) is returned.
+
+TODO: explain how when we have a bigger region, we might want to only look at relations and not ways.
+
+#### Combining the LineStrings and MultilineStrings into a feature collection of single rivers
+
+The Overpass API returns a list of features, each representing a waterway. The features can be of type `LineString` or `MultiLineString`, depending on the complexity of the waterway.
+
+There are also thousands of disjoint ways that make up a single river. To make the data easier to work with (due to the performance fact that we only look for the single intersection point and skip the rest), I combined all the features into a single feature.
+
+This makes it easier to iterate over the individual rivers and calculate intersections with the uploaded route.
+
+The one downside is the problem of common name rivers... TODO: talk about this.
+
+### Intersections
+
+TODO: introduce turf.js
+
+TODO: talk about converting everything to geojson
+
+TODO: talk about combining the features in the feature collection together to handel both ways and relations
+
+TODO: talk about the hiden self-intersections problem
+
+#### Let's talk about time complexity
 
 Finding out which rivers intersect with the uploaded route is taken care of by turf.js, using the [`booleanIntersects()`](https://github.com/Turfjs/turf/tree/master/packages/turf-boolean-intersects) function.
 
@@ -219,210 +402,11 @@ That's a fancy way of saying as the input data gets big (number of waterways to 
 
 The key to solving the problem involves keeping the input data "somewhat" small such that device doing the computation does not melt and crash.
 
+### Visualising the results
 
-TODO: explain about the size of the OSM planet-files, and that they are rather large (currently over 60GB), and that a big part of solving this problem is filtering for as little data as possible before running the computations.
-
-## Not all geo data files are created equally
-
-TODO: explain about differences between geodata formats and the tradeoff's different formats make. 
-TODO: include points about human readability, compression, metadata 
-
-| datatype | Description |
-|:------:| -----------:|
-| data   | path to data files to supply the data that will be passed into templates. |
-| engine | engine to be used for processing templates. Handlebars is the default. |
-| ext    | extension to be used for dest files. |
-### WKT 
-
-
-### .gpx
-
-A  standard "open" geo data format also known as GPS exchange format. The format uses a [XML schema](https://en.wikipedia.org/wiki/XML) to stores waypoints, tracks, and routes plus metadata describing the data. The tracks data type includes the co-ordinates
-
-ref: [https://en.wikipedia.org/wiki/GPS_Exchange_Format](https://en.wikipedia.org/wiki/GPS_Exchange_Format)
-
-If you open a gpx file with a editor, you will seen some lines of code
-TODO: add example .gpx code
-
-```xml
-
-```
-
-### .geojson
-
-[Specification](https://geojson.org/)
-
-[geojson.io](http://geojson.io)
-
-[Wiki](https://en.wikipedia.org/wiki/GeoJSON)
-
-```json
-{
-  "type": "Feature",
-  "properties": {},
-  "geometry": {
-    "coordinates": [
-      [
-        13.3957,
-        52.4771
-      ],
-      [
-        13.3965,
-        52.4715
-      ],
-      [
-        13.4005,
-        52.4741
-      ],
-      [
-        13.4081,
-        52.4722
-      ],
-      [
-        13.4103,
-        52.4687
-      ]
-    ],
-    "type": "LineString"
-  }
-}
-```
-
-### .OSM
-
-TODO: add example openstreetmap code
-
-TODO: link to https://wiki.openstreetmap.org/wiki/OSM_XML
-
-### .parquet
-
-### Polyline
-
-https://developers.google.com/maps/documentation/utilities/polylinealgorithm
-
-https://www.twistedape.me.uk/2014/04/20/google-polyline-encoding/
-
-### ProtoMap tiles
-
-The new kid on the block.
-
-This is cutting edge stuff. New take on serving vector content involving classic comp sci and math concepts (range headers,). Includes some cool ideas from my fave space filling curve from German Mathmatician Mr Hillbert
-
-### Vector tiles
-
-> Compared to a tiled raster map, data transfer is also greatly reduced, as vector data is typically much smaller than a rendered bitmap. Also, styling can be applied later in the process, or even in the browser itself, allowing much greater flexibility in how data is presented. It is also easy to provide interactivity with map features, as their vector representation already exists within the client.[2] Yet another benefit is that less centralised server processing power is required, since rasterisation can be performed directly in the client. This has been described as making "rendering ... a last-mile problem, with fast, high-quality GPU[s] in everyone’s pocket".[3]
-
-https://en.wikipedia.org/wiki/Vector_tiles
-
-https://github.com/protomaps/PMTiles/blob/master/spec/v3/spec.md
-
-There is a really good paper which benchmarks and compares the loading and interaction time of vector and raster basemaps [Performance Testing on Vector vs. Raster Map Tiles—Comparative Study on Load Metrics](https://www.mdpi.com/634908)
-
-### Geoparquet
-
-TODO: link to https://geoparquet.org/
-
-## Converting between the formats
-
-### Why?
-
-By converting the OSM and route geographic data to geojson, I could use turf.js to do all spatial analytics in the js code, meaning the computing would be done client side and no backend would be required! Being in geojson format also means that it can be easily added to the map using [https://maplibre.org/maplibre-style-spec/sources/#geojson]()
-
-### Ok enough theory, lets solve the problem.
-
-## How to get the open data on rivers
-
-### OpenStreetMaps (aka OSM)
-
-TODO: talk about the OSM data model elements https://wiki.openstreetmap.org/wiki/Elements and how they map to points, linestrings, polygons.
-
-
-### OSM Overpass API
-
-[http://overpass-api.de](http://overpass-api.de)
-
-OpenStreetMap offer a read-only public API called the Overpass API, perfect for this project.
-
-Its possible to use the Overpass Query langauge to search for OSM features in the proximity of a polyline [https://dev.overpass-api.de/overpass-doc/en/full_data/polygon.html](https://dev.overpass-api.de/overpass-doc/en/full_data/polygon.html).
-
-This API reduces the problem to simply encoding the gpx file as a polyline, constructing a valid overpass query, and parsing the response.
-
-#### Overpass Turbo
-
-TODO: explain overpass turbo and how its useful for testing out queries.
-[https://overpass-turbo.eu/](https://overpass-turbo.eu/)
-
-TODO: explain the following query
-
-```js
-async function fetchRivers(bbox) {
-  const response = await fetch(
-    "https://www.overpass-api.de/api/interpreter?",
-    {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: `rel["waterway"](${bbox[1]},${bbox[0]},${bbox[3]},${bbox[2]});out geom;`,
-    }
-  );
-  return await response.text();
-}
-```
-
-TODO: explain how when we have a bigger region, we want to look at the ways and relations.
-
-TODO: talk about the response https://wiki.openstreetmap.org/wiki/OSM_XML#Overpass_API_out_geom
-
-## Application
-
-Although I am most comfortable programming in python, I wanted everything to run locally on the client. Everything should be done on the client side, to avoid the need of hosting any backend. Therefore we will use the language of the browser, javascript.
-
-### Maplibre gl
+#### Maplibre gl
 
 TODO: write about slippy maps, how good maplibre is because of vector tiles, allowing for zooming in and out without pixelation and ability to render features conditionally on the client side.
-
-eg)
-
-> Vector tiles represent a significant advancement in how map data is processed and presented. Unlike traditional raster tiles, which are static images with pixels, vector tiles are like the ‘SVGs’ of the mapping world: you get lines and points. This stores geodata in a format that allows for dynamic styling and interactivity, enabling the user to adapt the visual appearance of the map without altering the data. If that sounds like what you’ve seen on other maps, you are right! Vector tiles have become industry standard in interactive maps that, unlike openstreetmap.org, don’t get updated often, and where you can simply recalculate your whole database occasionally.
-
-> Background¶
-  What are raster tiles?¶
-
-  As we mentioned in the intro, map tiles can be broadly classified as either raster or vector. Raster tiles are the simplest to understand, as they are just PNG or JPG images that get stitched together in a grid, so we'll start here.
-  Advantages¶
-
-  Raster tiles have been around for a long time, and even today, they have a number of unique advantages.
-
-      Simplicity - Just about every device can render a PNG or JPG image, and it's very easy to build a performant renderer around these. Additionally, raster tiles don't require any other resources (such as fonts or icons) or special logic to render.
-      Specificity - Map tiles simplify a lot of data into a form that's useful for the user. If you are working with a minimalist map style (like our Alidade Smooth family), raster tiles can be more bandwidth efficient, as they only contain the raw visible pixels.
-
-  Limitations¶
-
-  While raster tiles are battle tested and supported pretty much everywhere, they also have some inherent limitations.
-
-  Inflexibility - You cannot change much about raster tiles. If you want to hide a certain layer, change the language of labels, or do just about anything else to alter the appearance of the tiles, you're out of luck.
-  Scalability - Raster map tiles cannot be scaled up and down, meaning you need to send 4x as many pixels over the network for your maps to look good on modern "high DPI" displays. This problem also shows up when zooming in to a raster map as the tiles become blurry until the new ones are loaded.
-
-  What are vector tiles?¶
-
-  Vector tiles are a newer development, and are broadly viewed as the future of digital interactive maps. Rather than pixels, vector tiles contain a mathematical description of the geometry as well as structured data about each feature on the map.
-  Advantages¶
-
-  Flexibility - Vector tiles aren't just raw pixels; the actual data is preserved in the tile. This means that you can seamlessly change the language of text labels, change the color scheme to suit your brand, or even switch styles dynamically based on the time of day or the user's device preferences. You can even completely change the camera angle for a 3D perspective.
-  Scalability - Since vector shapes are expressed in mathematical terms, they can be scaled up and down smoothly. For example, when the user zooms in, they'll get a smooth scale-in without any pixelation. This is especially relevant on mobile devices, where users are used to continuous zoom for most applications rather than discrete steps.
-  Cost - Many vendors, including Stadia Maps, charge per tile request. Switching to vector tiles can mean significant savings, as vector tiles cover a larger area. On average, we see users switching to vector making approximately 60% fewer tile requests.
-
-  A vector map showing a 3D perspective view of Midtown, Atlanta
-  Limitations¶
-
-  Complexity - While vector tiles provide a lot of flexibility, this comes at the cost of complexity. Tiles need to be rendered client-side, and this may create performance concerns for older or embedded applications. Additionally, since vector maps require additional resources to be present, the initial map load typically involves a greater number of network requests.
-  Size - For applications only requiring a low level of detail that don't utilize any of the 3D perspective features of vector tiles, the vector tiles can weigh a bit more. However, this is somewhat offset since all zooming past level 14 can use the information in the z14 tile.
-
-  Recap: Which should I use?¶
-
-  We've covered a lot of ground. To summarize, vector tiles offer greater flexibility, look great on any screen, and typically reduce costs by around 60%. However, if your application is targeting older devices or doesn't need a high level of detail (for example, our Alidade Smooth and Alidade Smooth Dark styles), raster tiles are not necessarily a bad option.
 
 TODO: include some history of webmaps.
 
@@ -443,9 +427,8 @@ https://wiki.openstreetmap.org/wiki/Vector_tiles#Providers
 
 TODO: Talk about maptiler and stadia maps both offering free tiers for serving vector map tiles. Maptiler give 100,000 requests per month for free. 
 
-### Upload file
 
-### Creating a high quality user experience 
+### Features
 
 TODO: talk about being happy with the look and feel of maplibre, and reusing the css for displaying info.
 
@@ -617,6 +600,8 @@ This was a easy one to implement after reading the spec on [https://ogp.me](http
 ```
 
 At first the image was not being displayed when I shared it via whatsapp, however a [quick stackoverflowing](https://stackoverflow.com/a/39182227) explained WhatsApp only supports images less than 300kb in size so I added a compressed image.
+
+![Loading the url in whatsapp](/images/whatsapp.gif)
 
 Everything worked, the internet is magic sometimes!
 
@@ -893,7 +878,7 @@ I already settled on the name Kreuzungen. It's a German word that means "crossin
 
 To no surprise, the domain kreuzungen.com was already taken and a short call to the owner assured me that it was not up for sale, ces't la internet.
 
-I looked at what other top level domains were not taken, and although there was not `.en` top level domain so that I could do the cool thing where the fully qualified domain is the world (like `bit.ly`, `redd.it`) I saw that **`krezungen.world`** was available. I liked the way it sounded, so I bought it.
+I looked at what other top level domains were not taken, and although there was not `.en` top level domain so that I could do the cool thing where the fully qualified domain is the world (like `bit.ly`, `redd.it`) I saw that **`krezungen.world`** was available. I liked the way it sounded, so I purchased it.
 
 ### DNS
 
@@ -911,9 +896,11 @@ kreuzungen.world.	195	IN	A	185.199.111.153
 
 Then I updated the github repo with the custom domain and all seemed good.
 
-![Github notification saying "Your site is live at https://kreuzungen.world/"](/images/github_pages_custom_domain.png)
+![Github notification saying "Your site is live at https://kreuzungen.world/"](/images/github_pages_deploy.png)
 
 A last sanity check with the browser showed that [https://kreuzungen.world](https://kreuzungen.world) was live!
+
+![https://kreuzungen.world loading for the first time](/images/output.gif)
 
 ### SEO
 
@@ -931,13 +918,439 @@ There are a few things you can do to speed up the process.
 
 #### Crawl first before you walk
 
-I added the site to the [google search console](https://search.google.com/search-console/about) and verified that I was the owner of the domain by adding a TXT record to my DNS.
+I added the site to the [google search console](https://search.google.com/search-console/about) and verified that I was the owner of the domain by adding a TXT record to my DNS. 
 
-TODO: add a screen shot of it on google.
+![Kreuzungen.world listing on Google!](/images/google.png)
 
 #### Description
 
-TODO: talk about how you imrpoved the description/snippet [https://developers.google.com/search/docs/appearance/snippet](https://developers.google.com/search/docs/appearance/snippet)
+TODO: talk about how you imrpoved the description/snippet [https://developers.google.com/search/docs/appearance/snippet](https://developers.google.com/search/docs/appearance/snippet) with SEO magic.
+
+## Getting hooked into that webhook stuff
+
+I was inspired by what I have seen from [https://wandrer.earth](https://wandrer.earth), [https://summitbag.com](https://summitbag.com) and [https://whatismyskc.com](https://whatismyskc.com) on my friends activities. Theses apps enrich user activities by pushing additional information back to Strava servers, such that the greater Strava community to see it.
+
+I wanted to have a similar feature in my app, a automagical feature that updates the description of an activity with a nice message including the name and number of waterways crossed, and a link to [https://kreuzungen.world](https://kreuzungen.world).
+
+{{< admonition type=tip title="Update message"  open=true >}}
+
+
+{{% center %}}
+Crossed 5 waterways 🏞️ Nile | Amazon River | Mississippi River | Danube River | Ganges | River Thames 🌐 https://kreuzungen.world 🗺️
+
+_*if any design people are reading this, I would love some help to improve this message_
+
+{{% /center %}}
+{{< /admonition >}}
+
+To accomplish this, I utilized the [Strava Webhook Events API](https://developers.strava.com/docs/webhooks/). I created a subscription and wrote a little server to listen for events from the subscription, process the new activites and update the activity descriptions on Strava in real-time.
+
+This approach eliminates the need for users to manually check activities on [https://kreuzungen.world](https://kreuzungen.world). After a one-time authorization of Kreuzungen with the "Upload your activities from Kreuzungen to Strava" scope set, users should receive automatic and consistent updates about the waterways on their Strava profile, for life.
+
+The enriched activity descriptions are then visible to all on the Strava platform, potentially inspiring others to explore Kreuzungen and join a new community of river lovers.
+
+### Refactor
+
+Krezungen was untill now a webapp written in javascript and running in the browser. I wanted to use the same logic used to process routes in the browser, but I wanted this to run on a lightweight server somewhere that strava could talk to it.
+
+One option I had was to translate the geometry processing code, in my fave language python.
+
+Another way would be to use node to run some of the same code that is used in the frontend. This would be a good way to avoid reimplementing the wheel (or most parts atleast), and keeps a single, nodivergent codebases to work with in the future.
+
+I would need to refactor the code to run it with node. I decided to go with this option, and refactor the code and use TypeScript and use webpack to bundle up the assets needed for the webapp.
+
+The structre would look a little like this:
+
+| File      | Description                                |
+|-----------|--------------------------------------------|
+| geo.ts    | Contains the geometry processing code       |
+| strava.ts | Contains the logic to auth with Strava      |
+| main.ts   | Contains the code to be bundled and injected into the webapp |
+| app.ts    | Contains the Express server and webhook subscriptions |
+
+### Setting up a webhook subscription
+
+I needed to set up a webhook subscription with Strava to receive events when a user uploads a new activity. I followed the [Strava Webhook Events API](https://developers.strava.com/docs/webhooks/) documentation.
+
+This is a two step part which essentaily involves:
+
+1. setting up a server to listen which will respond correctly to a validation request from Strava
+2. making a POST request to the Strava API to create the subscription.
+
+First I created `app.ts` to handle the webhook subscription callback validation flow.
+
+```typescript
+// route for '/webhook' to verify the webhook subscription with Strava
+app.get("/webhook", (req, res) => {
+  const VERIFY_TOKEN = "STRAVA";
+
+  let mode = req.query["hub.mode"];
+  let token = req.query["hub.verify_token"];
+  let challenge = req.query["hub.challenge"];
+
+  if (mode && token) {
+    if (mode === "subscribe" && token === VERIFY_TOKEN) {
+      console.log("WEBHOOK_VERIFIED");
+      res.json({ "hub.challenge": challenge });
+    } else {
+      res.sendStatus(403);
+    }
+  }
+});
+```
+
+I deploy this to fly.io and register the webhook with Strava with a POST request to the Strava API.
+
+```bash
+curl -X POST https://api.strava.com/api/v3/push_subscriptions \
+  -H "Authorization
+  -H "Content-Type: application/json" \
+  -d '{"client_id": 12345, "client_secret": "supersecret", "callback_url": "https://yourdomain.com/webhook", "verify_token": "STRAVA"}'
+```
+
+## Squishing bugs
+
+During refactoring I found a bug in the code that was causing the random rivers to creep into the results. After some digging and test writing, it looked like extra waterways were being selected as intersecting with the route when they had a self intersection.
+
+I looked into the turf [booleanIntersects](https://www.npmjs.com/package/@turf/boolean-intersects) implementation, and it turns out that one of the underlying functions lineIntercept() has a `ignoreSelfIntersections` vaiable that can be set. I fixed this locally and the tests passed.
+
+```bash
+kreuzungen-py3.11➜  site git:(new) ✗ npm test
+
+> test
+> jest --verbose
+
+ PASS  src/geo.test.ts (5.71 s)
+  intersectingFeatures
+    ✓ should return a FeatureCollection of 2 intersecting kanals  in nk (3 ms)
+    ✓ should return a FeatureCollection of 1 intersecting features including Grünerbach and excluding Mandlerbach (15 ms)
+    ✓ should return a empty FeatureCollection of intersecting features excluding Mandlerbach (4 ms)
+    ✓ should return a FeatureCollection with a single feature Grünerbach (6 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        5.844 s
+Ran all test suites.
+```
+
+I want to reuse the geometry processing code that I wrote for the frontend to process the strava activities. I could have copied the code, but that would have been a bad idea, because if I ever wanted to change the way the geometry is processed, I would have to change it in two places. I decided to refactor the code into a separate module that could be imported into the backend.
+
+#### webpack
+
+TODO: explain a bundler and why it is good to use one here
+
+```js
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
+
+
+module.exports = {
+  mode: 'development',
+  devtool: 'inline-source-map',
+  devServer: {
+    static: './dist',
+  },
+  optimization: {
+    runtimeChunk: 'single',
+  },
+  entry: { main: './src/main.ts' },
+  module: {
+    rules: [
+      {
+        test: /\.ts?$/,
+        use: 'ts-loader',
+        exclude: [/node_modules/, /\.test\.ts$/],
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: 'asset/resource'
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+        exclude: /input\.css$/,
+      },
+      {
+        test: /\.md$/,
+        use: [
+          {
+            loader: 'html-loader',
+            options: {
+              esModule: false,
+            },
+          },
+          {
+            loader: 'markdown-loader',
+          },
+        ],
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
+  node: { global: true },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      inject: true,
+    }),
+  ],
+  output: {
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+};
+```
+
+tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+  }
+  ,    "files": [
+    "./src/app.ts",
+]
+}
+
+package.json
+
+```json
+{
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/lodash": "^4.17.0",
+    "@types/mapbox__polyline": "^1.0.5",
+    "@types/marked": "^6.0.0",
+    "@types/umami": "^0.1.5",
+    "css-loader": "^7.1.1",
+    "html-loader": "^5.0.0",
+    "html-webpack-plugin": "^5.6.0",
+    "jest": "^29.7.0",
+    "markdown-loader": "^8.0.0",
+    "marked": "^12.0.2",
+    "style-loader": "^4.0.0",
+    "tailwindcss": "^3.4.3",
+    "ts-jest": "^29.1.2",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
+  },
+  "scripts": {
+    "test": "jest --verbose",
+    "build": "webpack",
+    "serve": "webpack serve --open",
+    "compile": "npx tsc",
+    "start": "node dist/app.js"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/free-brands-svg-icons": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@mapbox/polyline": "^1.2.1",
+    "@mapbox/togeojson": "^0.16.2",
+    "@turf/boolean-point-in-polygon": "^7.0.0-alpha.115",
+    "@turf/helpers": "^7.0.0-alpha.115",
+    "@turf/line-intersect": "^7.0.0-alpha.115",
+    "@turf/meta": "^7.0.0-alpha.115",
+    "@turf/polygon-to-line": "^7.0.0-alpha.115",
+    "@turf/turf": "^7.0.0-alpha.114",
+    "@umami/node": "^0.2.0",
+    "body-parser": "^1.20.2",
+    "cross-fetch": "^4.0.0",
+    "express": "^4.19.2",
+    "font-awesome": "^4.7.0",
+    "fontawesome-free": "^1.0.4",
+    "geojson": "^0.5.0",
+    "lodash": "^4.17.21",
+    "maplibre-gl": "^4.1.2",
+    "osmtogeojson": "^3.0.0-beta.5",
+    "redis": "^4.6.13"
+  }
+}
+```
+
+### Sprinkle Redis in the Mix
+
+I also needed to bite the bullet and admit it was time to set up a perisitant storage.
+
+Up until now, I avoided the need of any storage. However if I want to process strava activities on behalf of users, I would need to re-authenticate with strava without the user .
+
+I added a fly.io redis instance to the backend to store the strava access tokens and refresh tokens. This makes me a full stack developer now, right?
+
+I set env vars for the redis url and password on fly.io and added the following code to the backend to store the tokens.
+
+### Express server and webhook subscriptions
+
+I wanted to have a lightweight backend, and I decided to use express.js to serve the frontend and handle the strava webhooks.
+
+I created a file `src/app.ts` and added the following code to anwser the strava webhook verification and process the incoming events.
+
+
+```typescript
+import express from "express";
+import bodyParser from "body-parser";
+import { createClient } from "redis";
+import {
+  getStravaAccessTokenRedis,
+  getStravaActivity,
+  updateStravaActivityDescription,
+} from "./strava";
+import { calculateIntersectingWaterwaysPolyline, createWaterwaysMessage } from "./geo";
+
+const app = express().use(bodyParser.json());
+const redisClient = createClient({ url: process.env.REDIS_URL });
+redisClient.on("error", (error) => {
+  console.error(`Redis client error:`, error);
+});
+main();
+
+// The main asynchronous function
+async function main() {
+  try {
+    await redisClient.connect();
+    app.listen(process.env.PORT || 80, () =>
+      console.log("webhook is listening")
+    );
+  } catch (error) {
+    console.error("Error connecting to Redis:", error);
+  }
+}
+
+// route for '/webhook' to verify the webhook subscription with Strava
+app.get("/webhook", (req, res) => {
+  const VERIFY_TOKEN = "STRAVA";
+
+  let mode = req.query["hub.mode"];
+  let token = req.query["hub.verify_token"];
+  let challenge = req.query["hub.challenge"];
+
+  if (mode && token) {
+    if (mode === "subscribe" && token === VERIFY_TOKEN) {
+      console.log("WEBHOOK_VERIFIED");
+      res.json({ "hub.challenge": challenge });
+    } else {
+      res.sendStatus(403);
+    }
+  }
+});
+
+// route for '/webhook' to receive and process incoming events
+// must acknowledge each new event with a status code of 200 OK within two seconds.
+// Event pushes are retried (up to a total of three attempts) if a 200 is not returned. 
+// If your application needs to do more processing of the received information, it should do so asynchronously.
+app.post("/webhook", async (req, res) => {
+  // return a aknoledgment and process the event asynchronously
+  res.status(200).send("EVENT_RECEIVED");
+  const event = req.body;
+  if (event.aspect_type === "create" && event.object_type === "activity") {
+    processAndUpdateStrava(event.owner_id, event.object_id);
+  }
+  else if (event.aspect_type === "update" && event.object_type === "athlete" && event.updates && event.updates.authorized === "false") {
+    deleteUser(event.owner_id)
+  }
+});
+
+async function processAndUpdateStrava(owner_id, activity_id,) {
+  try {
+    const owner_access_token = await getStravaAccessTokenRedis(
+      owner_id,
+      redisClient
+    );
+    if (!owner_access_token) {
+      console.error("No access token found for user_id: " + owner_id);
+      return;
+    }
+    const activityData = await getStravaActivity(
+      activity_id,
+      owner_access_token
+    );
+
+    if (!activityData.map || !activityData.map.summary_polyline) {
+      console.error(
+        "Activity does not have a summary polyline:",
+        activityData
+      );
+      return;
+    }
+
+    const intersectingWaterways = await calculateIntersectingWaterwaysPolyline(
+      activityData.map.summary_polyline
+    );
+
+    if (intersectingWaterways.features.length === 0) {
+      console.log("No intersecting waterways found");
+      return;
+    }
+    
+    const waterwaysMessage = createWaterwaysMessage(intersectingWaterways);
+
+    // update the activity description with the waterways message if there are waterways
+    const success = await updateStravaActivityDescription(
+      activity_id,
+      owner_access_token,
+      waterwaysMessage
+    );
+    if (success) {
+      console.log(`Updated activity https://www.strava.com/activities/${activity_id} with ${waterwaysMessage}`)
+    } else {
+      console.error(`Failed to update activity description for activity_id: ${activity_id}`);
+    }
+  } catch (error) {
+    console.error("Error updating activity description", error);
+  }
+}
+
+async function deleteUser(owner_id) {
+  try {
+    await redisClient.del(owner_id.toString());
+    console.log(`Deleted access token for user_id: ${owner_id}`);
+  } catch (error) {
+    console.error("Error deleting access token", error);
+  }
+}
+```
+
+
+```python
+
+```
+TODO: copy code
+```
+
+```bash
+TODO: copy code
+```
+
+### Strava API webhooks
+
+TODO: add video
+
+TODO: add section on manual update button.
+
+## Adding a faq section
+
+I wrote up some common questions that I thought people might have, and added them to the site. I kept this simple and used markdown to write the questions and answers, and then used the html-loader and markdown-loader to load the content into the site.
+
+I then added a map control using a question mark icon that would toggle the faq section on and off.
+
+## Tracking
+
+TODO: write about wanting to have privacy respecting analytics, and how I self hosted umani and wrote some basic events.
+
+TODO: Show graph
+
+
 
 ### Shout outs
 
@@ -947,6 +1360,26 @@ TODO: talk about how you imrpoved the description/snippet [https://developers.go
 
 Use this lib for having gpx and osm stuff straight onto the map.
 [https://github.com/jimmyrocks/maplibre-gl-vector-text-protocol](https://github.com/jimmyrocks/maplibre-gl-vector-text-protocol)
+
+### Hindsight
+
+Refactoring using typescript is great. I should have done this from the start. It would have saved me a lot of time debugging and writing tests.
+
+If I started again I would of set of with a framework that deals with state. In the end the ui became more complex, and I had to use a lot of global variables to keep track of the state of the app.
+
+When I implemented the share controller, I got a bit caried away and added twitter/facebook/whatsapp share buttons. I should have just kept it simple and only added the copy to clipboard button. The other share buttons are not really needed, and apparently people do not share on social media, and if they do they copy the url and paste it. Removing the buttons reduced some code and made the ui cleaner.
+
+I thought it was a good idea to add the sharing of routes by encoding them into a polyline and adding the string to a url parameter. This has arguable benefits, as the route 
+
+However this was shown to be unpractical due to the way messaging apps like whatsapp handle super long urls. Only some of the url is displayed, and the user must explictly expand it to see the full url. If they press on the shortened url, it will open in the browser but only show the trucated route. This is a confusing user experience, and while I like providing users the option of easily sharing a route without storing the data on kreuzungen servers, most people prefer the convenience of a simple share button and a freindly url like .
+
+### Conclusion
+
+Like the ride, I set out on this project with a direction but was ready to adapt. I learnt a lot about mapping technologies. I also learnt about the turf library and how to use it to process geojson data. I also learnt about the open street map api and how to use it to get data about waterways, and I learnt about the strava api and webhooks. Along the way I learnt about typescript and how to use it to write more robust code and how to use webpack to bundle up the code.
+
+It is really cool seeing the app being used in distant place like the US or Norway. This is the magic of the internet, building something from open data and seeing it used by people all over the world.
+
+I am happy with the result, I anwserd the question I set out to answer, and I have a working app that I can share with the world. I looking forward to seeing if the app takes of and reaches a level of viralbility to take off.
 
 #### Known issues
 
@@ -960,3 +1393,20 @@ Sometimes the name fo the relation willbe different from the ways resulting in t
 
 [ ] - add diagrams https://hugodoit.pages.dev/create-diagrams/#complicated
 [ ] - add contents on the right hand side
+
+
+
+<!-- "how can I get all the rivers in area x?". This is a simple question which can be answered concisely.
+
+OpenStreetMaps 
+
+When working with geospatial data, it's important to distinguish between different types of watercourses based on their scale and characteristics. For example, major rivers like the Amazon or the Nile are considered distinct rivers at a global scale. However, when zooming in to a specific region, smaller watercourses such as streams, canals, and even ditches may also be identified as rivers.
+
+The level of precision and detail required for identifying rivers depends on the context and purpose. In the case of a long-distance cycling route from London to Berlin, the focus may be on major rivers rather than smaller waterways. However, for a hike around a small town, even tiny streams or ditches could be of interest.
+
+TODO: explain what a real world river is and how its different from a stream, and how as your mental geographical model "zoom out" you don't need so much precision with the smaller waterways. Eg when you thinking of a route the whole way across england, you probably don't care for all the tiny streams and ditches you went over, but in contrast if you do a hike around a small town, you might be interested in each of the tiny streams you went over. -->
+
+<!-- 
+TODO: talk about invalid geometries and problems around holes (https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule vs https://en.wikipedia.org/wiki/Nonzero-rule) ect... link to https://mapshaper.org 
+
+TODO: say your keeping this breif but link to interesting geometry problems -->
