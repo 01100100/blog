@@ -99,7 +99,9 @@ The spatial part is composed of different types of geometries. The primitive typ
 
 **Any geometry combined with non-geometric properties is a geometric feature.**
 
-TODO: explain about multi line strings and feature collections
+Sometimes, a single geometry type might not be sufficient to represent a feature. For example, a river system with multiple branches cannot be accurately represented by a single LineString. In such cases, we can use multi geometry features like a MultiLineString or a MultiPolygon.
+
+We can group different features together to form a feature collection. Imagine you want to represent all the rivers, lakes and wells in a region. You could group them together in a feature collection using
 
 ### An Example: Dicke Marie (Fat Mary)
 
@@ -122,7 +124,7 @@ Now we can add some "what" properties describe Fat Marie. Perhaps we can add the
 | height   | 23    |
 | wikipedia | [https://de.wikipedia.org/wiki/de:Dicke_Marie](https://de.wikipedia.org/wiki/de:Dicke_Marie) |
 
-As a geojson, the data could be written like this
+Using the geojson data format, a Dicke Marie could be written like this
 
 ```json
 {
@@ -157,7 +159,7 @@ The big question. A river is a natural flowing watercourse that typically moves 
 
 <iframe style="border-radius:12px" src="https://open.spotify.com/embed/episode/2Azu2f93hikPGcwQJ876QK?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 
-This a very interesting question to think about, but actually it doesn't mater for this project. A better question would be "Where to get the river data from?"
+This a very interesting question to think about, but philosophizing about what constitutes a river doesn't help me solve the problem of working out which rivers I crossed on my bike ride. A better question would be "Where can I get data from and how can I define waterways in geospatial data terms?"
 
 ## OpenStreetMap
 
@@ -218,7 +220,7 @@ You can visit [this link](https://wiki.openstreetmap.org/wiki/Waterways). It pro
 
 The OSM database is huge. [Planet.osm](https://wiki.openstreetmap.org/wiki/Planet.osm) is a single file containing all OpenStreetMap data (currently over 1902.6 gb uncompressed and growing), and it's not practical to download and process the entire dataset every time you want to work with a few features.
 
-OpenStreetMap offer a read-only public API with [http://overpass-api.de](http://overpass-api.de). tT has a usage policy: You can safely assume that you don't disturb other users when you do less than 10,000 queries per day and download less than 1 GB data per day[1]. 
+OpenStreetMap offer a read-only public API with [http://overpass-api.de](http://overpass-api.de). It has a usage policy: You can safely assume that you don't disturb other users when you do less than 10,000 queries per day and download less than 1 GB data per day[1].
 
 This API makes it easy to request data and work with it programmatically, and by providing a query language called Overpass QL, which is similar to SQL, which allows you to get exactly what you need from a truly vast amount of geospatial data. This is perfect for this project.
 
@@ -227,6 +229,8 @@ This API makes it easy to request data and work with it programmatically, and by
 [Overpass Turbo](https://overpass-turbo.eu/) is a web-based data filtering tool for OpenStreetMap. It's a great tool for testing out queries because it provides a visual interface for constructing and running Overpass API queries. It also displays the results on a map, making it easy to verify the queries.
 
 ![Load of rivers on overpass!](/images/overpassturbo.png)
+
+// TODO: link to the query that produced this.
 
 {{</ admonition >}}
 
@@ -314,15 +318,11 @@ export async function parseGPXToGeoJSON(GPXContents: string) {
 ```
 
 
-```html
-
 ### Uploading a route
 
 I added a hidden [file input](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file) to the html to facilitate the file upload. The user can then click on a button to trigger the file input, or 
 
-The user can then select a file, and the file input will emit a change event. I added an event listener to the file input to listen for the change event and read the file.
-
-```js
+The user can then select a file, and the file input will emit a change event. I added an event listener to the file input, such that the change event will call code that reads the .gpx file, displays it on the map and then processes it.
 
 ```html
 <!-- File input and map container -->
@@ -335,7 +335,7 @@ The user can then select a file, and the file input will emit a change event. I 
     ...
   </div>
 </div>
-``
+```
 
 #### Why convert?
 
@@ -359,11 +359,26 @@ This has three parts to it, and aims to capture all potentially intersecting wat
 
 TODO: explain how when we have a bigger region, we might want to only look at relations and not ways.
 
+TODO: talk about when it would make sense to download the OSM planet dataset and then store and serve the waterways data on my own server, and when it would make sense to fetch it from the overpass api.
+
+Going back to my point about not needed a backend, this is only possible due to the existence of the overpass api.
+
+However on my webhook backend server, I am likely going to request the same river data many times for well traveled regions. Eacch subsequent request is redundant (Ignoring the temporal changes. If someone has built a new canal in Berlin and added it to OSM, since the last request of Berlin waterways, then it is worth knowing about). The idea of caching requests is a good one, however its not practical due to the requests being specific to a routes bounding box, and the fact they are unlikely to not be unique. It would be more efficient to download the OSM data once and store it on my server, accessing it willi nilli. Although this adds a burden on me, to maintain a server and keep the data up to date, it would be more efficient and faster for the user, and most importantly would limit the number of redundant requests to the overpass api. However, I don't imagine my little project will be getting that much traffic, so I will stick with the overpass api for now and deal with this if/when I get hit with some major traffic.
+
+consider when we are getting the citys a route crosses through, there are two ways to make a scaleable solution for the whole world:
+
+1. Download the OSM planet dataset and store it on a server, then query the server for the data.
+2. Use the overpass api to fetch the data on the fly.
+
+The first option is more efficient, but requires a lot of storage and maintenance. The second option is less efficient, but is easier to set up and maintain.
+
+The reality is that I am a very little app with a few users, and the users are located in very few places. I can get away with using the overpass api for now, and if I get more users, I can always switch to the first option and save some load on the overpass api .
+
 #### Combining the LineStrings and MultilineStrings into a feature collection of single rivers
 
 The Overpass API returns a list of features, each representing a waterway. The features can be of type `LineString` or `MultiLineString`, depending on the complexity of the waterway.
 
-There are also thousands of disjoint ways that make up a single river. To make the data easier to work with (due to the performance fact that we only look for the single intersection point and skip the rest), I combined all the features into a single feature.
+There are also thousands of disjoint ways that make up a single river. To make the data easier to work with (due to the performance fact that we only look for the single intersection point and skip the rest), I combined all the features with a matching name into a single feature.
 
 This makes it easier to iterate over the individual rivers and calculate intersections with the uploaded route.
 
@@ -377,7 +392,11 @@ TODO: talk about converting everything to geojson
 
 TODO: talk about combining the features in the feature collection together to handel both ways and relations
 
-TODO: talk about the hiden self-intersections problem
+TODO: talk about the self-intersections problem and the hidden option of passing the `{ ignoreSelfIntersections: true }` parameter to the `lineIntersect` function.
+
+TODO: talk about the tests used to verify this was fixxed ^^ 
+
+```js
 
 #### Let's talk about time complexity
 
@@ -426,7 +445,6 @@ eg) The complete OSM vector tile data set is >110gb https://data.maptiler.com/do
 https://wiki.openstreetmap.org/wiki/Vector_tiles#Providers
 
 TODO: Talk about maptiler and stadia maps both offering free tiers for serving vector map tiles. Maptiler give 100,000 requests per month for free. 
-
 
 ### Features
 
@@ -581,7 +599,7 @@ A *early-beta-tester* (you know who you are) gave me some feedback that they wou
 
 > The Open Graph protocol enables any web page to become a rich object in a social graph**
 
-That sounds pretty good! Basically you can add some specific `<meta>` tags to the `<head>` of a website, and when you share a url in social-media/messaging apps will render the content and display a little preview.
+That sounds pretty good! Basically you can add some specific `<meta>` tags to the `<head>` of a website, and when you share a url in social-media/messaging apps will render the content and display a little preview. You know when you share a link in whatsapp and it shows a little image and a description? That's the Open Graph protocol in action.
 
 This was a easy one to implement after reading the spec on [https://ogp.me](https://ogp.me). I looked up the optimal image dimensions and according to *reasons* this was **1200px x 630px**. The result was added in the following code
 
@@ -623,7 +641,7 @@ TODO: put in the many different share icons that people are used to... talk abou
 
 When the control is clicked on, it should expand and show different options for quickly sharing on different platforms using as well as having a copy button that will copy the url to the clipboard.
 
-The clickingaround-test showed that the copy-to-clipboard didn't feel like it was working because there was no user feedback. To fix that I implemented a message to signify that the copy action has been done, it fades out after 0.5s.
+The clickingaround-test showed that the copy-to-clipboard didn't feel like it was working because there was no user feedback. To fix that I implemented a message to flash on the screen and signify that the copy action has been done, it fades out after 0.5s.
 
 ```js
 class ShareControl {
@@ -868,6 +886,8 @@ I want this app to be as fast as possible. Everything feels better when there is
 
 #### First things first, lets profile
 
+TODO: link to profiling proj
+
 ## Build it and they will come, right?
 
 Ok so the app is built, and it's working. The next step is to share it with the world, and ensure that people can find it when they are looking for it.
@@ -878,7 +898,7 @@ I already settled on the name Kreuzungen. It's a German word that means "crossin
 
 To no surprise, the domain kreuzungen.com was already taken and a short call to the owner assured me that it was not up for sale, ces't la internet.
 
-I looked at what other top level domains were not taken, and although there was not `.en` top level domain so that I could do the cool thing where the fully qualified domain is the world (like `bit.ly`, `redd.it`) I saw that **`krezungen.world`** was available. I liked the way it sounded, so I purchased it.
+I looked at what other top level domains were not taken, and although there was not `.en` top level domain so that I could do the cool thing where the fully qualified domain is the world (like `bit.ly`, `redd.it`) I saw that **`krezungen.world`** was available. I liked the way it sounded, so I purchased it. [It should be cool for a long time](https://www.w3.org/Provider/Style/URI).
 
 ### DNS
 
@@ -900,7 +920,9 @@ Then I updated the github repo with the custom domain and all seemed good.
 
 A last sanity check with the browser showed that [https://kreuzungen.world](https://kreuzungen.world) was live!
 
-![https://kreuzungen.world loading for the first time](/images/output.gif)
+![https://kreuzungen.world loading for the first time](/images/loadingkreuzungen.gif)
+
+I also made records to point the subdomain `auth.kreuzungen.world` to the fly.io server that was running the backend service.
 
 ### SEO
 
@@ -1344,17 +1366,19 @@ I wrote up some common questions that I thought people might have, and added the
 
 I then added a map control using a question mark icon that would toggle the faq section on and off.
 
+## Improving the UI
+
+[UI/UX Best Practices for Designing Amazing Web Apps ](https://youtu.be/OSfSDdl-QmM)
+https://youtu.be/OSfSDdl-QmM?t=955
+
+[https://www.mapuipatterns.com/](https://www.mapuipatterns.com/)
+
+
 ## Tracking
 
-TODO: write about wanting to have privacy respecting analytics, and how I self hosted umani and wrote some basic events.
+TODO: write about wanting to have privacy respecting analytics, and how I self hosted umani and wrote some basic events to get a understanding of how the app is used and how this could be useful in the future to improve the user experiance.
 
 TODO: Show graph
-
-
-
-### Shout outs
-
-[https://www.paulnorman.ca/](https://www.paulnorman.ca/)
 
 ### Future imrpovements
 
@@ -1375,9 +1399,11 @@ However this was shown to be unpractical due to the way messaging apps like what
 
 ### Conclusion
 
-Like the ride, I set out on this project with a direction but was ready to adapt. I learnt a lot about mapping technologies. I also learnt about the turf library and how to use it to process geojson data. I also learnt about the open street map api and how to use it to get data about waterways, and I learnt about the strava api and webhooks. Along the way I learnt about typescript and how to use it to write more robust code and how to use webpack to bundle up the code.
+Like the ride, I set out on this project, not knowing how I would get all the way to the end, but with a naive courage that I could do it. In life it is always good to try things and just start out. I learnt a lot about mapping technologies. I also learnt about the turf library and how to use it to process geojson data. I also learnt about the OpenStreetMap data model, the overpass api and how to use it to get data about waterways, and I learnt about the strava api and webhooks. Along the way I learnt about typescript and how to use it to write more robust code and how to use webpack to bundle up the code.
 
-It is really cool seeing the app being used in distant place like the US or Norway. This is the magic of the internet, building something from open data and seeing it used by people all over the world.
+It is really cool seeing the app being used in distant place like the US, Serbia or Norway. And it was amazing to see it pop up on my strava feed, from a freind of mine that had no idea I made this. I am happy that people are enjoying this app, and I hope it inspires people to get out and explore the waterways around them.
+
+This is a magical thing about the internet, building something from open data and seeing it used by people all over the world.
 
 I am happy with the result, I anwserd the question I set out to answer, and I have a working app that I can share with the world. I looking forward to seeing if the app takes of and reaches a level of viralbility to take off.
 
