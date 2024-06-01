@@ -42,7 +42,7 @@ All source code is available in this [github repository](https://github.com/0110
 
 ## Introduction
 
-Last year I embarked on a bike ride from a [geo-spatial-data-conference](spatial-data-science-conference.com) in London to my home in Berlin.
+Last year I embarked on a bike ride from a [geo-spatial-data-conference](https://spatial-data-science-conference.com/) in London to my home in Berlin.
 
 I used [Komoot](https://www.komoot.com) to plan, navigate and record my journey. I set my start point to the Royal Albert hall in London and my end point to Brandenburg Tor in Berlin, with intermediate points being the international ferry ports of Harwich and Hook of Holland. I choose "Road cycling" as my preferred style of riding and hit the "Let's go" button. It was that easy! I am a huge fan of the [Komoot](https://www.komoot.com) app and highly recommend it.
 
@@ -66,7 +66,7 @@ Realizing that I had recorded data of the ride, had the great asset of open stre
 
 As a geospatial data engineer, and a lover of long cycles in really remote places, this challenge doesn't sound too hard.
 
-Little did I know that this project would turn out to be much more interesting than first expected, just like the bike journey. I just started and didn't know where it would take me but simply started out in a single direction, and looking back I am quite chuffed with how far I have come and what I have achieved.
+Little did I know that this project would turn out to be much more interesting than first expected, just like the bike journey. I didn't know where exactly the project would take me, but I had a goal and simply started out ready to adapt.
 
 {{< admonition type=info title=Naming >}}
 The word "Kreuzungen" is German for "crossings" or "intersections"...
@@ -86,6 +86,8 @@ It consists of two parts: the "where" and the "what". The "where" part includes 
 
 The spatial part is composed of different types of geometries. The primitive types of geometry are points, lines and polygons. These are the building blocks of geospatial data, and out of them we can build some amazing things.
 
+TODO: add popups for the examples with a map and few cases of each.
+
 - A Point: represents a specific location on the Earth's surface, defined by its latitude and longitude coordinates. It is often used to mark a point of interest, such as a atm, traffic light or water fountain.
 - A LineSting: represents a path made up of a ordered series of connected points. A hiking path, road or a river.
 - A Polygon: A polygon is a closed shape with the vertices defined by a ordered series of points. It is used to represent areas like countries, cities, or lakes. Polygons are defined by a list of coordinates that outline their boundaries.
@@ -97,22 +99,26 @@ The spatial part is composed of different types of geometries. The primitive typ
                  *---*    *-----------*
 ```
 
-**Any geometry combined with non-geometric properties is a geometric feature.**
+**Any geometry combined with non-geometric properties/attributes is know in the industry as a geometric feature.**
 
 Sometimes, a single geometry type might not be sufficient to represent a feature. For example, a river system with multiple branches cannot be accurately represented by a single LineString. In such cases, we can use multi geometry features like a MultiLineString or a MultiPolygon.
 
-We can group different features together to form a feature collection. Imagine you want to represent all the rivers, lakes and wells in a region. You could group them together in a feature collection using
+TODO: add a image with a river system and the different LinesStrings that would make the MultiLineString
 
-### An Example: Dicke Marie (Fat Mary)
+We can group different features together to form a feature collection. Imagine you want to represent all the rivers, lakes and wells in a region. You could group them together in a feature collection using LineStrings for the rivers, Polygons for the lakes and Points for the wells.
 
-If you go into Tegel Forest in the east of Berlin, you might bump into the so called "Fat Mary". This is the name given to a really old, award winning Oak tree, estimated to be over 800 years old.
+### An Example: Dicke Marie (Thick Mary)
+
+If you go into Tegel Forest in the east of Berlin, you might bump into the so called "Thick Mary". This is the name given to a really old, award winning[^dicke-marie] oak tree, estimated to be over 800 years old.
 
 [https://berlindoodleblog.blogspot.com/2015/02/dicke-marie.html](https://berlindoodleblog.blogspot.com/2015/02/dicke-marie.html)
 
 ![Dicke Marie](/images/dickemarie.jpg)
 Let's imagine what the geospatial data would look like that describes this great tree...
 
-First we should define the location or the "where" of Dicke Marie. We could use words to do this, perhaps "North East of Berlin", "In Tegel" or "about 300m south of Tegel Schloss" However we can do much better if we define with the position with a single set of co-ordinates `(52.5935770, 13.2649068)` locating the point where the centre of the tree trunk comes out of the ground. These numbers are much more powerful then the wordy descriptions. It fixes it to a set position on a grid of the world, and the numeric values can be quickly and efficiently compared to other geospatial data types to answer questions like.. "How far is this point east of point x" "Does this point lie within polygon z?". Ohhh, I feel the power of this geospatial stuff.
+First we should define the location or the "where" of Dicke Marie. We could use words to do this, perhaps "North East of Berlin", "In Tegel" or "about 300m south of Tegel Schloss" would work. However we can do much better if we define with the position with a `POINT` geometry. We could do this with a a single set of co-ordinates `(52.5935770, 13.2649068)` representing the middle of the tree trunk.
+
+These geometric data types are much more powerful then the wordy descriptions. Defining the position of thick Mary with a `POINT` fixes it to a set position on a grid of the world, and the value can be quickly and efficiently compared to other geospatial data types to answer questions like.. "How far is this point east of point x" "Does this point lie within polygon z?". Ohhh yeahhhh, I am starting to feel the power of this geospatial stuff.
 
 Now we can add some "what" properties describe Fat Marie. Perhaps we can add the following properties:
 
@@ -155,11 +161,13 @@ In fact someone already defined Dicke Marie using geospatial data and added it t
 
 ## What is a river?
 
-The big question. A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities. There is a hour long podcast that dives into this in more depth.
+The big question! A river is a natural flowing watercourse that typically moves towards an ocean, sea, lake, or another river. It plays a vital role in the Earth's hydrological cycle and supports various ecosystems and human activities[^river-wiki]
+
+There is a hour long podcast that dives into this in more depth.
 
 <iframe style="border-radius:12px" src="https://open.spotify.com/embed/episode/2Azu2f93hikPGcwQJ876QK?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 
-This a very interesting question to think about, but philosophizing about what constitutes a river doesn't help me solve the problem of working out which rivers I crossed on my bike ride. A better question would be "Where can I get data from and how can I define waterways in geospatial data terms?"
+This a very interesting question to think about, but philosophizing about what constitutes a river doesn't exactly help me solve the problem of working out which rivers I crossed on my bike ride. A better question would be __**"Where can I get data from and how can I define waterways in geospatial data terms?"**__
 
 ## OpenStreetMap
 
@@ -170,7 +178,7 @@ TODO: link to OSM iceberg meme
 
 The data is freely available under an open license, and it's maintained and updated by volunteers. This means that the data is constantly being updated, reflecting changes in the real world.
 
-Everyone can make use of this data and create applications scaling to cover the whole world. OSM already powers many of the maps you see on the web today.
+Everyone can make use of this data and create applications scaling to cover the whole world. OSM already powers most of the maps and map related services you find on the web today[^osm-services].
 
 {{< admonition type=info title="Street Complete" >}}
 
@@ -183,16 +191,18 @@ One of the key features of OSM is the ability to tag different elements with var
 
 Here are examples of different waterways in OSM:
 
+TODO: add links to osm elements
+
 | Waterway Type | Description | Example |
 |---------------|-------------|---------|
-| River         | A large natural waterway | The River Thames |
-| Stream        | A small natural waterway | A stream in your local park |
-| Canal         | A man-made waterway used for transportation, irrigation, or drainage | The Suez Canal |
-
+| [River](https://wiki.openstreetmap.org/wiki/Tag:waterway%3Driver)         | A large natural waterway | The River Thames [] |
+| [Stream](https://wiki.openstreetmap.org/wiki/Tag:waterway%3Dstream)        | A small natural waterway | A stream in your local park |
+| [Canal](https://wiki.openstreetmap.org/wiki/Tag:waterway%3Dcanal)         | A man-made waterway used for transportation, irrigation, or drainage | The Suez Canal |
+| [Drain](https://wiki.openstreetmap.org/wiki/Tag:waterway%3Ddrain) | A man-made waterway used to drain water |  | 
 
 ### OpenStreetMaps data model
 
-OpenStreetMap's data model is quite simple and consists of three main elements
+OpenStreetMap's data model is quite simple, there are three main elements which are used to represent the entire world:
 
 - **Nodes**: These are individual points on the map. Each node has a latitude and longitude. For example, a node could represent a park bench or a water fountain. A node corresponds to a **POINT**.
 
@@ -251,13 +261,14 @@ A little website could work well for this. The browser can take care of the the 
 
 The website should be simple and easy to use. Easier said then implemented!
 
-When the user navigates to [https://kreuzungen.world](https://kreuzungen.world) I want them to see a map. There should be a container with text explaining the site, and a button to upload a route from there device. When the user uploads a .gpx file, it should be displayed on the map. Then the site should fetch the waterway data in the background and compute the intersecting waterways before highlighting them on the map and listing the river names. The user should be able to explore the map and river data using intuitive interactions, there should be information shown for every river with its properties and a link to the data source.
+When the user navigates to [https://kreuzungen.world](https://kreuzungen.world) I want them to see a map. There should be a container with text explaining the site, and a button to upload a route from there device. When the user uploads a .gpx file, it should be displayed on the map. Then the site should fetch the waterway data in the background and compute the intersecting waterways before highlighting them on the map and listing the river names. The user should be able to explore the map and river data using intuitive interactions, there should be information shown for every river with any 
+interesting properties links to the upstream data source.
 
 ### The build
 
 ### The body of the machine
 
-The html should be quite simple. Let's start basic with a input for the file handling and a div for the map. The map should take up the whole screen. Inside the map should be a couple be containers for the displaying of text information. A "info-container" will explain how to use the site, and another which is initially set to not be displayed, but will later show information from the uploaded route.
+The html should be quite simple (hopefully). Let's start basic with a input for the file handling and a div for the map. The map should take up the whole screen. Inside the map should be a couple be containers for the displaying of text information. A "info-container" will explain how to use the site, and another which is initially set to not be displayed, but will later show information from the uploaded route.
 
 ```html
 <!DOCTYPE html>
@@ -303,7 +314,7 @@ The html should be quite simple. Let's start basic with a input for the file han
 
 I will use MapLibre GL JS to render the map. It's a great library that allows you to create interactive maps with vector tiles. It's based on WebGL, which means it can render maps quickly and efficiently in the browser.
 
-MapLibre  will inject a map into the div with the id "map". The map will be centered on the [natural center of the world in Greenwich](https://en.wikipedia.org/wiki/Prime_meridian_(Greenwich)#history), and have a zoom level of 10. The map will have a "outdoor-sy" style from [MapTiler](https://www.maptiler.com/), a company that provides vector tiles for maps.
+MapLibre  will inject a map into the div with the id "map". The map will be centered on the [natural center of the world in Greenwich](https://en.wikipedia.org/wiki/Prime_meridian_(Greenwich)#history), and have a initial zoom level of 10. The map will use a "outdoor-sy" style from [MapTiler](https://www.maptiler.com/), a company that provides vector tiles for maps.
 
 ### Error! DataFormat Unknown
 
@@ -419,7 +430,13 @@ $$ \mathcal{O}(n^2) $$
 That's a fancy way of saying as the input data gets big (number of waterways to check for intersections), the time is takes to compute gets realllllly big.
 {{< /admonition >}}
 
-The key to solving the problem involves keeping the input data "somewhat" small such that device doing the computation does not melt and crash.
+The key to solving the problem in a "acceptable time" involves keeping the input data "somewhat" small such that device doing the computation does not melt and crash.
+
+TODO: talk about the long tail distibution.
+
+TODO: napkin math
+
+TODO: flash a message on the screen.
 
 ### Visualising the results
 
@@ -576,7 +593,12 @@ primary_region = 'ams'
   memory_mb = 256
 ```
 
-TODO: talk about how you set the secrets on fly.io using the commands
+{{< admonition type=tip >}}
+
+Setting the `auto_stop_machines` and `auto_start_machines` options on a fly.io service will automatically turn off the machine when it's idle and turn it on whenever there is a incoming request, akin to turning off a engine at a stopped traffic light[^start-stop]. This means your only charged for whatever you need and will save some money to spend on fun activities. This completely makes sense for any non critical service that is not being used 24/7.
+
+[https://fly.io/docs/apps/autostart-stop/](https://fly.io/docs/apps/autostart-stop/)
+{{< /admonition >}}
 
 ``` bash
 fly secrets set STRAVA_API_CLIENT_SECRET=$STRAVA_API_CLIENT_SECRET
@@ -884,6 +906,36 @@ https://www.openstreetmap.org/way/307632376#map=16/52.4725/13.4564
 
 I want this app to be as fast as possible. Everything feels better when there is a instant reaction, and in the modern "short-attention-span" age, it's kind of a given that things should work quickly and if not people assume something is broken.
 
+#### Avoid slow requests
+
+Normally, the Umami analytics script is served from a `/script.js` endpoint on the server that where Umami is runnning. In my case this server is automatically stopped when not in use (for money reasons) and takes more then a jiffy to start up.
+
+This is suboptimal, and because I am cheap, the start up time of the server is not something I change. I can however change the way the script is loaded. Instead of the client loading the script from the remote  server, I can add the script to the built assets and rely on github pages to serve it up fast and efficiently.
+
+
+
+#### Async all the things
+
+There are some things that are "nice to have" but in no way essential for the so called happy path of the app. These should be done in the background and not block the essential parts of the app from working.
+
+
+[`async`](https://developer.mozilla.org/en-US/docs/Glossary/Asynchronous#in_software_design) is a way of doing this, instructing the browser to run a task in the background and not block the main thread. This is a great way to keep the app feeling responsive and fast.
+
+The umami analytics script is a good example of something that is by no means essential for the app to work but nice to have for some "vanity metrics" telling me how many people are using the app and where they are located in the world. 
+
+It should be loaded in the background and not block the user from interacting with the app.
+
+```html
+<!-- the following script is used for cookie-less, GDPR compliant analytics.
+you can disable it at any time, e.g. using the NoScript or PrivacyBadger browser extensions,
+and the website will still work 100% fine. Check https://umami.is/docs/faq -->
+<script async src="https://stats.kreuzungen.world/script.js" data-website-id="a8bb61a3-65fb-404b-9a30-1bed3812b291"></script>
+```
+
+For example, when the user uploads a route, the app should display the route on the map as soon as possible, and then fetch the river data in the background. This way the user can start interacting with the map and see the route while the rivers are being fetched.
+
+### 
+
 #### First things first, lets profile
 
 TODO: link to profiling proj
@@ -960,6 +1012,8 @@ I wanted to have a similar feature in my app, a automagical feature that updates
 {{% center %}}
 Crossed 5 waterways 🏞️ Nile | Amazon River | Mississippi River | Danube River | Ganges | River Thames 🌐 https://kreuzungen.world 🗺️
 
+TODO: add a screenshot of it in action
+
 _*if any design people are reading this, I would love some help to improve this message_
 
 {{% /center %}}
@@ -973,15 +1027,15 @@ The enriched activity descriptions are then visible to all on the Strava platfor
 
 ### Refactor
 
-Krezungen was untill now a webapp written in javascript and running in the browser. I wanted to use the same logic used to process routes in the browser, but I wanted this to run on a lightweight server somewhere that strava could talk to it.
+Krezungen was until now a webapp written in javascript and running in the browser. I wanted to use the same logic used to process routes in the browser, but I wanted this to run on a lightweight server somewhere that strava could talk to it.
 
-One option I had was to translate the geometry processing code, in my fave language python.
+One option I had was to translate the geometry processing code, into my fave language python.
 
 Another way would be to use node to run some of the same code that is used in the frontend. This would be a good way to avoid reimplementing the wheel (or most parts atleast), and keeps a single, nodivergent codebases to work with in the future.
 
 I would need to refactor the code to run it with node. I decided to go with this option, and refactor the code and use TypeScript and use webpack to bundle up the assets needed for the webapp.
 
-The structre would look a little like this:
+The structure would look a little like this:
 
 | File      | Description                                |
 |-----------|--------------------------------------------|
@@ -1378,6 +1432,8 @@ https://youtu.be/OSfSDdl-QmM?t=955
 
 TODO: write about wanting to have privacy respecting analytics, and how I self hosted umani and wrote some basic events to get a understanding of how the app is used and how this could be useful in the future to improve the user experiance.
 
+I wanted some 
+
 TODO: Show graph
 
 ### Future imrpovements
@@ -1387,31 +1443,43 @@ Use this lib for having gpx and osm stuff straight onto the map.
 
 ### Hindsight
 
-Refactoring using typescript is great. I should have done this from the start. It would have saved me a lot of time debugging and writing tests.
+Typescript is great. I should have used it from the start. It would have saved me a lot of time debugging and writing tests, and will probably save me time in the future.
 
-If I started again I would of set of with a framework that deals with state. In the end the ui became more complex, and I had to use a lot of global variables to keep track of the state of the app.
+If I started again I would start out using a with a framework that deals with state. In the end the ui became more complex, and I had to use a lot of global variables to keep track of the state of the app. Using a framework would outsource 
 
 When I implemented the share controller, I got a bit caried away and added twitter/facebook/whatsapp share buttons. I should have just kept it simple and only added the copy to clipboard button. The other share buttons are not really needed, and apparently people do not share on social media, and if they do they copy the url and paste it. Removing the buttons reduced some code and made the ui cleaner.
 
-I thought it was a good idea to add the sharing of routes by encoding them into a polyline and adding the string to a url parameter. This has arguable benefits, as the route 
+I thought it was a good idea to add the sharing of routes by encoding them into a polyline and adding the string to a url parameter. This has arguable benefits, as the route can be shared without the need for a backend to store the precious user data.
 
-However this was shown to be unpractical due to the way messaging apps like whatsapp handle super long urls. Only some of the url is displayed, and the user must explictly expand it to see the full url. If they press on the shortened url, it will open in the browser but only show the trucated route. This is a confusing user experience, and while I like providing users the option of easily sharing a route without storing the data on kreuzungen servers, most people prefer the convenience of a simple share button and a freindly url like .
+However the reality was that this doesn't work, because of the way messaging apps like whatsapp handle super long urls. Only some of the url is displayed, and the user must explictly expand/uncollapse it to see the full url. If they press on the shortened url, it will open in the browser but only show the trucated route. This is a confusing/buggy user experience, and while I really like providing users the option of easily sharing a route without storing the data on kreuzungen servers, most people prefer the convenience of a simple share button and a freindly url like .
 
 ### Conclusion
 
 Like the ride, I set out on this project, not knowing how I would get all the way to the end, but with a naive courage that I could do it. In life it is always good to try things and just start out. I learnt a lot about mapping technologies. I also learnt about the turf library and how to use it to process geojson data. I also learnt about the OpenStreetMap data model, the overpass api and how to use it to get data about waterways, and I learnt about the strava api and webhooks. Along the way I learnt about typescript and how to use it to write more robust code and how to use webpack to bundle up the code.
 
-It is really cool seeing the app being used in distant place like the US, Serbia or Norway. And it was amazing to see it pop up on my strava feed, from a freind of mine that had no idea I made this. I am happy that people are enjoying this app, and I hope it inspires people to get out and explore the waterways around them.
+Looking back I am quite chuffed with how far I have come and what I have achieved.
 
-This is a magical thing about the internet, building something from open data and seeing it used by people all over the world.
+It is really cool seeing the app being used in distant place like the US, Australia, Serbia or Norway. And it was amazing to see it pop up on my strava feed, from a freind of mine that had no idea I made this. I am happy that people are enjoying this app, and I hope it inspires people to get out and explore the waterways around them.
 
-I am happy with the result, I anwserd the question I set out to answer, and I have a working app that I can share with the world. I looking forward to seeing if the app takes of and reaches a level of viralbility to take off.
+TODO: add image of peoples strava usage around the world.
+
+There is a magical thing about the internet, building something from open data and seeing it used by people all over the world.
+
+I am happy with the results, I anwserd the question I set out to answer, I have a working app that I can share with the world. I looking forward to seeing if the app takes of and reaches a level of viralbility to take off.
+
+One of the reasons I got into programming in the first place was this romantic idea that the time that I invested once codiefied could be multiplied infinitely. Now I have finished, I am sure that this will blow up.
 
 #### Known issues
 
 When asking OSM for ways and joining together ways with the same name, there might be some common name used for them both (), meaning there will be a .
 
 Sometimes the name fo the relation willbe different from the ways resulting in two unique objects.
+
+Zwift is a virtual cycling app for people who ride indoors infront of a screen. 
+
+![Zwift website]()
+
+It is often connected with Strava and the routes use real world geographies for the virtual routes[^zwift]. Some of these routes intersect with real life waterways, like the central park route intersecting with [The Loch](https://www.openstreetmap.org/node/5214031647#map=15/40.7952/-73.9578). Not sure if that's a bug or a feature but yeah... This is something I didn't prepare for and leaves me feeling weird. (On a side note, the Zwift tech community unexpectaly goes in deep [https://zwiftmap.com/watopia](https://zwiftmap.com/watopia), [https://zwiftinsider.com/route/park-perimeter-reverse/](https://zwiftinsider.com/route/park-perimeter-reverse/))
 
 ![](image-1.png)
 
@@ -1436,3 +1504,11 @@ TODO: explain what a real world river is and how its different from a stream, an
 TODO: talk about invalid geometries and problems around holes (https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule vs https://en.wikipedia.org/wiki/Nonzero-rule) ect... link to https://mapshaper.org 
 
 TODO: say your keeping this breif but link to interesting geometry problems -->
+
+## Footnotes
+
+[^dicke-marie]: [https://nationalerbe-baeume.de/project/dicke-marie-berlin-tegel/](https://nationalerbe-baeume.de/project/dicke-marie-berlin-tegel/)
+[^river-wiki]: [https://en.wikipedia.org/wiki/River](https://en.wikipedia.org/wiki/River)
+[^osm-services]: [https://wiki.openstreetmap.org/wiki/List_of_OSM-based_services](https://wiki.openstreetmap.org/wiki/List_of_OSM-based_services)
+[^start-stop]: [https://en.wikipedia.org/wiki/Start-stop_system](https://en.wikipedia.org/wiki/Start-stop_system)
+[^zwift]: [https://www.bikeforums.net/indoor-stationary-cycling-forum/1286793-question-zwift-users.html](https://www.bikeforums.net/indoor-stationary-cycling-forum/1286793-question-zwift-users.html)
