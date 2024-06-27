@@ -954,7 +954,7 @@ I looked at what other top level domains were not taken, and although there was 
 
 ### DNS
 
-Setting up github pages with my new shiny domain was pretty easy. I followed the [docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) and configured my DNS with some A records pointing to github servers.
+Setting up github pages with my new shiny domain was pretty easy. I followed the [docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) and configured my DNS with some A records pointing to github servers. I also set up the www. subdomain to redirect to the "naked" apex domain, because [both is better](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Choosing_between_www_and_non-www_URLs#make_your_page_work_for_both).
 
 After waiting a few mins, I checked that the records had propagated through the network.
 
