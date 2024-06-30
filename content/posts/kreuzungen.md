@@ -902,7 +902,7 @@ I looked at what other top level domains were not taken, and although there was 
 
 ### DNS
 
-Setting up github pages with my new shiny domain was pretty easy. I followed the [docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) and configured my DNS with some A records pointing to github servers.
+Setting up github pages with my new shiny domain was pretty easy. I followed the [docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) and configured my DNS with a txt record to verify I owned the domain, and some A records pointing to github servers.
 
 After waiting a few mins, I checked that the records had propagated through the network.
 
@@ -922,11 +922,11 @@ A last sanity check with the browser showed that [https://kreuzungen.world](http
 
 ![https://kreuzungen.world loading for the first time](/images/loadingkreuzungen.gif)
 
-I also made records to point the subdomain `auth.kreuzungen.world` to the fly.io server that was running the backend service.
+I also made records to point the subdomains `auth.kreuzungen.world` and `stats.kreuzungen.world` to the fly.io servers running the backend and analytics services. This is for cosmetic reasons has no technical advantage (subdomains are still different domains, so CORS still shows up). I avoid the user seeing any requests to `https://random_scary_name.fly.dev/`, and that makes me happy.
 
 ### SEO
 
-I am no SEO expert, and everything I implement was based on a few google searches, if any SEO pro's are reading and have some tips, I would love to hear them.
+I am no SEO expert, and everything I implement was based on a few google searches, if any SEO pro's are reading and have some tips, I would love to hear them ([email me](mailto:davidwhittingham94@gmail.com)).
 
 #### Google
 
@@ -937,7 +937,7 @@ Generally, google finds all website and will automatically index them, but this 
 
 There are a few things you can do to speed up the process.
 {{< /admonition >}}
-
+00000000000
 #### Crawl first before you walk
 
 I added the site to the [google search console](https://search.google.com/search-console/about) and verified that I was the owner of the domain by adding a TXT record to my DNS. 
