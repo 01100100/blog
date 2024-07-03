@@ -954,7 +954,7 @@ I looked at what other top level domains were not taken, and although there was 
 
 ### DNS
 
-Setting up github pages with my new shiny domain was pretty easy. I followed the [docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) and configured my DNS with some A records pointing to github servers. I also set up the www. subdomain to redirect to the "naked" apex domain, because [both is better](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Choosing_between_www_and_non-www_URLs#make_your_page_work_for_both).
+Setting up github pages with my new shiny domain was pretty easy. I followed the [docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site) and configured my DNS with a txt record to verify I owned the domain, and some A records pointing to github servers.
 
 After waiting a few mins, I checked that the records had propagated through the network.
 
@@ -974,7 +974,11 @@ A last sanity check with the browser showed that [https://kreuzungen.world](http
 
 ![https://kreuzungen.world loading for the first time](/images/loadingkreuzungen.gif)
 
-I also made records to point the subdomain `auth.kreuzungen.world` to the fly.io server that was running the backend service.
+I set up the www. subdomain to redirect to the "naked" apex domain, because [both is better](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Choosing_between_www_and_non-www_URLs#make_your_page_work_for_both).
+
+I also made records to point the subdomains `auth.kreuzungen.world` and `stats.kreuzungen.world` to the fly.io servers running the backend and analytics services. This is for cosmetic reasons has no technical advantage (subdomains are still different domains, so CORS still shows up with a arguable performance cost). I avoid the user seeing any requests to `https://random_scary_name.fly.dev/`, and that makes me happy.
+
+
 
 ### SEO
 
@@ -1023,7 +1027,7 @@ To accomplish this, I utilized the [Strava Webhook Events API](https://developer
 
 This approach eliminates the need for users to manually check activities on [https://kreuzungen.world](https://kreuzungen.world). After a one-time authorization of Kreuzungen with the "Upload your activities from Kreuzungen to Strava" scope set, users should receive automatic and consistent updates about the waterways on their Strava profile, for life.
 
-The enriched activity descriptions are then visible to all on the Strava platform, potentially inspiring others to explore Kreuzungen and join a new community of river lovers.
+The enriched activity descriptions are then visible to all on the Strava platform, potentially inspiring others to explore Kreuzungen and join a new community of river lovers. More people  using the kreuzungen.world with strava means more people will see the app, meaning more people will use the app, and so on. Viva la Kreuzungen!
 
 ### Refactor
 
@@ -1459,7 +1463,11 @@ Like the ride, I set out on this project, not knowing how I would get all the wa
 
 Looking back I am quite chuffed with how far I have come and what I have achieved.
 
-It is really cool seeing the app being used in distant place like the US, Australia, Serbia or Norway. And it was amazing to see it pop up on my strava feed, from a freind of mine that had no idea I made this. I am happy that people are enjoying this app, and I hope it inspires people to get out and explore the waterways around them.
+It is really cool seeing the app being used in distant place like the US, Australia, Serbia or Norway. And it was amazing to see it pop up on my strava feed, from a freind of mine that had no idea I made this. 
+
+TODO: insert screenshot with the comment
+
+I am happy that people are enjoying this app, and I hope it inspires people to get out and explore the waterways around them.
 
 TODO: add image of peoples strava usage around the world.
 
@@ -1504,6 +1512,16 @@ TODO: explain what a real world river is and how its different from a stream, an
 TODO: talk about invalid geometries and problems around holes (https://en.wikipedia.org/wiki/Even%E2%80%93odd_rule vs https://en.wikipedia.org/wiki/Nonzero-rule) ect... link to https://mapshaper.org 
 
 TODO: say your keeping this breif but link to interesting geometry problems -->
+
+
+## Other interesting shit
+
+- Cool web app that shows the watershed from any point clicked on the map!
+[https://mghydro.com/watersheds/](https://mghydro.com/watersheds/)
+- Global river runner, api for calculating the path any raindrop will run out to the ocean [https://ksonda.github.io/global-river-runner/](https://ksonda.github.io/global-river-runner/)
+- Visulaise the path of a rain drop falling to the ocean [https://river-runner-global.samlearner.com/](https://river-runner-global.samlearner.com/)
+- web app showing connected waterway networks [waterwaymap.org](waterwaymap.org)
+- OSM forum discussion walking about if waterways should be mapped across lakes ect.. [https://community.openstreetmap.org/t/should-river-lines-be-mapped-through-lakes-estuaries-gulfs-and-other-large-water-bodies/104438]https://community.openstreetmap.org/t/should-river-lines-be-mapped-through-lakes-estuaries-gulfs-and-other-large-water-bodies/104438()
 
 ## Footnotes
 
