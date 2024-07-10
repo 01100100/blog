@@ -1,4 +1,4 @@
-baseURL = '01100100.github.io'
+baseURL = 'davidwhittingham.com'
 languageCode = 'en'
 title = "Data Dave's Blog"
 defaultContentLanguage = "en"
@@ -112,7 +112,7 @@ BuyMeACoffee = ""
 Linktree = ""
 QQ = ""
 QQGroup = ""
-Email = "davidwhittingham94@gmail.com"
+Email = "contact@davidwhittingham.com"
 RSS = true
 
 [params.header]
