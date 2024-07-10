@@ -224,3 +224,12 @@ enable = true
 copyTex = true
 # KaTeX extension mhchem
 mhchem = true
+
+[params.analytics]
+enable = true
+
+[params.analytics.umami]
+data_website_id = "a4340d1e-a48a-4a46-9609-2a89e8a3b547"
+src = "https://stats.davidwhittingham.com/script.js"
+data_host_url = "https://stats.davidwhittingham.com"
+data_domains = ""

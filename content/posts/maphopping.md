@@ -47,7 +47,7 @@ You might encounter two very different looking basemaps, which often leads to sq
 
 Many mapping services use a common pattern of encoding the viewport settings (latitude, longitude and zoom level) into the URL using the [hash property](https://developer.mozilla.org/en-US/docs/Web/API/URL/hash).
 
-For the sake of some examples, lets use the undisputed arbitrarily-chosen center of the World[^prime-meridian-history], The Royal Observatory in Greenwich, London with co-ordinates `51.4769° N, 0.0000° E` and a arbitrary zoom level of `13`.
+Consider for the sake of some examples, the undisputed arbitrarily-chosen center of the World[^prime-meridian-history], The Royal Observatory in Greenwich, London with co-ordinates `51.4769° N, 0.0000° E` and a arbitrary zoom level of `13`.
 
 Here’s how different mapping services encode this information into the URL:
 
@@ -79,11 +79,11 @@ If you're using [Leaflet](https://leafletjs.com), there is a popular plugin that
 
 MapSwap is a little utility that you can add to your web browser, a Bookmarklet[^bookmarklet]. When you click the "MapSwap" bookmark, the browser executes a bit of javascript that parses the {x} and {y} coordinates and {z} zoom level from a map via the URL, using the `window.location`[^window.location] object. It then opens another tab, allowing you to select from various mapping applications. The selected application will open configured with the same coordinates and zoom level, essentially preserving the original viewport.
 
-There is a [file](https://gitlab.com/trailstash/mapswap/-/blob/main/swap/maps.js?ref_type=heads) that houses a JSON array of mapping application entries.
+The file [`map.js`](https://gitlab.com/trailstash/mapswap/-/blob/main/swap/maps.js?ref_type=heads) houses a JSON array of mapping application entries.
 
 Each entry contains the name of the application, a URL template string, an icon URL, and an array of tags.
 
-A new entry for Komoot would look like this
+A entry for Komoot would look something like this:
 
 ```js
 {
@@ -118,7 +118,7 @@ There are many different mapping applications out there, each having pros and co
 
 ![Swapping maps in Greenwich](/videos/all_maps_greenwich.gif)
 
-The next level would be syncing different maps in real-time.
+The next level to this would be syncing different maps viewports in real-time.
 
 Imagine planning a big winter ski-touring-bike-packing trip using Komoot on the left side of the screen and then both snow conditions and ski touring routes on the right side, and everything moving in sync.
 
