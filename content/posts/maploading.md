@@ -39,7 +39,7 @@ Vector maps use vector data, made up of points, lines and polygons with accompan
 
 Vector maps are the opposite of raster maps, which are made up of pixel data pre-rendered on a server. Raster maps are harder to manipulate and style.
 
-The best resource out there to to have a refresh on web maps is [mapschool.io](https://mapschool.io/). It explains the difference between raster and vector maps and much more.
+The best resource to go for a refresh on web maps is the [mapschool.io](https://mapschool.io/). It explains the difference between raster and vector maps and much more.
 
 {{< /admonition >}}
 
@@ -139,9 +139,126 @@ Here is a taste of a style à la MapTiler Basic Light**
 }
 ```
 
-It a very simple style that only shows a few of the features you would expect of a map. It has a background color, grass and wood areas, water, buildings and some text.
+TODO: store this style.json relative to the blog post
 
-There are two sources of data, one for the map data and one for the attribution. This informs the library where to request data from the tile server with address `https://api.maptiler.com/tiles/v3/tiles.json?key={YOUR_API_KEY}`.
+It a very simple style that only shows a few of the features you would expect of a map. It has a background color, grass and wood areas, water, buildings and some text. Here is the style in action, you can toggle the different layers on and with the checkboxes and see how the map changes and the layers interact with each other.
+
+TODO: add a map with the style above
+
+
+{{< toggle_layer_map >}}
+
+![Video of the above style being rendered piece by piece](TODO:)
+
+There are two sources of data, one for the map data and one for the attribution. This informs the library where to request data from the tile server with address `https://api.maptiler.com/tiles/v3/tiles`.
+
+The tile json file that is served from this address will look something like this:
+
+```
+	
+vector_layers	
+0	
+id	"contour"
+minzoom	9
+maxzoom	14
+description	"Contour lines with height and additional information for index line and glacier styling."
+fields	
+height	"Elevation in meters (10 resolution)."
+glacier	"Marks whether a line intersects a glacier."
+nth_line	"Marks every other, 2nd, 5th or 10th line."
+1	
+id	"contour_ft"
+minzoom	9
+maxzoom	14
+description	"Contour lines with height in feet and additional information for index line and glacier styling."
+fields	
+height	"Elevation in feet."
+glacier	"Marks whether a line intersects a glacier."
+nth_line	"Marks every other, 2nd, 5th or 10th line."
+tilestats	
+layerCount	2
+layers	
+0	
+layer	"contour"
+attributes	
+0	
+attribute	"height"
+type	"Number"
+max	8730
+min	-420
+1	
+attribute	"nth_line"
+type	"Number"
+values	
+0	1
+1	2
+2	5
+3	10
+2	
+attribute	"glacier"
+type	"Number"
+values	
+0	1
+attributeCount	3
+geometry	"LineString"
+1	
+layer	"contour_ft"
+attributes	
+0	
+attribute	"height"
+type	"Number"
+max	28640
+min	-1400
+1	
+attribute	"nth_line"
+type	"Number"
+values	
+0	1
+1	2
+2	5
+3	10
+2	
+attribute	"glacier"
+type	"Number"
+values	
+0	1
+attributeCount	3
+geometry	"LineString"
+tilejson	"2.1.0"
+format	"pbf"
+id	"contours"
+minzoom	9
+maxzoom	14
+pixel_scale	"256"
+version	"2.2"
+generator	"MapTiler Data"
+description	"Tiles with isolines of equal elevation. It consists of two layer - contour - contour lines in meters; contour_ft - contour lines in feet."
+attribution	'<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
+bounds	
+0	-180
+1	-66.513
+2	180
+3	74.01954331150226
+center	
+0	8.4773
+1	47.0879
+2	10
+logo	"https://api.maptiler.com/resources/logo.svg"
+name	"Contours"
+crs	"EPSG:3857"
+crs_wkt	'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]'
+extent	
+0	-20037508.342789244
+1	-10018681.42468256
+2	20037508.342789244
+3	12523442.714243278
+tiles	
+0	"https://api.maptiler.com/tiles/contours/{z}/{x}/{y}.pbf?key=ykqGqGPMAYuYgedgpBOY"
+```
+
+TODO: meh, this is not a good example, need to find a better one.
+
+TODO:: add images/videos to the style in the popups
 
 The layers key is where the rendering instructions are. Each layer has an id, a type, a source (in our case it is always the single `openmaptiles` source) and some paint instructions.
 
@@ -182,7 +299,7 @@ There are many different places to get vector map styles. Providers offer them. 
 
 Different providers offer different styles and it is not always clear which one is the fastest, the Usain Bolt of map styles.
 
-It is also possible to write a custom style, and there are many tools out there that can help you. Maplibre-gl has a [style spec](https://github.com/maplibre/maplibre-style-spec) that you can use to write your own style. MapTiler has a [online style editor](https://www.maptiler.com/cloud/customize/) that you can use to create your own style.
+It is also possible to write a custom style, and there are many tools out there that can help you. Maplibre-gl has a [style spec](https://maplibre.org/maplibre-style-spec/) that you can use to write your own style. MapTiler has a [online style editor](https://www.maptiler.com/cloud/customize/) that you can use to create your own style.
 
 ## The Experiment
 
@@ -349,7 +466,6 @@ for k, v in STYLES.items():
 
 All code is available in the [mapStyleProfile github repository](https://github.com/01100100/mapStyleProfile).
 
-
 ## The Results
 
 {{< echarts >}}
@@ -494,3 +610,20 @@ There are a few things that could be done to improve the experiment:
 - [ ] Profile the different parts of the map loading process to break down ingload time
 - [ ] Add more "real world" interactions to the experiment and see how the  styles perform under different conditions.
 - [ ] Set up a github action to run the experiment on pull requests and provided a central place to see the results.
+- [ ] Use the [firefox profiler](https://profiler.firefox.com/docs) to get a more detailed view of the rendering process.
+
+## Down the profiling rabbit hole
+
+The whole point of profiling is to get a better understanding of how something will perform in the real world and give you measurements to compare and make decisions on.
+
+This experiment only looked at the time it took to load the map and used events emitted from the maplibre-gl library to measure this time. In my case, this information was already enough to make a decision about which style to use. But you can go much, much deeper.
+
+You could profile the different parts of the map loading process, like the time it takes to download the style document, the time it takes to start downloading vector tiles, the time it takes to render the tiles, the time it takes to render the text... The possibilities are endless.
+
+{{< admonition type=info title="Enter is the firefox profiler" >}}
+
+I am a fan of the [firefox profiler](https://profiler.firefox.com/docs) for giving a holistic view of what's happening in the browser without writing code that monitors specific actions. 
+
+There are many other tools out there that can help you profile your web app. The [awesome Web Performance Optimization](https://github.com/davidsonfellipe/awesome-wpo) contains a giant list of tools and resources.
+
+{{< /admonition >}}
