@@ -27,6 +27,16 @@ defaults:
     shell: bash
 
 jobs:
+  # Lint job to check Markdown files
+  lint-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Markdown linter
+        run: npm install -g markdownlint-cli
+      - name: Lint Markdown files
+        run: markdownlint '**/*.md' --disable MD013
   # Build job to check the site builds correctly
   build:
     runs-on: ubuntu-latest
