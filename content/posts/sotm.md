@@ -3,7 +3,6 @@ title: "Traveling to State of the Map 2024 🌍🗺️"
 subtitle: ""
 date: 2024-07-11T01:46:42+02:00
 lastmod: 2024-07-11T01:46:42+02:00
-draft: true
 authors: []
 description: ""
 
