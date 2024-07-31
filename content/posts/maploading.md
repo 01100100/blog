@@ -145,7 +145,6 @@ There are two sources of data, one for the map data and one for the attribution.
 
 The layers key is where the rendering instructions are. Each layer has an id, a type, a source (in our case it is always the single `openmaptiles` source) and some paint instructions.
 
-
 The background gets loaded, polygons of grass gets drawn with a opaque green, water gets drawn in blue, but not when it goes through a tunnel, building footprints rise up.
 
 Paint instructions can get quite complex, and contain many conditional rules and transformations. Things that can be controlled are the size lines, opacity of fills and the font of the text.
@@ -190,7 +189,7 @@ I used playwright, a browser automation library to launch a chromium browser, in
 
 The experiment was run on my local machine (A 10 year old HP Pavilion) with a 50mbps internet connection somewhere in Germany.
 
-All [the code](#show-me-the-code) is available in [this repo](https://github.com/01100100/mapStyleProfile) if you want to replicate the experiment.
+All [the code](#code-used-to-profile-the-styles) is available in [this repo](https://github.com/01100100/mapStyleProfile) if you want to replicate the experiment.
 
 Note: Your mileage may vary depending on your hardware and internet connection.
 
@@ -349,7 +348,6 @@ for k, v in STYLES.items():
 
 All code is available in the [mapStyleProfile github repository](https://github.com/01100100/mapStyleProfile).
 
-
 ## The Results
 
 {{< echarts >}}
@@ -468,7 +466,7 @@ Now there are some numbers to quantify the different map styles speed.
 
 Remember speed isn't everything, and a good map experience is a combination of many things. A fast loading map is just one part of the puzzle, along with space and color, compromises may have to be made to get the best overall experience.
 
-## Don't just take my word for it, test styles out yourself online now!
+## Don't just take my word for it, test styles out yourself online now
 
 {{< admonition type=idea title="A online tool for DIY testing 💻📏" >}}
 
@@ -490,7 +488,7 @@ This was a simple experiment to get some numbers on the different map styles, on
 
 There are a few things that could be done to improve the experiment:
 
-- [ ] Add more styles from different providers to get a better idea of the landscape.
-- [ ] Profile the different parts of the map loading process to break down ingload time
-- [ ] Add more "real world" interactions to the experiment and see how the  styles perform under different conditions.
-- [ ] Set up a github action to run the experiment on pull requests and provided a central place to see the results.
+* [ ] Add more styles from different providers to get a better idea of the landscape.
+* [ ] Profile the different parts of the map loading process to break down ingload time
+* [ ] Add more "real world" interactions to the experiment and see how the  styles perform under different conditions.
+* [ ] Set up a github action to run the experiment on pull requests and provided a central place to see the results.
