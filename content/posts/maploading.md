@@ -1,4 +1,5 @@
 ---
+type: posts
 title: "Map Loading... 🗺️📏🎨"
 subtitle: "Experimenting with different vector map style loading times using maplibre-gl."
 date: 2024-03-25T11:42:41+01:00

@@ -1,4 +1,5 @@
 ---
+type: posts
 title: "Map Hopping Made Easy!  🗺️🦘🗺️"
 subtitle: "Yet another useful tool in the modern mapping ecosystem."
 date: 2024-07-09T23:28:25+02:00
