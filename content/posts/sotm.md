@@ -223,27 +223,30 @@ It was forecasted to be dry and hot, which means a lower air density and even le
 
 ## The Journey 🚴‍♂️
 
-TODO: talk about dropping a laptop off at Dominik's and then leaving Berlin, the first 100km to the border, the border crossing, the first night in Poland, the second day, and the arrival in Łódź.
+I left Berlin around 10:00 AM. I had a laptop with me, which I dropped off at Dominik's place on the outskirts of Berlin (big thanks for taking care of it!). From then on, I was heading east!
 
-I avoided wearing a backpack. Thankfully, a fellow SOTM attendee offered to take my laptop with him on the bus.
+The first 100km were super smooth. I was flying! The sun was shining, and I was moving through the forests of Brandenburg with a tailwind all the way to the border. I was cruising on the aero bars at around 30km/h without much effort.
 
-TODO: talk about going over the Oder River and noticing the difference in surface quality.
+I went over the Oder/Odra River, which marked the international border between Germany and Poland. I do love a good Schengen border crossing. You just glide through without being stopped or checked. I probably wouldn't have even noticed if I didn't know I was crossing a border. Especially as someone who used to be an EU citizen, I truly appreciate the freedom of movement.
 
-TODO: talk about how great the Schengen agreement is.
+The road quality changed as soon as I crossed the border. The roads became rougher and bumpier. Such is life. It would be interesting to analyze the road quality data from OSM to see if there is a difference between countries. I imagine that the surface_type completeness in Polish street data in OSM is lower than in Germany, but that is a topic for another time.
 
-TODO: talk about the lake.
+I went along a Park narodowy (aka a national park) and saw some beautiful birds flying around, many storks. I also saw a few deer and a big frog.
 
-TODO: talk about the puncture after hitting a pothole and fixing it.
-
-TODO: talk about how clean Poland is and how there was no trash anywhere.
+One remarkable thing I noticed was how clean Poland was. There was no trash anywhere. I didn't see a single piece of litter on the road, and the fields and forests were well-kept.
 
 ![A beautiful polish road](/images/polish-road.jpg)
+A lake provided the perfect spot to cool off and eat some food. Poland is beautiful in the summer.
 
-TODO: talk about something happening in Poznan.
+The afternoon heat was intense, and I was cooking, my skin slick with a slimy mix of salty sweat and sunscreen lotion. But whatever, I was moving fast.
 
-TODO: talk about the sun and tan lines.
+I spent the night in Poznan, a beautiful city with a lot of young people and a lot of history. I arrived, had a shower, and headed out to explore the city and have something to eat. The city was alive with people and music. I almost got swindled in a strip club, but that is a story for another time.
 
-TODO: Talk about the Polish gravel gang you met after not seeing anyone on a bike for 400km and how they raced into town and got some burgers.
+After a big breakfast, I hit the road again. The second day was again super smooth. I had a tailwind all the way to Łódź. I was flying!
+
+A sudden pothole caused a snakebite1. No biggie, I had a spare tube and fixed it in no time and was back on the road cruising again.
+
+With about 50km left, I encountered a group of Polish gravel riders. They were, let's just say, a lively bunch. They invited me to join their ride. We raced into Łódź together, they showed me a few sights, and we finished the journey sharing stories and beers. A perfect ending to an epic ride.
 
 ![The Polish Gravel Gang](/images/unicorn.jpeg)
 
@@ -287,3 +290,5 @@ Cycling has many uncountable benefits, but for me, it's the best way to travel a
 [^aero-bike-bags]: According to the manufacturer, bike bags can make you faster... [apidura.com](https://www.apidura.com/journal/apidura-aero-pack-system-packs-that-make-you-faster/)
 [^rolling-resistance]: Grand Prix 5000 comparison on [bicyclerollingresistance.com](https://www.bicyclerollingresistance.com/specials/grand-prix-5000-s-tr-comparison)
 [^bonk]: Wikipedia on bonking [aka Hitting the Wall](https://en.wikipedia.org/wiki/Hitting_the_wall) 
+[^snakebite]: Sheldon Brown on [Snakebite Punctures](https://www.sheldonbrown.com/brandt/snakebites.html)
+```
