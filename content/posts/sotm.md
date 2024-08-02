@@ -256,6 +256,13 @@ In Poland, you find "Sklep Polski" everywhere, which are small local shops selli
 
 Since it was so hot, I needed to drink a lot of water on the ride, like 6 litres a day. However it was never a problem to find clean water on route. I took some isotonic tablets with me to stay hydrated.
 
+## Key Takeaways for Long-Distance Cycling in 2024
+
+* Bike Fit: Ensure your bike fits you well. Small adjustments can make a huge difference in comfort and performance.
+* Hydration and Nutrition: Plan your food and water intake meticulously. Staying hydrated and fueled is crucial for maintaining energy levels.
+* Gear: Invest in quality gear that prioritizes comfort and efficiency. Aero bars, padded shorts, and proper tires can significantly enhance your ride.
+* Route Planning: Use tools like Komoot to plan your route in detail. Knowing the terrain and expected weather conditions helps in better preparation.
+
 ## Conclusion
 
 State of the Map 2024 was fantastic! I had a great time and learned a lot, which could fill another blog post.
@@ -268,9 +275,9 @@ Cycling has many uncountable benefits, but for me, it's the best way to travel a
 
 ![Me on my bike!](/images/sunshine.jpg)
 
-[^500km]: 510km according to [Komoot](https://www.komoot.com/tour/1700459745).
+[^500km]: 510km according to [Komoot.com](https://www.komoot.com/tour/1700459745).
 [^nerve-damage-in-bikepacking]: How Nerve Damage During Ultras is a thing from [dotwatcher.cc](https://dotwatcher.cc/feature/nerve-damage-during-ultras)
-[^helmet-test]: [Helmet Test](https://www.youtube.com/watch?v=7d7DznkY3Jo)
-[^aero-helmet]: A interesting NASA article on bike helmets[nasa.gov](https://www.nasa.gov/directorates/stmd/tech-transfer/spinoffs/tech-today-a-nasa-inspired-bike-helmet-with-aerodynamics-of-a-jet/)
-[^aero-bike-bags]: According to the manufacturer, bike bags can make you faster[apidura.com](https://www.apidura.com/journal/apidura-aero-pack-system-packs-that-make-you-faster/)
+[^helmet-test]: Guy tests out helmet in a wind tunnel on [youtube.com](https://www.youtube.com/watch?v=7d7DznkY3Jo)
+[^aero-helmet]: A interesting article on bike helmets from [nasa.gov](https://www.nasa.gov/directorates/stmd/tech-transfer/spinoffs/tech-today-a-nasa-inspired-bike-helmet-with-aerodynamics-of-a-jet/)
+[^aero-bike-bags]: According to the manufacturer, bike bags can make you faster... [apidura.com](https://www.apidura.com/journal/apidura-aero-pack-system-packs-that-make-you-faster/)
 [^rolling-resistance]: Grand Prix 5000 comparison on [bicyclerollingresistance.com](https://www.bicyclerollingresistance.com/specials/grand-prix-5000-s-tr-comparison)
