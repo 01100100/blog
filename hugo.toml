@@ -18,7 +18,7 @@ title = ""
 weight = 1
 
 [params]
-gitRepo = "https://github.com/01100100/"
+gitRepo = "https://github.com/01100100/blog"
 
 
 [params.home.profile]
@@ -168,7 +168,7 @@ linkToEdit = false
 linkToReport = false
 # "https://github.com/user/repo/issues/new?title=[bug]%20{title}&body=|Field|Value|%0A|-|-|%0A|Title|{title}|%0A|Url|{url}|%0A|Filename|https://github.com/user/repo/blob/main/{path}|"
 # DoIt NEW | 0.2.4 whether to show the full text content in RSS
-rssFullText = false
+rssFullText = true
 # DoIt NEW | 0.2.13 whether to enable series navigation
 seriesNavigation = true
 # whether to enable last modified time
