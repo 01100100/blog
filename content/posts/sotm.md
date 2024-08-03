@@ -190,6 +190,7 @@ Here is a complete list of what I took with me:
   * Toothpaste
   * Sunscreen
 
+
 {{< /admonition >}}
 
 ## The Route 🗺️
@@ -230,7 +231,23 @@ The first 100km were super smooth. I was flying! The sun was shining, and I was 
 
 I went over the Oder/Odra River, which marked the international border between Germany and Poland. I do love a good Schengen border crossing. You just glide through without being stopped or checked. I probably wouldn't have even noticed if I didn't know I was crossing a border. Especially as someone who used to be an EU citizen, I truly appreciate the freedom of movement.
 
-The road quality changed as soon as I crossed the border. The roads became rougher and bumpier. Such is life. It would be interesting to analyze the road quality data from OSM to see if there is a difference between countries. I imagine that the surface_type completeness in Polish street data in OSM is lower than in Germany, but that is a topic for another time.
+The road quality changed as soon as I crossed the border. The roads became rougher and bumpier. Such is life. It would be interesting to analyze the road quality data from OSM to see if there is a difference between countries. I imagine that the `surface` tag completeness in Polish street data in OSM is lower than in Germany, but that is a topic for another time.
+
+{{<admonition type=info title="OSM Tag Statistics" open=false >}}
+
+Due to the nature of OpenStreetMap, the data quality can vary. A element can be tagged[^osm-tag] in a almost infinite number of ways. If a element is without a tag, it is considered unknown. If a element is similar to a group of other elements which all contain a common tag. It is consider incomplete data (eg think of adding a new x to OSM TODO: finish this example).
+
+[Taginfo](https://taginfo.openstreetmap.org/) helps you by showing statistics about which tags are actually in the database, how many people use those tags, where they are used and so on..
+
+You can quickly look up the `highway` tag and see how many times it is used in combination with the `surface` tag in Germany and Poland.
+
+[https://taginfo.openstreetmap.org/keys/surface#overview](https://taginfo.openstreetmap.org/keys/surface#overview)
+
+It also contains a list of all the different applications that use the `surface` tag.
+
+[https://taginfo.openstreetmap.org/keys/surface#projects](https://taginfo.openstreetmap.org/keys/surface#projects)
+
+{{< /admonition >}}
 
 I went along a Park narodowy (aka a national park) and saw some beautiful birds flying around, many storks. I also saw a few deer and a big frog.
 
@@ -294,3 +311,4 @@ Cycling has many uncountable benefits, but for me, it's the best way to travel a
 [^rolling-resistance]: Grand Prix 5000 comparison on [bicyclerollingresistance.com](https://www.bicyclerollingresistance.com/specials/grand-prix-5000-s-tr-comparison)
 [^bonk]: Wikipedia on bonking [aka Hitting the Wall](https://en.wikipedia.org/wiki/Hitting_the_wall)
 [^snakebite]: Sheldon Brown on [Snakebite Punctures](https://www.sheldonbrown.com/brandt/snakebites.html)
+[^osm-tag]: OSM wiki on [tags](https://wiki.openstreetmap.org/wiki/Tags)
