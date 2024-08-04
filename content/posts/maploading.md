@@ -22,7 +22,7 @@ toc:
   enable: true
 math:
   enable: false
-lightgallery: false
+lightgallery: true
 license: ""
 ---
 <!--more-->
@@ -30,7 +30,7 @@ license: ""
 
 When using a map on a digital device, it is important that it is fast to load and the map interactions are seamlessly smooth. A fast loading map will go by unnoticed as "everything works" leading to a natural feeling experience. A slow loading map will get in the way of a good user experience, leading to frustration, grief and a bad taste in the mouth.
 
-![GIF of a slow loading map](/images/maploading/slowloading.gif)
+{{< image src="/videos/maploading/slowloading.gif" alt="GIF of a slow loading map" caption="A slow loading map" >}}
 
 Vector maps are being used more and more on the web. They offer a faster and more interactive experience and more ways of being styled.
 
@@ -60,7 +60,7 @@ This _recipe_ is often called a `style` document, which is usually a json file c
 
 A good designer aka a cartograpaher, will design a style in a way that it shows off the best parts of the data with certain balance of space and color, producing something that looks appealing and allows easy reading of the data.
 
-![A artist painting a map](/images/maploading/painting_map.jpeg)
+{{< image src="/images/maploading/painting_map.jpeg" alt="A artist painting a map" caption="A artist painting a map" >}}
 
 ### What makes things fast or slow?
 
@@ -469,19 +469,15 @@ Remember speed isn't everything, and a good map experience is a combination of m
 
 ## Don't just take my word for it, test styles out yourself online now
 
-{{< admonition type=idea title="A online tool for DIY testing 💻📏" >}}
-
 I made a online tool that lets you paste a style url into it and it will time how long it takes to load the map.
-
-![Screenshot](/images/maploading/screenshot_frame.png)
 
 {{% center %}}
 [https://01100100.github.io/mapStyleProfile/](https://01100100.github.io/mapStyleProfile/)
 {{% /center %}}
 
-All source code is available in the same [github repository](https://github.com/01100100/mapStyleProfile).
+{{< image src="/images/maploading/screenshot_frame.png" alt="Screenshot of the online tool" >}}
 
-{{< /admonition >}}
+All source code is available in the same [github repository](https://github.com/01100100/mapStyleProfile).
 
 ## Future ideas
 
