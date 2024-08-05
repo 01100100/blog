@@ -13,7 +13,7 @@ series: []
 hiddenFromHomePage: false
 hiddenFromSearch: false
 featuredImage: ''
-featuredImagePreview: '/videos/ride-poland.gif'
+featuredImagePreview: '/videos/sotm/ride-poland.gif'
 toc:
   enable: true
 math:
