@@ -1,0 +1,34 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "static/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "posts"
+    label: "Posts"
+    folder: "content/posts"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Type", name: "type", widget: "hidden", default: "posts" }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Last Modified", name: "lastmod", widget: "datetime", required: false }
+      - { label: "Authors", name: "authors", widget: "list", field: { label: "Author", name: "author", widget: "string" }, required: false }
+      - { label: "Description", name: "description", widget: "text", required: false }
+      - { label: "Draft", name: "draft", widget: "boolean", default: false }
+      - { label: "Tags", name: "tags", widget: "list", field: { label: "Tag", name: "tag", widget: "string" }, required: false }
+      - { label: "Categories", name: "categories", widget: "list", field: { label: "Category", name: "category", widget: "string" }, required: false }
+      - { label: "Series", name: "series", widget: "list", field: { label: "Series", name: "series", widget: "string" }, required: false }
+      - { label: "Hidden From Home Page", name: "hiddenFromHomePage", widget: "boolean", default: false }
+      - { label: "Hidden From Search", name: "hiddenFromSearch", widget: "boolean", default: false }
+      - { label: "Featured Image", name: "featuredImage", widget: "image", required: false }
+      - { label: "Featured Image Preview", name: "featuredImagePreview", widget: "image", required: false }
+      - { label: "Table of Contents", name: "toc", widget: "object", fields: [{ label: "Enable", name: "enable", widget: "boolean", default: false }] }
+      - { label: "Math", name: "math", widget: "object", fields: [{ label: "Enable", name: "enable", widget: "boolean", default: false }] }
+      - { label: "Lightgallery", name: "lightgallery", widget: "boolean", default: false }
+      - { label: "License", name: "license", widget: "string", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }
