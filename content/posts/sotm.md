@@ -1,25 +1,25 @@
 ---
 type: posts
-title: "Traveling to State of the Map 2024 \U0001F6B2"
-subtitle: ''
-date: '2024-08-01T01:46:42+02:00'
-lastmod: '2024-08-01T01:46:42+02:00'
+title: Traveling to State of the Map Europe 2024 🚲
+subtitle: ""
+date: 2024-08-01T01:46:42+02:00
+lastmod: 2024-08-01T01:46:42+02:00
 authors: []
-description: 'How my bike delivered me to an OpenStreetMap event in Łódź, Poland.'
+description: How my bike delivered me to an OpenStreetMap event in Łódź, Poland.
 draft: false
 tags: []
 categories: []
 series: []
 hiddenFromHomePage: false
 hiddenFromSearch: false
-featuredImage: ''
-featuredImagePreview: '/media/sotm/ride-poland.gif'
+featuredImage: ""
+featuredImagePreview: /media/sotm/ride-poland.gif
 toc:
   enable: true
 math:
   enable: false
 lightgallery: true
-license: ''
+license: ""
 ---
 
 <!--more-->
