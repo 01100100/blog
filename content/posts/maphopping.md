@@ -16,7 +16,7 @@ hiddenFromHomePage: false
 hiddenFromSearch: false
 
 featuredImage: ""
-featuredImagePreview: "/videos/maphopping/all_maps_greenwich.gif"
+featuredImagePreview: "/media/maphopping/all_maps_greenwich.gif"
 
 toc:
   enable: true
@@ -34,7 +34,7 @@ I use a lot of different maps applications and often end up "map hopping". That 
 
 Sometimes this is a smooth and quick process, but other times it can be a real pain fumbling around to digitally triangulate[^triangulation] and locate the same place on both maps.
 
-{{< image src="/videos/maphopping/maphopping_skiguru_komoot.gif" alt="Trying to line up Komoot with SkiGuru" caption="Trying to line up Komoot with SkiGuru" >}}
+{{< image src="/media/maphopping/maphopping_skiguru_komoot.gif" alt="Trying to line up Komoot with SkiGuru" caption="Trying to line up Komoot with SkiGuru" >}}
 
 You might encounter two very different looking basemaps, which often leads to squinting and searching for a uniquely-shaped river bend on both maps, using that to line things up and then inevitably finding another bend in a river and doubting if you're even looking at the same thing.
 
@@ -42,7 +42,7 @@ You might encounter two very different looking basemaps, which often leads to sq
 
 [MapSwap](https://mapswap.trailsta.sh/), is a  simple yet ingenious tool I recently discovered through the [OSM US Slack community](https://slack.openstreetmap.us/). It provides a way of switching between mapping application whilst preserving the viewport. This means no more time spent manually aligning things and is a game changer 🔥.
 
-{{< image src="/videos/maphopping/mapswap.gif" alt="Screen capture of MapSwap Demo" caption="MapSwap Demo" >}}
+{{< image src="/media/maphopping/mapswap.gif" alt="Screen capture of MapSwap Demo" caption="MapSwap Demo" >}}
 
 ## Encoding the viewport in the URL
 
@@ -117,7 +117,7 @@ I noticed that [Komoot](https://www.komoot.com) wasn't supported in MapSwap, so 
 
 There are many different mapping applications out there, each having pros and cons. Combining them together is incredibly useful, and MapSwap makes this easy. It means less fumbling between different maps trying to pinpoint the same location and that's a win in my book.
 
-{{< image src="/videos/maphopping/all_maps_greenwich.gif" alt="Screencapture of map hopping in Greenwich, London" caption="Map hopping in Greenwich, London" >}}
+{{< image src="/media/maphopping/all_maps_greenwich.gif" alt="Screencapture of map hopping in Greenwich, London" caption="Map hopping in Greenwich, London" >}}
 
 The next level to this would be syncing different maps viewports in real-time.
 

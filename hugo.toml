@@ -24,7 +24,7 @@ gitRepo = "https://github.com/01100100/blog"
 [params.home.profile]
 enable = true
 # URL of avatar shown in home page
-avatarURL = "images/transbalkans.jpg"
+avatarURL = "media/transbalkans.jpg"
 # URL the avatar links to
 avatarLinkURL = ""
 # title = "This is me riding the TransBalkanRace in 2023"

@@ -13,7 +13,7 @@ series: []
 hiddenFromHomePage: false
 hiddenFromSearch: false
 featuredImage: ''
-featuredImagePreview: '/videos/sotm/ride-poland.gif'
+featuredImagePreview: '/media/sotm/ride-poland.gif'
 toc:
   enable: true
 math:
@@ -39,7 +39,7 @@ It was a great event! Kudos to the organizing team! I met a ton of cool people, 
 
 A lot of folks I met were curious about my journey and had many questions about how I managed to transport myself to the event.
 
-{{< image src="/videos/sotm/ride-poland-wide.gif" caption="My ride to Łódź" >}}
+{{< image src="/media/sotm/ride-poland-wide.gif" caption="My ride to Łódź" >}}
 
 This blog post spills the beans on how I prepared to ride my bike from Berlin to SOTM, held in Łódź, Poland. 500km[^500km] in 2 days 🚴‍♀️🌕🚴‍♂️.
 
@@ -59,7 +59,7 @@ For this journey, I aimed to go fast and efficiently, stay comfy, and not be tot
 
 I chose to break the ride into two days, with an overnight in a cheap hotel in Poznan. This meant I could leave the tent, sleeping setup, and cooking gear behind. It would just be me, my bike, and the essentials.
 
-Here’s what I priorities to optimize my setup for the journey:
+Here are the key areas I focused on to optimize my setup for the journey:
 
 * Comfort
 * Aerodynamics
@@ -69,7 +69,7 @@ Here’s what I priorities to optimize my setup for the journey:
 
 Meet Trustini, my trusty long-distance steed.
 
-{{< image src="/images/sotm/trustini.jpg" caption="Trustini" >}}
+{{< image src="/media/sotm/trustini.jpg" caption="Trustini" >}}
 
 I have done many long rides on this bike and know it fits me well. A gravel bike with a relaxed geometry, built around a buttery smooth titanium frame, and a lot of history. We have a good relationship built on years of trust and going places together.
 
@@ -92,15 +92,15 @@ For long distances comfort, the contact points are where the magic happens: sadd
 
 I use a narrow [Brooks C13 Cambium](https://www.brooksengland.com/en_eu/c13.html) saddle with a bit of flex and team it up with my most comfortable bib shorts from Santini that include a butt-saving "C3 seat pad with anti-shock gel inserts". This combination has proven itself on many long rides.
 
-{{< image src="/images/sotm/santini-pad.png" caption="Santini C3 seat pad" >}}
+{{< image src="/media/sotm/santini-pad.png" caption="Santini C3 seat pad" >}}
 
 For the handlebars, I use the thickest bar tape I can find. More cushion absorbs the vibrations that come through the bars better. I also wear padded gloves.
 
-{{< image src="/images/sotm/bartape.png" caption="Different width bar tapes are available." >}}
+{{< image src="/media/sotm/bartape.png" caption="Different width bar tapes are available." >}}
 
 My friend Michael gave me some aero bars to try out. This gives me more hand positions to switch between, helping avoid any nerve damage[^nerve-damage-in-bikepacking] from the long days in the saddle.
 
-{{< image src="/images/sotm/ironman.png" caption="Ironman tri bars" >}}
+{{< image src="/media/sotm/ironman.png" caption="Ironman tri bars" >}}
 
 I use clip-in pedals with stiff shoes that fit me well. This means I can pedal more efficiently and have the force evenly distributed around my whole foot.
 
@@ -113,7 +113,7 @@ When cycling above 15km/h, the biggest thing slowing you down is air resistance 
 
 Considering I am much bigger than the bike, the biggest source of drag is me. Changing your position on the bike can make a big difference.
 
-{{< image src="/images/sotm/aero-positions.png" caption="Aerodynamic study of different riding positions" >}}
+{{< image src="/media/sotm/aero-positions.png" caption="Aerodynamic study of different riding positions" >}}
 
 While I will try to stay as aero as possible, a comfortable position is key. So I opted for a tight-fitting jersey. Not because it looks cool, but because it's practicool.The reason the pros wear them is that it’s faster to have skin-fitting clothes than things flapping around.
 
@@ -123,13 +123,13 @@ I wear an [Oakley Ar05 Race](https://www.oakley.com/en-eu/product/FOS901302?vari
 
 The rest of my stuff was stashed in my bike bags. Top tube bag + frame bag + so-called "Arse Rocket" saddle bag. The bags are positioned to avoid increasing the frontal area and avoid any extra turbulence. According to some sources, the bags might even help me stay aero[^aero-bike-bags].
 
-{{< image src="/images/sotm/aero-trustini.png" caption="My bike" >}}
+{{< image src="/media/sotm/aero-trustini.png" caption="My bike" >}}
 
 It was my first time using aero bars, and wow, it was a game changer! My intention was to give myself different positions to rest my hands. But oh boy, when I was in the aero bar position, I felt like I was piercing through the air. It was also super comfortable to be able to switch between different positions. I will definitely be using them again on long rides.
 
 Plus, I could mount my phone on the aero bars in a chiller position, optimal for navigation and changing up tunes on the go.
 
-{{< image src="/images/sotm/phone-mount.png" caption="Phone + aero bar setup" >}}
+{{< image src="/media/sotm/phone-mount.png" caption="Phone + aero bar setup" >}}
 
 ### Rolling Resistance 🛞
 
@@ -141,7 +141,7 @@ This idea is evolving with new perspectives, lower pressures, and the industry p
 
 I like Continental GP5000 tires, and according to the rolling resistance data[^rolling-resistance], the 32mm version, which I am using, is not much worse than the skinny 25mm version, and is one of the faster tires available.
 
-{{< image src="/images/sotm/width_rolling_resistance.png" caption="Grand Prix 5000 Different Width Rolling Resistance Test" >}}
+{{< image src="/media/sotm/width_rolling_resistance.png" caption="Grand Prix 5000 Different Width Rolling Resistance Test" >}}
 
 Using 32mm, fatter and softer tires also means more comfort, especially on the rough stuff, which is important for long rides.
 
@@ -195,7 +195,7 @@ Here is a complete list of what I took with me:
 
 I used [Komoot](https://www.komoot.com) to plan the route. I put in my start and end locations and set Poznan as a waypoint 📍 to break up the journey. I tweaked the route by adding a waypoint in a national park to avoid the main road, and that was it.
 
-![Komoot route planner](/images/komoot-route-planner.png)
+![Komoot route planner](/media/sotm/komoot-route-planner.png)
 
 Komoot provides the surface type and elevation expected along the route to give you a good idea of what to expect and helping you pace yourself.
 
@@ -213,13 +213,13 @@ Nature plays a huge factor in cycling, but it's beyond your control. Sometimes y
 
 I used [windy.com](https://www.windy.com) to check the wind forecast, and it looked like the wind gods would be blowing in my favor for once!
 
-![Windy forecast](/videos/windy.gif)
+![Windy forecast](/media/sotm/windy.gif)
 
 Get in! I would have a tailwind all the way to Łódź.
 
 It was forecasted to be dry and hot, which means a lower air density and even less drag. I got lucky.
 
-![Temperature Forecast](/images/heat.png)
+![Temperature Forecast](/media/sotm/heat.png)
 
 ## The Journey 🚴‍♂️
 
@@ -235,7 +235,7 @@ I went along a Park narodowy (aka a national park) and saw some beautiful birds 
 
 One remarkable thing I noticed was how clean Poland was. There was no trash anywhere. I didn't see a single piece of litter on the road, and the fields and forests were well-kept.
 
-{{< image src="/images/sotm/polish-road.jpg" caption="A beautiful polish road" >}}
+{{< image src="/media/sotm/polish-road.jpg" caption="A beautiful polish road" >}}
 
 A lake provided the perfect spot to cool off and eat some food. Poland is beautiful in the summer.
 
@@ -249,7 +249,7 @@ A sudden pothole caused a snakebite[^snakebite]. No biggie, I had a spare tube a
 
 With about 50km left, I encountered a group of Polish gravel riders. They were, let's just say, a lively bunch. They invited me to join their ride. We raced into Łódź together, they showed me a few sights, and we finished the journey sharing stories and beers. A perfect ending to an epic ride.
 
-{{< image src="/images/sotm/unicorn.jpeg" caption="The Polish Gravel Gang" >}}
+{{< image src="/media/sotm/unicorn.jpeg" caption="The Polish Gravel Gang" >}}
 
 ## The Food 🍲
 
@@ -261,7 +261,7 @@ I like to take things like Bananas, muesli bars, croissants with me and keep man
 
 In Poland, you find "Sklep Polski" everywhere, which are small local shops selling everything you need and can resupply. The owners were always nice and refilled my water bottles. I also wanted to taste some traditional Polish food, so I stopped at a couple of restaurants along the way and enjoyed some delicious pierogi.
 
-{{< image src="/images/sotm/sklep.jpg" caption="Yet another Sklep Polski" >}}
+{{< image src="/media/sotm/sklep.jpg" caption="Yet another Sklep Polski" >}}
 
 Since it was so hot, I needed to drink a lot of water on the ride, like 6 litres a day. However it was never a problem to find clean water en route. I took some isotonic tablets with me to stay hydrated.
 
@@ -282,7 +282,7 @@ Traveling across Poland by bike gave me an opportunity to see the country evolve
 
 Cycling has many uncountable benefits, but for me, it's the best way to travel and straight-up fun. I recommend for anyone interested to get out there and give it a go!
 
-{{< image src="/images/sotm/sunshine.jpg" caption="Me on my bike!]" >}}
+{{< image src="/media/sotm/sunshine.jpg" caption="Me on my bike!]" >}}
 
 [^500km]: 510km according to [Komoot.com](https://www.komoot.com/tour/1700459745).
 [^nerve-damage-in-bikepacking]: How Nerve Damage During Ultras is a thing from [dotwatcher.cc](https://dotwatcher.cc/feature/nerve-damage-during-ultras)
