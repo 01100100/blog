@@ -98,12 +98,13 @@
       }
     }
 
-    .post-footer {
+    .project-footer {
       margin-top: .4rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: .875rem;
+      flex-wrap: wrap;
 
       @include link(false, false);
 

@@ -30,15 +30,6 @@
                 <a href="{{ $params.website }}">{{ .Title }}</a>
             </h1>
 
-            {{- /* Meta */ -}}
-            <div class="project-meta">
-                <span class="project-github">
-                    {{- with $params.github -}}
-                    <a href="{{ . }}" target="_blank" rel="noopener noreferrer"><i class='fab fa-github fa-fw'></i>Repo on Github</a>
-                    {{- end -}}
-                </span>
-            </div>
-
             {{- /* Summary content */ -}}
             <div class="content">
                 {{- with .Summary -}}
@@ -48,16 +39,26 @@
                 {{- end -}}
             </div>
 
+            {{- /* Meta */ -}}
+
+
+
 
             {{- /* Footer */ -}}
-    <div class="post-footer">
+    <div class="project-footer">
+        <div class="github">
+            <i class='fab fa-github fa-fw'></i>
+            <a href="{{ $params.github }}" target="_blank" rel="noopener noreferrer">Repo on Github</a>
+        </div>
         {{- with .Params.tags -}}
-        <div class="post-tags">
-            <i class="fas fa-tags fa-fw"></i>&nbsp;
+        <div class="tech-tags">
+            <i class="fas fa-cogs fa-fw"></i>&nbsp;&nbsp;
             {{- range $index, $value := . -}}
-            {{- if gt $index 0 }},&nbsp;{{ end -}}
+            {{- if lt $index 0 }},&nbsp;{{ end -}}
+            <code>
             {{- $tag := partialCached "function/path.html" $value $value | printf "/tags/%v" | $.Site.GetPage -}}
-            <a href="{{ $tag.RelPermalink }}">{{ $tag.Title }}</a>
+            {{ $tag.Title }}
+        </code>
             {{- end -}}
         </div>
         {{- end -}}
