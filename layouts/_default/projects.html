@@ -1,0 +1,68 @@
+{{- define "content" -}}
+    <div class="page projects" projects="">
+        {{- /* Title */ -}}
+        <h2 class="projects-title animate__animated animate__pulse animate__faster">
+            Projects
+        </h2>
+        {{- range sort .Pages ".Params.rank" -}}
+        <article class="single summary" itemscope itemtype="http://schema.org/Article">
+            {{- /* Featured image */ -}}
+            {{- $params := .Params | merge .Site.Params.page -}}
+            {{- $image := $params.featuredImagePreview | default $params.featuredImage -}}
+            {{- $height := "auto" -}}
+            {{- $width := "auto" -}}
+            {{- with .Resources.GetMatch (printf "%s" ($image)) -}}
+            {{- $image = .RelPermalink -}}
+            {{- $height = .Height -}}
+            {{- $width = .Width -}}
+            {{- end -}}
+
+            {{- with $image -}}
+            <div class="featured-image-preview">
+                <a href="{{ $params.website }}" aria-label={{ $.Title }}>
+                    {{- dict "Src" . "Title" $.Description "Resources" $.Resources "Height" $height "Width" $width "Title" $params.website "Loading" "eager" | partial "plugin/image.html" -}}
+                </a>
+            </div>
+            {{- end -}}
+
+            {{- /* Title */ -}}
+            <h1 class="single-title" itemprop="name headline">
+                <a href="{{ $params.website }}">{{ .Title }}</a>
+            </h1>
+
+            {{- /* Meta */ -}}
+            <div class="project-meta">
+                <span class="project-github">
+                    {{- with $params.github -}}
+                    <a href="{{ . }}" target="_blank" rel="noopener noreferrer"><i class='fab fa-github fa-fw'></i>Repo on Github</a>
+                    {{- end -}}
+                </span>
+            </div>
+
+            {{- /* Summary content */ -}}
+            <div class="content">
+                {{- with .Summary -}}
+                {{- dict "Content" . "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML -}}
+                {{- else -}}
+                {{- .Description | safeHTML -}}
+                {{- end -}}
+            </div>
+
+
+            {{- /* Footer */ -}}
+    <div class="post-footer">
+        {{- with .Params.tags -}}
+        <div class="post-tags">
+            <i class="fas fa-tags fa-fw"></i>&nbsp;
+            {{- range $index, $value := . -}}
+            {{- if gt $index 0 }},&nbsp;{{ end -}}
+            {{- $tag := partialCached "function/path.html" $value $value | printf "/tags/%v" | $.Site.GetPage -}}
+            <a href="{{ $tag.RelPermalink }}">{{ $tag.Title }}</a>
+            {{- end -}}
+        </div>
+        {{- end -}}
+    </div>
+        </article>
+        {{- end -}}
+    </div>
+{{- end -}}
