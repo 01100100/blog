@@ -20,6 +20,10 @@ weight = 1
 name = "Projects"
 url = "/projects/"
 weight = 2
+[[menu.main]]
+name = "About"
+url = "/about/"
+weight = 2
 
 [params]
 gitRepo = "https://github.com/01100100/blog"
