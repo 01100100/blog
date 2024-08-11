@@ -7,4 +7,5 @@ description: A static website to share detailed information about the climbing w
 github: "https://github.com/01100100/huttenblock"
 website: "https://hüttenblock.com"
 featuredImage: "/media/huttenblock/mockup.jpeg"
+tags: ["HUGO", "Go", "HTML", "CSS", "JavaScript"]
 ---
