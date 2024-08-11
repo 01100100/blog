@@ -16,10 +16,14 @@ url = "/posts/"
 # title will be shown when you hover on this menu link
 title = ""
 weight = 1
+[[menu.main]]
+name = "Projects"
+url = "/projects/"
+weight = 2
 
 [params]
 gitRepo = "https://github.com/01100100/blog"
-
+mainSections = ["posts", "projects"]
 
 [params.home.profile]
 enable = true
