@@ -21,7 +21,6 @@ math:
 lightgallery: true
 license: ""
 ---
-
 <!--more-->
 
 ## Intro 🪐
@@ -49,7 +48,7 @@ This blog post spills the beans on how I prepared to ride my bike from Berlin to
 
 The best bike is the one you have --- just get out and ride it!
 
---- The Buddha 🧘 (Probably)
+\--- The Buddha 🧘 (Probably)
 
 {{< /admonition >}}
 
@@ -105,6 +104,7 @@ My friend Michael gave me some aero bars to try out. This gives me more hand pos
 I use clip-in pedals with stiff shoes that fit me well. This means I can pedal more efficiently and have the force evenly distributed around my whole foot.
 
 <!-- markdownlint-disable-next-line MD036 -->
+
 **The combination of these things hopefully means I can ride for hours without any discomfort 🤞**
 
 ### Aerodynamics 💨
@@ -118,6 +118,10 @@ Considering I am much bigger than the bike, the biggest source of drag is me. Ch
 While I will try to stay as aero as possible, a comfortable position is key. So I opted for a tight-fitting jersey. Not because it looks cool, but because it's practicool.The reason the pros wear them is that it’s faster to have skin-fitting clothes than things flapping around.
 
 Wearing a helmet actually reduces drag and makes you faster, as proven by Greg LeMond in the 1989 Tour de France[^aero-helmet]. People actually compare helmets to see which one is fastest[^helmet-test].
+
+
+
+![An extreme aero helmet](//media//sotm/1000010807.jpg)
 
 I wear an [Oakley Ar05 Race](https://www.oakley.com/en-eu/product/FOS901302?variant=193517780012) helmet which does a good job. I also use sun glasses with a big lens to protect my eyes from the sun, wind, and bugs. The frame of the glasses matches up with the helmet and reduces drag even further. Marginal gains, but hey, I will take every saving I can!
 
@@ -146,6 +150,7 @@ I like Continental GP5000 tires, and according to the rolling resistance data[^r
 Using 32mm, fatter and softer tires also means more comfort, especially on the rough stuff, which is important for long rides.
 
 <!-- markdownlint-disable-next-line MD036 -->
+
 **With all this setup, I should be rolling with ease. The only thing left to do was to pack my bags and hit the road 🚴**
 
 ### Packing List 🧳
@@ -155,10 +160,12 @@ Using 32mm, fatter and softer tires also means more comfort, especially on the r
 Here is a complete list of what I took with me:
 
 * Essentials
+
   * Passport
   * Money
 * Bike
 * Bike bags
+
   * Frame bag
   * Saddle bag
   * Top tube bag
@@ -166,14 +173,17 @@ Here is a complete list of what I took with me:
 * Bike lights
 * Gloves
 * Electronics
+
   * Phone
   * Camera
   * Wireless headphones
   * Powerbank
   * Headtorch
 * Bottles
+
   * Stay hydrated
 * Bike tools
+
   * Pump
   * Multitool
   * Spare tube
@@ -182,9 +192,11 @@ Here is a complete list of what I took with me:
   * Chain lube
 * Clothes
 * Shoes
+
   * Bike
   * Casual
 * Hygiene
+
   * Toothbrush
   * Toothpaste
   * Sunscreen
@@ -202,9 +214,11 @@ Komoot provides the surface type and elevation expected along the route to give 
 Komoot Premium includes a feature that shows the expected weather along the route at the time you are expected to be there. It also displays the sunrise and sunset times, which are super useful for deciding what to take with you on a tour.
 
 <!-- markdownlint-disable-next-line MD033 -->
+
 <iframe src="https://www.komoot.com/tour/1700459745/embed?share_token=abZftELVk4mCpm3tqrp7IANUByObu8zy0n9FVaVTWZhzh3eMHf&profile=1" width="100%" height="900" frameborder="0" scrolling="no"></iframe>
 
 <!-- markdownlint-disable-next-line MD036 -->
+
 **I saved the route offline on my phone, strapped it to my handlebars, and was ready 🛫**
 
 ## The Wind 🌬️
