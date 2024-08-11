@@ -7,6 +7,6 @@ description: "A web application that allows users to upload a local GPX file or 
 github: "https://github.com/01100100/kreuzungen"
 website: "https://kreuzungen.world"
 featuredImage: "/media/kreuzungen/screenshot.png"
-tags: ["TypeScript", "Maplibre", "Overpass-api", "turf.js", "Strava API", "redis"]
+tags: ["TypeScript", "maplibre-gl", "Overpass-api", "turf.js", "Strava API", "redis"]
 ---
 
