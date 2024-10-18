@@ -45,9 +45,11 @@ All source code is available in this [github repository](https://github.com/0110
 
 Last year I embarked on a bike ride from a [geo-spatial-data-conference](https://spatial-data-science-conference.com/) in London to my home in Berlin.
 
-I used [Komoot](https://www.komoot.com) to plan, navigate and record my journey. I set my start point to the Royal Albert hall in London and my end point to Brandenburg Tor in Berlin, with intermediate points being the international ferry ports of Harwich and Hook of Holland. I choose "Road cycling" as my preferred style of riding and hit the "Let's go" button. It was that easy! I am a huge fan of the [Komoot](https://www.komoot.com) app and highly recommend it.
+I used [Komoot](https://www.komoot.com) to plan, navigate and record my journey. I set my start point to the Royal Albert hall in London and my end point to Brandenburg Tor in Berlin, with intermediate points being the international ferry ports of Harwich and Hook of Holland. I choose "Road cycling" as my preferred style of riding and hit the "Save route" button. I had a route and directions to follow taking me all the way home, It was that easy! I am a huge fan of the [Komoot](https://www.komoot.com) app and highly recommend it.
 
 ![Komoot Screenshot](/media/kreuzungen/komoot_screenshot.png)
+
+TODO: add the story of the ride.
 
 During my multi-day ride, crossing various rivers, a thought struck me:
 
@@ -65,9 +67,11 @@ Realizing that I had recorded data of the ride, had the great asset of open stre
 {{% /center %}}
 {{< /admonition >}}
 
+This tool I built to anwser this question and find out how many rivers I crossed on the way ended up being called `Kreuzungen`, and went somewhat viral, being used all over the planet.
+
 As a geospatial data engineer, and a lover of long cycles in really remote places, this challenge doesn't sound too hard.
 
-Little did I know that this project would turn out to be much more interesting than first expected, just like the bike journey. I didn't know where exactly the project would take me, but I had a goal and simply started out ready to adapt.
+Little did I know that this project would turn out to be much more interesting than first expected, just like the bike journey.I didn't know where exactly the project would take me, but I had a goal and simply started out ready to adapt.
 
 {{< admonition type=info title=Naming >}}
 The word "Kreuzungen" is German for "crossings" or "intersections"...
@@ -172,14 +176,29 @@ This a very interesting question to think about, but philosophizing about what c
 
 ## OpenStreetMap
 
+TODO: add pic from the presentation of OSM.
+
 ![OpenStreetMap logo](/media/kreuzungen/oslogo.svg.png)
 TODO: link to OSM iceberg meme
 
-[OpenStreetMap](https://www.openstreetmap.org/) (OSM) is an incredible resource, akin to the Wikipedia of maps. It's a collaborative project where a community of mappers from around the world contribute to creating a free and editable map of the world. This was not possible 25 years ago, and the existence of such a resource today is a testament to the power of community and open source efforts.
+[OpenStreetMap](https://www.openstreetmap.org/) (OSM) in its simplest form is a free database of geospatial data, the software to support serving and editing the data, and the community of people (aka "mappers") who contribute the data for free.
+
+An incredible resource, akin to the Wikipedia of maps. It's a collaborative project where a community of mappers from around the world contribute to creating a free and editable map of the world. This was not possible 25 years ago, and the existence of such a resource today is a testament to the power of community and open source efforts.
 
 The data is freely available under an open license, and it's maintained and updated by volunteers. This means that the data is constantly being updated, reflecting changes in the real world.
 
-Everyone can make use of this data and create applications scaling to cover the whole world. OSM already powers most of the maps and map related services you find on the web today[^osm-services].
+There is no barrier to entry, and anyone can contribute to the map and see their changes reflected in real-time.
+
+TODO: add video of adding a tree to OSM
+
+Everyone can make use of this data and create a broad range of applications scaling to cover the whole world. 
+
+OSM already powers most of the maps and map related services you find on the web today[^osm-services].
+
+You probably are using OSM data in a lot of ways without being fully aware. Apple and Bing use OSM data in their basemaps. TomTom and Garmin use OSM data in their navigation systems to calculate optimal routes and provide turn-by-turn directions. Komoot uses OSM data to plan different routes for gravel or road cycling taking into account the surface type. Über eats uses OSM data to determine the location of restaurants and delivery addresses. Even that viral Pokemon Go thing used OSM data to determine where to place Pokestops and Gyms.
+
+The list goes on and on. There is a infinite amount of value that can be extracted from OSM data, and the possibilities are endless. People from different geometries and cultures can use the data to create applications that are tailored to their specific needs. It's pretty cool.
+
 
 {{< admonition type=info title="Street Complete" >}}
 
@@ -410,7 +429,11 @@ TODO: talk about the tests used to verify this was fixxed ^^
 
 ```js
 
-#### Let's talk about time complexity
+TODO: talk about monkey patching the lib. Then talk about a good way to do it is using the patch-package npm package.
+
+TODO: talk about getting in the pr upstream and removing this, and how thats a win.
+
+#### Let's talk about ~~performance~~ time complexity
 
 Finding out which rivers intersect with the uploaded route is taken care of by turf.js, using the [`booleanIntersects()`](https://github.com/Turfjs/turf/tree/master/packages/turf-boolean-intersects) function.
 
@@ -622,7 +645,7 @@ A *early-beta-tester* (you know who you are) gave me some feedback that they wou
 
 > The Open Graph protocol enables any web page to become a rich object in a social graph**
 
-That sounds pretty good! Basically you can add some specific `<meta>` tags to the `<head>` of a website, and when you share a url in social-media/messaging apps will render the content and display a little preview. You know when you share a link in whatsapp and it shows a little image and a description? That's the Open Graph protocol in action.
+That sounds pretty good! Basically, you know that thing that happens when you paste a url into a whatsapp chat it would pop up with a image, or how when you used fackbook back in the day and shared a link it, facebook would do a nice little showcase of the site including a title, description and image. Well my freinds, you can add some specific `<meta>` tags to the `<head>` of a website, and when you share a url in social-media/messaging apps will render the content and display a little preview. You know when you share a link in whatsapp and it shows a little image and a description? That's the Open Graph protocol in action.
 
 This was a easy one to implement after reading the spec on [https://ogp.me](https://ogp.me). I looked up the optimal image dimensions and according to *reasons* this was **1200px x 630px**. The result was added in the following code
 
