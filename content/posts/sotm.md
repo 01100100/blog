@@ -202,7 +202,7 @@ Komoot provides the surface type and elevation expected along the route to give 
 Komoot Premium includes a feature that shows the expected weather along the route at the time you are expected to be there. It also displays the sunrise and sunset times, which are super useful for deciding what to take with you on a tour.
 
 <!-- markdownlint-disable-next-line MD033 -->
-<iframe src="https://www.komoot.com/tour/1700459745/embed?share_token=abZftELVk4mCpm3tqrp7IANUByObu8zy0n9FVaVTWZhzh3eMHf&profile=1" width="100%" height="900" frameborder="0" scrolling="no"></iframe>
+<iframe src="https://www.komoot.com/tour/1962295602/embed?share_token=atDy5joOv8kjA98sxIcyRWnLEUDfAIG2bWD4hF8aW0gaVZJi6g&profile=1" width="100%" height="900" frameborder="0" scrolling="no"></iframe>
 
 <!-- markdownlint-disable-next-line MD036 -->
 **I saved the route offline on my phone, strapped it to my handlebars, and was ready 🛫**
