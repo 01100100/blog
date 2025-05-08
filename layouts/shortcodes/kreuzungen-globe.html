@@ -1,0 +1,179 @@
+<link href="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.css" rel="stylesheet" />
+<style>
+  #kreuzungen-map {
+    width: 100%;
+    height: 500px;
+    margin-bottom: 1.5em;
+    border-radius: 8px;
+  }
+  .maplibregl-popup {
+    max-width: 300px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  }
+</style>
+
+<div id="kreuzungen-map" class="maplibregl-map"></div>
+
+<script src="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<script>
+  // Function to convert country code to flag emoji
+  function getFlagEmoji(countryCode) {
+    return countryCode.toUpperCase().replace(/./g, char =>
+      String.fromCodePoint(127397 + char.charCodeAt())
+    );
+  }
+
+  // Function to add globe projection to a maplibre style JSON
+  function addGlobeProjection(styleJson) {
+    return {
+      ...styleJson,
+      projection: { type: 'globe' }
+    };
+  }
+
+  // Function to update the style JSON with waterway data and update country colors accordingly
+  function updateStyleJson(styleJson, countriesWaterwayData) {
+    const updatedStyle = addGlobeProjection(JSON.parse(JSON.stringify(styleJson)));
+
+    const countryColors = {};
+    for (const [countryCode, data] of Object.entries(countriesWaterwayData)) {
+      if (data.waterways_crossed === 0) {
+        countryColors[countryCode] = 'rgba(230, 230, 250, 1)';
+      } else {
+        const originalLayer = styleJson.layers.find(layer => layer.id === 'countries-fill' && layer.type === 'fill');
+        if (originalLayer) {
+          const originalColor = originalLayer.paint['fill-color'];
+          countryColors[countryCode] = originalColor;
+        }
+      }
+    }
+
+    updatedStyle.layers = updatedStyle.layers.map(layer => {
+      if (layer.id === 'countries-fill' && layer.type === 'fill') {
+        layer.paint['fill-color'] = [
+          'match',
+          ['get', 'ADM0_A3'],
+          ...Object.entries(countryColors).flat(),
+          '#EAB38F'
+        ];
+      }
+      return layer;
+    });
+
+    return updatedStyle;
+  }
+
+  // Initialize the map when the DOM is fully loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the map
+    const map = new maplibregl.Map({
+      container: 'kreuzungen-map',
+      center: [0, 31.4934],
+      zoom: 1.75
+    });
+
+    fetch('https://demotiles.maplibre.org/style.json')
+      .then(response => response.json())
+      .then(customStyle => {
+        // Fetch the waterways data
+        fetch('https://fly.storage.tigris.dev/hydro-xpid/modelled/country.json')
+          .then(response => response.text()) // Fetch as text to handle NDJSON
+          .then(text => {
+            try {
+              // Split the NDJSON text by newlines and parse each line
+              const data = text.split('\n').filter(line => line.trim() !== '').map(line => JSON.parse(line));
+              // Convert waterways data to a dictionary for easy lookup
+              const waterwaysDict = data.reduce((acc, country) => {
+                acc[country.country_code_3] = {
+                  waterways_crossed: country.waterway_realtions_crossed, // Add total number of waterway crossings in country
+                  unique_waterways_crossed: country.unique_waterway_realtions_crossed, // Add total number of rivers crossed in a country. 
+                  country_name: country.country,
+                  most_popular_waterway: country.most_popular_waterway || 'N/A', // Add most_popular_waterway
+                  country_code_2: country.country_code_2 // Add 2-letter country code
+                };
+                return acc;
+              }, {});
+
+              updatedStyle = updateStyleJson(customStyle, waterwaysDict);
+              map.setStyle(updatedStyle);
+
+              map.on('load', () => {
+                let hoveredCountryId = null;
+                const popup = new maplibregl.Popup({
+                  closeButton: false,
+                  closeOnClick: false
+                });
+
+                map.on('mousemove', 'countries-fill', (e) => {
+                  if (e.features.length > 0) {
+                    if (hoveredCountryId) {
+                      map.setFeatureState(
+                        { source: 'maplibre', sourceLayer: 'countries', id: hoveredCountryId },
+                        { hover: false }
+                      );
+                    }
+                    hoveredCountryId = e.features[0].id;
+                    map.setFeatureState(
+                      { source: 'maplibre', sourceLayer: 'countries', id: hoveredCountryId },
+                      { hover: true }
+                    );
+
+                    const countryCode = e.features[0].properties.ADM0_A3;
+                    const countryData = waterwaysDict[countryCode];
+                    const countryName = e.features[0].properties.ADMIN;
+
+                    if (countryData) {
+                      popup.setLngLat(e.lngLat)
+                        .setHTML(`
+                          <strong>${getFlagEmoji(countryData.country_code_2)} ${countryData.country_name}</strong><br>
+                          Waterways Crossed: ${countryData.waterways_crossed}<br>
+                          Unique Waterways Crossed: ${countryData.unique_waterways_crossed}<br>
+                          Most Popular Waterway: ${countryData.most_popular_waterway}
+                        `)
+                        .addTo(map);
+                    } else {
+                      popup.setLngLat(e.lngLat)
+                        .setHTML(`
+                          <strong>${countryName}</strong><br>
+                          No waterway data available
+                        `)
+                        .addTo(map);
+                    }
+                  }
+                });
+
+                map.on('mouseleave', 'countries-fill', () => {
+                  if (hoveredCountryId) {
+                    map.setFeatureState(
+                      { source: 'maplibre', sourceLayer: 'countries', id: hoveredCountryId },
+                      { hover: false }
+                    );
+                  }
+                  hoveredCountryId = null;
+                  popup.remove();
+                });
+
+                map.on('click', 'countries-fill', (e) => {
+                  if (e.features.length > 0) {
+                    const country = e.features[0];
+                    const bbox = turf.bbox(country);
+
+                    map.fitBounds(bbox, {
+                      padding: 40,
+                      duration: 2000
+                    });
+                  }
+                });
+              });
+
+            } catch (error) {
+              console.error('Error parsing JSON:', error);
+              console.log('Raw response text:', text);
+            }
+          })
+          .catch(error => console.error('Error fetching waterways data:', error));
+      })
+      .catch(error => console.error('Error fetching style JSON:', error));
+  });
+</script>
