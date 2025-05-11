@@ -1,14 +1,14 @@
 ---
 type: posts
-title: "High grade geospatial processing (feat. crazy fast ducks) 🦆🔥"
-subtitle: "From Browser fast to Blazing fast: R-Tree rips 💨"
+title: "High grade geospatial processing (feat. R-Tree's ) 🌲⚡️"
+subtitle: "From Browser fast to Blazing fast: DuckDB Rips 🦆💨"
 date: 2025-05-10T09:00:00+02:00
 lastmod: 2025-05-10T09:00:00+02:00
 draft: false
 authors: []
-description: "From Browser Fast to Blazing Fast: R-Tree rips 💨 A high speed journey processing Geospatial"
+description: "From Browser fast to Blazing fast: DuckDB Rips 🦆💨 A high speed journey processing Geospatial 🌎"
 
-tags: ["duckdb", "rtree", "geospatial", "performance", "optimization"]
+tags: []
 categories: []
 series: []
 
