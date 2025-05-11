@@ -32,7 +32,7 @@ license: ""
 
 So last year, I created a web app called [kreuzungen.world](https://kreuzungen.world) that calculates the number of waterways crossed by a gpx route. It was a fun little project to build and led to some interesting encounters.
 
-{{< image src="/media/kreuzungen/screenshot.png" caption="Kreuzungen - the app that started it all" >}}
+{{< image src="/media/performance/kreuzungen-screenrecording.gif" caption="Kreuzungen - the app that started it all" >}}
 
 The app was built using javascript in a way that required no backend.. Thats right, all the data fetching and processing was done in the browser. (No server costs 💸).
 
@@ -221,7 +221,7 @@ This query uses the created index to quickly identify potential intersections, t
 
 ## Quantifying the Gains 📈
 
-To measure the performance gains, I created a benchmarking script (`benchmark.py`) that tests different GPX files against the API. The results were stunning:
+To measure the performance gains, I created a benchmarking script (`benchmark.py`) that tests different GPX files against the API. The results showed a drastic improvement:
 
 {{< image src="/media/performance/kreuzungen-benchmark.gif" caption="Seeing the performance increase 🧑‍💻" >}}
 
