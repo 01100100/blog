@@ -69,12 +69,8 @@
     initialZoom = 1; // Very small screens (mobile)
   } else if (viewportWidth < 768) {
     initialZoom = 1.25; // Small screens (larger phones/small tablets)
-  } else if (viewportWidth < 1024) {
-    initialZoom = 1.4; // Medium screens (tablets/small laptops)
-  } else if (viewportWidth < 1440) {
-    initialZoom = 1.75; // Large screens (laptops)
   } else {
-    initialZoom = 2; // Very large screens (desktops)
+    initialZoom = 1.4; // For larger screens the width of the map is capped, 1.4 fits best.
   }
   
   // Initialize the map when the DOM is fully loaded
