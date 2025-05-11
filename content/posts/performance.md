@@ -15,8 +15,8 @@ series: []
 hiddenFromHomePage: false
 hiddenFromSearch: false
 
-featuredImage: "/media/performance/kreuzungen-benchmark.gif"
-featuredImagePreview: ""
+featuredImage: ""
+featuredImagePreview: "/media/performance/kreuzungen-benchmark.gif"
 
 toc:
   enable: true
@@ -113,6 +113,8 @@ Let me walk you through the pipeline, which is at the heart of the solution, tha
 3. **Convert to GeoParquet**: Using [ohsome-planet](https://github.com/GIScience/ohsome-planet). The format is columnar and much more efficient for analytical queries. This Java tool is amazing, it does a great job at converting the OSM data into a format that is easy to work with.
 
 4. **Build database for querying**: I leverage [dbt](https://github.com/duckdb/dbt-duckdb) with the DuckDB adapter. This framework brings structure to data transformation workflows. It nicely separates the data transformation logic from the data engineering configuration. Makes a setup that's easy to maintain and extend and minimizes boilerplate code.
+
+{{< image src="/media/performance/datapipeline.gif" caption="The whole of Andorra in downloaded, filtered and optimized to serve in <10 seconds" >}}
 
 #### R-Tree Indexing 🌳
 
