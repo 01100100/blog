@@ -63,14 +63,27 @@
 
     return updatedStyle;
   }
-
+  const viewportWidth = window.innerWidth;
+  let initialZoom;
+  if (viewportWidth < 480) {
+    initialZoom = 1; // Very small screens (mobile)
+  } else if (viewportWidth < 768) {
+    initialZoom = 1.25; // Small screens (larger phones/small tablets)
+  } else if (viewportWidth < 1024) {
+    initialZoom = 1.5; // Medium screens (tablets/small laptops)
+  } else if (viewportWidth < 1440) {
+    initialZoom = 1.75; // Large screens (laptops)
+  } else {
+    initialZoom = 2; // Very large screens (desktops)
+  }
+  
   // Initialize the map when the DOM is fully loaded
   document.addEventListener('DOMContentLoaded', function() {
     // Initialize the map
     const map = new maplibregl.Map({
       container: 'kreuzungen-map',
       center: [0, 31.4934],
-      zoom: 1.75
+      zoom: initialZoom,
     });
 
     fetch('https://demotiles.maplibre.org/style.json')
