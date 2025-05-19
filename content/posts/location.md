@@ -1,7 +1,7 @@
 ---
 type: posts
-title: "High grade location fusion: when gps alone doesn't cut it!  📍"
-subtitle: "Navigating through the world of location data and all that jazz"
+title: "Where you at? Location fusion: when gps alone doesn't cut it!  📍"
+subtitle: "Navigating through the world of location data and all that shizz"
 date: 2024-07-09T23:28:25+02:00
 lastmod: 2024-07-09T23:28:25+02:00
 draft: false
@@ -34,11 +34,13 @@ Sometimes I pause for a moment and enjoy the simple things in life.
 
 The fact that there are satellites 4500m above are head that we can openly use to triangulate our position, and that we are all walking round with this tech readily available at the mere consent is pretty mind blowing
 
-This position data, can be useful for all sorts of things, like locating your position on a map and calculating your speed and distance travelled.
+I won't explain *the magic involved/how* these systems work together as there is a incredible blog post titled [GPS](https://ciechanow.ski/gps/) from the master [Bartosz Ciechanowski](https://ciechanow.ski) that goes into way more depth then I could. I recommend to take some time out and read it. If you haven't come across Bartosz' technical writing before then you are in for a treat!
+
+Triangulating positions is incredibly useful for all sorts of things, like locating your position on a map and calculating your speed and distance traveled.
 
 [Screenrecording of Komoot in action]()
 
-However there are some situations where GPS alone doesn't get the job done. If you are in a dense concrete jungle, going in a tunnel, or even just in a building with thick walls, then the signals can be way off. 
+However there are some situations where GPS alone doesn't get the job done. If you are in a dense concrete jungle, a mountainous region, in a tunnel, or even just in a building with thick walls, then the signals coming from the satellite will be affected. Yet another case of how the environment you are based in can have a big impact on your position in life.
 
 [Tunnel example]
 
@@ -48,9 +50,9 @@ However we can do better! thanks to the other sensors on our smart phones, we ca
 
 ## The problem with ~~GPS~~ GNSS 🛰️
 
-Lets get something out the way. Calling all satellite navigation systems "GPS" is like calling every smartphone an "iPhone" – technically wrong, but everyone calls it this, so whatever.
+GPS is short for Global Positioning System... However there is some confusion in this naming here, "GPS" specifically refers to the USA owned "brand" of satellites. Calling all satellite navigation systems "GPS" is like calling every phone an "iPhone"... technically wrong, but everyone calls it this. It is what it is. Now that is out the way we can move on.
 
-GPS is a specific system of US satellites, like the country, it can sometimes seem like it's the only system that matters. But GNSS which stands for global navigation satellite system is actually the whole family of different states satellite systems and they work collectively united (to help you find the nearest coffee shop).
+GPS is a specific system of US satellites, like the country, it can sometimes seem like it's the only system that matters. But GNSS which stands for global navigation satellite system is actually the whole family of different states satellite systems and they work collectively  (united in the pursuit of finding you the nearest coffee shop). These are free to the public to use, and what you connect with
 
 {{< admonition type=tip title="The extended GNSS family" open=false >}}
 
