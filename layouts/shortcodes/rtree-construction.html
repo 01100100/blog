@@ -1,0 +1,843 @@
+<link href="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.css" rel="stylesheet" />
+<style>
+  #rtree-construction-map {
+    width: 100%;
+    height: 500px;
+    margin-bottom: 1.5em;
+    border-radius: 8px;
+  }
+  .maplibregl-popup {
+    max-width: 300px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  }
+  .control-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    z-index: 1;
+  }
+  .control-panel button {
+    margin: 5px;
+    padding: 5px 10px;
+    background: #4a8ec2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+  }
+  .control-panel button:hover {
+    background: #3a7cb2;
+  }
+  .control-panel-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  .control-panel-controls button {
+    width: 45%;
+    margin: 0;
+  }
+  .control-panel-slider {
+    margin-top: 10px;
+    width: 100%;
+  }
+  .info-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 250px;
+    font-size: 14px;
+  }
+  .legend {
+    position: absolute;
+    bottom: 20px;
+    left: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+  }
+  .legend-color {
+    width: 20px;
+    height: 10px;
+    margin-right: 5px;
+  }
+  .next-point-marker {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    border: 2px solid white;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    display: none;
+  }
+  .slider-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+  }
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+  .slider-value {
+    font-weight: bold;
+  }
+</style>
+
+<div id="rtree-construction-map" class="maplibregl-map"></div>
+<div class="next-point-marker" id="next-point-marker"></div>
+
+<script src="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const map = new maplibregl.Map({
+      container: 'rtree-construction-map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [0, 0],
+      zoom: 1,
+      hash: false
+    });
+    
+    // Add navigation controls
+    map.addControl(new maplibregl.NavigationControl());
+    
+    // Create control panel
+    const controlPanel = document.createElement('div');
+    controlPanel.className = 'control-panel';
+    document.getElementById('rtree-construction-map').appendChild(controlPanel);
+    
+    // Add buttons
+    const startDemoButton = document.createElement('button');
+    startDemoButton.textContent = 'Start Construction Demo';
+    controlPanel.appendChild(startDemoButton);
+    
+    // Add speed slider
+    const sliderContainer = document.createElement('div');
+    sliderContainer.className = 'slider-container';
+    
+    const sliderLabel = document.createElement('div');
+    sliderLabel.className = 'slider-label';
+    
+    const sliderText = document.createElement('span');
+    sliderText.textContent = 'Speed:';
+    
+    const sliderValue = document.createElement('span');
+    sliderValue.className = 'slider-value';
+    sliderValue.textContent = 'Normal';
+    
+    sliderLabel.appendChild(sliderText);
+    sliderLabel.appendChild(sliderValue);
+    
+    const speedSlider = document.createElement('input');
+    speedSlider.type = 'range';
+    speedSlider.min = '0.5';
+    speedSlider.max = '2';
+    speedSlider.step = '0.5';
+    speedSlider.value = '1';
+    speedSlider.className = 'control-panel-slider';
+    
+    speedSlider.addEventListener('input', function() {
+      const value = parseFloat(this.value);
+      let speedText = 'Normal';
+      
+      if (value < 1) {
+        speedText = 'Slow';
+      } else if (value > 1) {
+        speedText = 'Fast';
+      }
+      
+      sliderValue.textContent = speedText;
+    });
+    
+    sliderContainer.appendChild(sliderLabel);
+    sliderContainer.appendChild(speedSlider);
+    controlPanel.appendChild(sliderContainer);
+    
+    // Add controls
+    const controlsDiv = document.createElement('div');
+    controlsDiv.className = 'control-panel-controls';
+    
+    const pauseButton = document.createElement('button');
+    pauseButton.textContent = 'Pause';
+    pauseButton.disabled = true;
+    
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset';
+    
+    controlsDiv.appendChild(pauseButton);
+    controlsDiv.appendChild(resetButton);
+    controlPanel.appendChild(controlsDiv);
+    
+    // Create info panel
+    const infoPanel = document.createElement('div');
+    infoPanel.className = 'info-panel';
+    infoPanel.innerHTML = '<strong>R-Tree Construction</strong><br>Click "Start Construction Demo" to watch how an R-tree is built incrementally.';
+    document.getElementById('rtree-construction-map').appendChild(infoPanel);
+    
+    // Create legend
+    const legend = document.createElement('div');
+    legend.className = 'legend';
+    document.getElementById('rtree-construction-map').appendChild(legend);
+    
+    // Legend title
+    const legendTitle = document.createElement('div');
+    legendTitle.textContent = 'R-Tree Hierarchy';
+    legendTitle.style.fontWeight = 'bold';
+    legendTitle.style.marginBottom = '5px';
+    legend.appendChild(legendTitle);
+    
+    // Legend items
+    const colors = [
+      { color: '#e41a1c', label: 'Root Node' },
+      { color: '#377eb8', label: 'Level 1' },
+      { color: '#4daf4a', label: 'Level 2' },
+      { color: '#ff7f00', label: 'Leaf Nodes' }
+    ];
+    
+    colors.forEach(item => {
+      const legendItem = document.createElement('div');
+      legendItem.className = 'legend-item';
+      
+      const colorBox = document.createElement('div');
+      colorBox.className = 'legend-color';
+      colorBox.style.backgroundColor = item.color;
+      
+      const label = document.createElement('span');
+      label.textContent = item.label;
+      
+      legendItem.appendChild(colorBox);
+      legendItem.appendChild(label);
+      legend.appendChild(legendItem);
+    });
+    
+    // Variables
+    let points = [];
+    let rtree = null;
+    let rtreeLayers = [];
+    let animation = null;
+    let pointIndex = 0;
+    let isPaused = false;
+    let maxEntriesPerNode = 4;
+    const nextPointMarker = document.getElementById('next-point-marker');
+    
+    // Reset visualization
+    function resetVisualization() {
+      // Clear animation
+      if (animation) {
+        clearTimeout(animation);
+        animation = null;
+      }
+      
+      // Hide next point marker
+      nextPointMarker.style.display = 'none';
+      
+      // Remove points
+      if (map.getLayer('points-layer')) {
+        map.removeLayer('points-layer');
+      }
+      if (map.getSource('points')) {
+        map.removeSource('points');
+      }
+      
+      // Remove next point
+      if (map.getLayer('next-point-layer')) {
+        map.removeLayer('next-point-layer');
+      }
+      if (map.getSource('next-point')) {
+        map.removeSource('next-point');
+      }
+      
+      // Remove R-tree visualization layers
+      rtreeLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      // Reset variables
+      rtreeLayers = [];
+      rtree = null;
+      points = [];
+      pointIndex = 0;
+      isPaused = false;
+      pauseButton.textContent = 'Pause';
+      pauseButton.disabled = true;
+      
+      // Update info panel
+      infoPanel.innerHTML = '<strong>R-Tree Construction</strong><br>Click "Start Construction Demo" to watch how an R-tree is built incrementally.';
+    }
+    
+    // Generate a set of random points
+    function generatePoints() {
+      // Generate 50-100 random points in different clusters
+      const numPoints = Math.floor(Math.random() * 50) + 30;
+      points = [];
+      
+      // Create 3-5 clusters
+      const numClusters = Math.floor(Math.random() * 3) + 3;
+      
+      for (let c = 0; c < numClusters; c++) {
+        // Random cluster center
+        const centerLng = Math.random() * 360 - 180;
+        const centerLat = Math.random() * 140 - 70; // Avoid extreme latitudes
+        
+        // Generate points around this center
+        const pointsInCluster = Math.floor(numPoints / numClusters);
+        const spread = Math.random() * 20 + 5;
+        
+        for (let i = 0; i < pointsInCluster; i++) {
+          const lng = centerLng + (Math.random() - 0.5) * spread;
+          const lat = centerLat + (Math.random() - 0.5) * spread;
+          
+          points.push(turf.point([lng, lat], { 
+            id: points.length,
+            cluster: c,
+            added: false
+          }));
+        }
+      }
+      
+      // Randomize the order of points
+      points = shuffleArray(points);
+      
+      // Create initial feature collection with no points added
+      const emptyFeatureCollection = turf.featureCollection([]);
+      
+      // Add source to map
+      map.addSource('points', {
+        type: 'geojson',
+        data: emptyFeatureCollection
+      });
+      
+      // Add layer to map
+      map.addLayer({
+        id: 'points-layer',
+        type: 'circle',
+        source: 'points',
+        paint: {
+          'circle-radius': 5,
+          'circle-color': [
+            'match',
+            ['get', 'cluster'],
+            0, '#fbb03b',
+            1, '#223b53',
+            2, '#e55e5e',
+            3, '#3bb2d0',
+            4, '#8a2be2',
+            '#ccc'
+          ],
+          'circle-opacity': 0.8
+        }
+      });
+      
+      // Add next point source and layer
+      map.addSource('next-point', {
+        type: 'geojson',
+        data: turf.featureCollection([])
+      });
+      
+      map.addLayer({
+        id: 'next-point-layer',
+        type: 'circle',
+        source: 'next-point',
+        paint: {
+          'circle-radius': 8,
+          'circle-color': '#ff0000',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+      
+      // Calculate bounding box for all points
+      const allPointsCollection = turf.featureCollection(points);
+      const bbox = turf.bbox(allPointsCollection);
+      
+      // Fit map to bounding box
+      map.fitBounds(bbox, { padding: 50 });
+    }
+    
+    // Fisher-Yates shuffle algorithm
+    function shuffleArray(array) {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
+    }
+    
+    // Create or update R-tree
+    function createOrUpdateRTree(newPoint) {
+      if (!rtree) {
+        // Create initial R-tree with just one point
+        rtree = {
+          bbox: calculateBBox([newPoint]),
+          features: [newPoint],
+          children: [],
+          depth: 0
+        };
+      } else {
+        // Add point to existing R-tree
+        insertPoint(rtree, newPoint);
+      }
+      
+      // Update visualization
+      updateRTreeVisualization();
+    }
+    
+    // Insert a point into the R-tree
+    function insertPoint(node, point) {
+      // If this is a leaf node
+      if (node.children.length === 0) {
+        // If there's room, add the point
+        if (node.features.length < maxEntriesPerNode) {
+          node.features.push(point);
+          // Update bounding box
+          node.bbox = calculateBBox(node.features);
+        } else {
+          // Split the node
+          splitLeafNode(node, point);
+        }
+      } else {
+        // This is a non-leaf node, find the best child to insert into
+        let bestChild = null;
+        let minEnlargement = Infinity;
+        
+        for (let child of node.children) {
+          // Calculate how much the child's bbox would need to be enlarged
+          const childBBox = child.bbox;
+          const pointBBox = calculateBBox([point]);
+          
+          const enlargedBBox = [
+            Math.min(childBBox[0], pointBBox[0]),
+            Math.min(childBBox[1], pointBBox[1]),
+            Math.max(childBBox[2], pointBBox[2]),
+            Math.max(childBBox[3], pointBBox[3])
+          ];
+          
+          const originalArea = (childBBox[2] - childBBox[0]) * (childBBox[3] - childBBox[1]);
+          const enlargedArea = (enlargedBBox[2] - enlargedBBox[0]) * (enlargedBBox[3] - enlargedBBox[1]);
+          const enlargement = enlargedArea - originalArea;
+          
+          if (enlargement < minEnlargement) {
+            minEnlargement = enlargement;
+            bestChild = child;
+          }
+        }
+        
+        // Insert the point into the best child
+        insertPoint(bestChild, point);
+        
+        // Update the node's bounding box
+        node.bbox = calculateBBoxFromChildren(node);
+        
+        // Check if this node needs to be split
+        if (node.children.length > maxEntriesPerNode) {
+          splitInternalNode(node);
+        }
+      }
+    }
+    
+    // Split a leaf node
+    function splitLeafNode(node, newPoint) {
+      // Add the new point to the features array
+      const allFeatures = [...node.features, newPoint];
+      
+      // Determine split axis (x or y)
+      const splitOnX = node.depth % 2 === 0;
+      
+      // Sort features by x or y coordinate
+      allFeatures.sort((a, b) => {
+        if (splitOnX) {
+          return a.geometry.coordinates[0] - b.geometry.coordinates[0];
+        } else {
+          return a.geometry.coordinates[1] - b.geometry.coordinates[1];
+        }
+      });
+      
+      // Split point - middle of the array
+      const splitIndex = Math.ceil(allFeatures.length / 2);
+      
+      // Create two new leaf nodes
+      const leftFeatures = allFeatures.slice(0, splitIndex);
+      const rightFeatures = allFeatures.slice(splitIndex);
+      
+      // Create the child nodes
+      const leftChild = {
+        bbox: calculateBBox(leftFeatures),
+        features: leftFeatures,
+        children: [],
+        depth: node.depth + 1
+      };
+      
+      const rightChild = {
+        bbox: calculateBBox(rightFeatures),
+        features: rightFeatures,
+        children: [],
+        depth: node.depth + 1
+      };
+      
+      // Update the current node
+      node.features = [];
+      node.children = [leftChild, rightChild];
+      node.bbox = calculateBBoxFromChildren(node);
+    }
+    
+    // Split an internal node
+    function splitInternalNode(node) {
+      // Determine split axis (x or y)
+      const splitOnX = node.depth % 2 === 0;
+      
+      // Sort children by the center of their bounding boxes
+      node.children.sort((a, b) => {
+        const aCenterX = (a.bbox[0] + a.bbox[2]) / 2;
+        const aCenterY = (a.bbox[1] + a.bbox[3]) / 2;
+        
+        const bCenterX = (b.bbox[0] + b.bbox[2]) / 2;
+        const bCenterY = (b.bbox[1] + b.bbox[3]) / 2;
+        
+        if (splitOnX) {
+          return aCenterX - bCenterX;
+        } else {
+          return aCenterY - bCenterY;
+        }
+      });
+      
+      // Split point - middle of the array
+      const splitIndex = Math.ceil(node.children.length / 2);
+      
+      // Create two new nodes at the same level
+      const leftChildren = node.children.slice(0, splitIndex);
+      const rightChildren = node.children.slice(splitIndex);
+      
+      // If this is the root node, create a new root
+      if (node.depth === 0) {
+        // Create left and right nodes
+        const leftNode = {
+          bbox: calculateBBoxFromChildren({ children: leftChildren }),
+          features: [],
+          children: leftChildren,
+          depth: 1
+        };
+        
+        const rightNode = {
+          bbox: calculateBBoxFromChildren({ children: rightChildren }),
+          features: [],
+          children: rightChildren,
+          depth: 1
+        };
+        
+        // Update depths for all children
+        updateNodeDepths(leftNode, 1);
+        updateNodeDepths(rightNode, 1);
+        
+        // Update the root node
+        node.children = [leftNode, rightNode];
+        node.bbox = calculateBBoxFromChildren(node);
+      } else {
+        // This is not the root, so we need to update the parent
+        // This implementation simplifies by just keeping the first half of children
+        node.children = leftChildren;
+        node.bbox = calculateBBoxFromChildren(node);
+        
+        // Create a new sibling node with the second half
+        const siblingNode = {
+          bbox: calculateBBoxFromChildren({ children: rightChildren }),
+          features: [],
+          children: rightChildren,
+          depth: node.depth
+        };
+        
+        // The parent would insert this new node (not implemented in this demo)
+        // For simplicity, we don't handle this case fully in this demo
+      }
+    }
+    
+    // Update depths for all nodes in a subtree
+    function updateNodeDepths(node, depth) {
+      node.depth = depth;
+      
+      for (let child of node.children) {
+        updateNodeDepths(child, depth + 1);
+      }
+    }
+    
+    // Calculate the bounding box for a set of features
+    function calculateBBox(features) {
+      if (features.length === 0) return [0, 0, 0, 0];
+      
+      // For point features
+      const xs = features.map(f => f.geometry.coordinates[0]);
+      const ys = features.map(f => f.geometry.coordinates[1]);
+      
+      return [
+        Math.min(...xs),
+        Math.min(...ys),
+        Math.max(...xs),
+        Math.max(...ys)
+      ];
+    }
+    
+    // Calculate the bounding box from a node's children
+    function calculateBBoxFromChildren(node) {
+      if (node.children.length === 0) return node.bbox;
+      
+      const childBBoxes = node.children.map(child => child.bbox);
+      
+      const minX = Math.min(...childBBoxes.map(bbox => bbox[0]));
+      const minY = Math.min(...childBBoxes.map(bbox[1]));
+      const maxX = Math.max(...childBBoxes.map(bbox[2]));
+      const maxY = Math.max(...childBBoxes.map(bbox[3]));
+      
+      return [minX, minY, maxX, maxY];
+    }
+    
+    // Update the R-tree visualization
+    function updateRTreeVisualization() {
+      // Remove existing R-tree layers
+      rtreeLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      rtreeLayers = [];
+      
+      // If there's an R-tree, visualize it
+      if (rtree) {
+        visualizeNode(rtree);
+      }
+    }
+    
+    // Visualize a node in the R-tree
+    function visualizeNode(node, nodeId = 'root') {
+      const color = depthToColor(node.depth);
+      const sourceId = `rtree-${nodeId}`;
+      const layerId = `rtree-layer-${nodeId}`;
+      
+      // Create a polygon from the bounding box
+      const polygon = turf.bboxPolygon(node.bbox);
+      
+      // Add source and layer
+      map.addSource(sourceId, {
+        type: 'geojson',
+        data: polygon
+      });
+      
+      map.addLayer({
+        id: layerId,
+        type: 'line',
+        source: sourceId,
+        paint: {
+          'line-color': color,
+          'line-width': 2,
+          'line-opacity': 0.7
+        },
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        }
+      }, 'points-layer'); // Insert below points
+      
+      rtreeLayers.push(sourceId);
+      rtreeLayers.push(layerId);
+      
+      // Recursively visualize children
+      if (node.children.length > 0) {
+        node.children.forEach((child, i) => {
+          visualizeNode(child, `${nodeId}-${i}`);
+        });
+      }
+    }
+    
+    // Map depth to color
+    function depthToColor(depth) {
+      const colors = [
+        '#e41a1c', // Root (red)
+        '#377eb8', // Level 1 (blue)
+        '#4daf4a', // Level 2 (green)
+        '#ff7f00'  // Leaf nodes (orange)
+      ];
+      
+      return colors[Math.min(depth, colors.length - 1)];
+    }
+    
+    // Start the demo
+    function startDemo() {
+      resetVisualization();
+      generatePoints();
+      
+      // Enable pause button
+      pauseButton.disabled = false;
+      
+      // Initialize animation
+      pointIndex = 0;
+      animateNextPoint();
+    }
+    
+    // Animate adding the next point
+    function animateNextPoint() {
+      if (pointIndex >= points.length) {
+        // Animation complete
+        finishAnimation();
+        return;
+      }
+      
+      if (isPaused) {
+        return;
+      }
+      
+      // Get the next point
+      const nextPoint = points[pointIndex];
+      
+      // Show the next point to be added
+      map.getSource('next-point').setData(turf.featureCollection([nextPoint]));
+      
+      // Show marker
+      const coords = nextPoint.geometry.coordinates;
+      const pixelCoords = map.project(coords);
+      nextPointMarker.style.left = (pixelCoords.x - 7) + 'px';
+      nextPointMarker.style.top = (pixelCoords.y - 7) + 'px';
+      nextPointMarker.style.display = 'block';
+      
+      // Update info panel
+      infoPanel.innerHTML = `<strong>R-Tree Construction</strong><br>Adding point ${pointIndex + 1} of ${points.length}.<br>Step: <strong>1/3</strong> Preview point to be added`;
+      
+      // Wait a moment, then highlight where it will go
+      animation = setTimeout(() => {
+        // Update info panel
+        infoPanel.innerHTML = `<strong>R-Tree Construction</strong><br>Adding point ${pointIndex + 1} of ${points.length}.<br>Step: <strong>2/3</strong> Finding where to add point`;
+        
+        // Wait a moment, then actually add the point
+        animation = setTimeout(() => {
+          // Add the point to the R-tree
+          nextPoint.properties.added = true;
+          createOrUpdateRTree(nextPoint);
+          
+          // Update displayed points
+          const addedPoints = points.filter(p => p.properties.added);
+          map.getSource('points').setData(turf.featureCollection(addedPoints));
+          
+          // Remove next point marker
+          map.getSource('next-point').setData(turf.featureCollection([]));
+          nextPointMarker.style.display = 'none';
+          
+          // Update info panel
+          infoPanel.innerHTML = `<strong>R-Tree Construction</strong><br>Adding point ${pointIndex + 1} of ${points.length}.<br>Step: <strong>3/3</strong> Point added and tree updated`;
+          
+          // Move to next point
+          pointIndex++;
+          
+          // Continue animation
+          const speedFactor = parseFloat(speedSlider.value);
+          animation = setTimeout(animateNextPoint, 2000 / speedFactor);
+        }, 1000 / parseFloat(speedSlider.value));
+      }, 1000 / parseFloat(speedSlider.value));
+    }
+    
+    // Finish the animation
+    function finishAnimation() {
+      // Update info panel
+      infoPanel.innerHTML = `<strong>R-Tree Construction Complete</strong><br>Added all ${points.length} points.<br>Final tree has ${countNodes(rtree)} nodes with a depth of ${getTreeDepth(rtree)}.`;
+      
+      // Disable pause button
+      pauseButton.disabled = true;
+    }
+    
+    // Count nodes in the tree
+    function countNodes(node) {
+      let count = 1; // Count this node
+      
+      // Count all children
+      for (let child of node.children) {
+        count += countNodes(child);
+      }
+      
+      return count;
+    }
+    
+    // Get the depth of the tree
+    function getTreeDepth(node) {
+      if (node.children.length === 0) {
+        return 0;
+      }
+      
+      let maxChildDepth = 0;
+      for (let child of node.children) {
+        const childDepth = getTreeDepth(child);
+        if (childDepth > maxChildDepth) {
+          maxChildDepth = childDepth;
+        }
+      }
+      
+      return maxChildDepth + 1;
+    }
+    
+    // Pause/resume the animation
+    function togglePause() {
+      isPaused = !isPaused;
+      
+      if (isPaused) {
+        pauseButton.textContent = 'Resume';
+      } else {
+        pauseButton.textContent = 'Pause';
+        animateNextPoint();
+      }
+    }
+    
+    // Handle window resize to keep the next point marker in the right place
+    function updateMarkerPosition() {
+      if (pointIndex < points.length && nextPointMarker.style.display === 'block') {
+        const nextPoint = points[pointIndex];
+        const coords = nextPoint.geometry.coordinates;
+        const pixelCoords = map.project(coords);
+        nextPointMarker.style.left = (pixelCoords.x - 7) + 'px';
+        nextPointMarker.style.top = (pixelCoords.y - 7) + 'px';
+      }
+    }
+    
+    // Set up event handlers
+    startDemoButton.addEventListener('click', startDemo);
+    pauseButton.addEventListener('click', togglePause);
+    resetButton.addEventListener('click', resetVisualization);
+    
+    // Update marker position when the map moves
+    map.on('move', updateMarkerPosition);
+    
+    // Clean up on page leave
+    window.addEventListener('unload', function() {
+      if (animation) {
+        clearTimeout(animation);
+      }
+      map.remove();
+    });
+  });
+</script>

@@ -1,0 +1,609 @@
+<link href="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.css" rel="stylesheet" />
+<style>
+  #rtree-basic-map {
+    width: 100%;
+    height: 500px;
+    margin-bottom: 1.5em;
+    border-radius: 8px;
+  }
+  .maplibregl-popup {
+    max-width: 300px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  }
+  .control-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    z-index: 1;
+  }
+  .control-panel button {
+    margin: 5px;
+    padding: 5px 10px;
+    background: #4a8ec2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+  }
+  .control-panel button:hover {
+    background: #3a7cb2;
+  }
+  .info-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 250px;
+    font-size: 14px;
+  }
+  .legend {
+    position: absolute;
+    bottom: 20px;
+    left: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+  }
+  .legend-color {
+    width: 20px;
+    height: 10px;
+    margin-right: 5px;
+  }
+  .search-animation {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: yellow;
+    border-radius: 50%;
+    border: 2px solid orange;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    display: none;
+  }
+</style>
+
+<div id="rtree-basic-map" class="maplibregl-map"></div>
+<div class="search-animation" id="search-marker"></div>
+
+<script src="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const map = new maplibregl.Map({
+      container: 'rtree-basic-map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [0, 0],
+      zoom: 2,
+      hash: false
+    });
+    
+    // Add navigation controls
+    map.addControl(new maplibregl.NavigationControl());
+    
+    // Create control panel
+    const controlPanel = document.createElement('div');
+    controlPanel.className = 'control-panel';
+    document.getElementById('rtree-basic-map').appendChild(controlPanel);
+    
+    // Add buttons
+    const generateButton = document.createElement('button');
+    generateButton.textContent = 'Generate Points';
+    controlPanel.appendChild(generateButton);
+    
+    const buildRTreeButton = document.createElement('button');
+    buildRTreeButton.textContent = 'Build R-Tree';
+    controlPanel.appendChild(buildRTreeButton);
+    
+    const demonstrateButton = document.createElement('button');
+    demonstrateButton.textContent = 'Demonstrate Search';
+    controlPanel.appendChild(demonstrateButton);
+    
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset';
+    controlPanel.appendChild(resetButton);
+    
+    // Create info panel
+    const infoPanel = document.createElement('div');
+    infoPanel.className = 'info-panel';
+    infoPanel.innerHTML = '<strong>R-Tree Visualization</strong><br>Click "Generate Points" to start.';
+    document.getElementById('rtree-basic-map').appendChild(infoPanel);
+    
+    // Create legend
+    const legend = document.createElement('div');
+    legend.className = 'legend';
+    document.getElementById('rtree-basic-map').appendChild(legend);
+    
+    // Legend title
+    const legendTitle = document.createElement('div');
+    legendTitle.textContent = 'R-Tree Hierarchy';
+    legendTitle.style.fontWeight = 'bold';
+    legendTitle.style.marginBottom = '5px';
+    legend.appendChild(legendTitle);
+    
+    // Legend items
+    const colors = [
+      { color: '#e41a1c', label: 'Root Node' },
+      { color: '#377eb8', label: 'Level 1' },
+      { color: '#4daf4a', label: 'Level 2' },
+      { color: '#ff7f00', label: 'Leaf Nodes' }
+    ];
+    
+    colors.forEach(item => {
+      const legendItem = document.createElement('div');
+      legendItem.className = 'legend-item';
+      
+      const colorBox = document.createElement('div');
+      colorBox.className = 'legend-color';
+      colorBox.style.backgroundColor = item.color;
+      
+      const label = document.createElement('span');
+      label.textContent = item.label;
+      
+      legendItem.appendChild(colorBox);
+      legendItem.appendChild(label);
+      legend.appendChild(legendItem);
+    });
+    
+    // Variables to store data
+    let points = [];
+    let rtree = null;
+    let rtreeLayers = [];
+    let searchAnimation = null;
+    const searchMarker = document.getElementById('search-marker');
+    
+    // Generate random points
+    function generatePoints() {
+      // Clear existing points
+      resetVisualization();
+      
+      // Generate 50-100 random points in different clusters
+      const numPoints = Math.floor(Math.random() * 50) + 50;
+      points = [];
+      
+      // Create 3-5 clusters
+      const numClusters = Math.floor(Math.random() * 3) + 3;
+      
+      for (let c = 0; c < numClusters; c++) {
+        // Random cluster center
+        const centerLng = Math.random() * 360 - 180;
+        const centerLat = Math.random() * 140 - 70; // Avoid extreme latitudes
+        
+        // Generate points around this center
+        const pointsInCluster = Math.floor(numPoints / numClusters);
+        const spread = Math.random() * 20 + 5;
+        
+        for (let i = 0; i < pointsInCluster; i++) {
+          const lng = centerLng + (Math.random() - 0.5) * spread;
+          const lat = centerLat + (Math.random() - 0.5) * spread;
+          
+          points.push(turf.point([lng, lat], { 
+            id: points.length,
+            cluster: c
+          }));
+        }
+      }
+      
+      // Add points to map
+      const pointsFeatureCollection = turf.featureCollection(points);
+      
+      map.addSource('points', {
+        type: 'geojson',
+        data: pointsFeatureCollection
+      });
+      
+      map.addLayer({
+        id: 'points-layer',
+        type: 'circle',
+        source: 'points',
+        paint: {
+          'circle-radius': 5,
+          'circle-color': [
+            'match',
+            ['get', 'cluster'],
+            0, '#fbb03b',
+            1, '#223b53',
+            2, '#e55e5e',
+            3, '#3bb2d0',
+            4, '#8a2be2',
+            '#ccc'
+          ],
+          'circle-opacity': 0.8
+        }
+      });
+      
+      // Fit map to points
+      const bbox = turf.bbox(pointsFeatureCollection);
+      map.fitBounds(bbox, { padding: 50 });
+      
+      // Update info panel
+      infoPanel.innerHTML = `<strong>R-Tree Visualization</strong><br>Generated ${points.length} points.<br>Click "Build R-Tree" to continue.`;
+    }
+    
+    // Build R-tree
+    function buildRTree() {
+      if (points.length === 0) {
+        infoPanel.innerHTML = '<strong>R-Tree Visualization</strong><br>Please generate points first.';
+        return;
+      }
+      
+      // Remove existing R-tree visualization
+      rtreeLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      rtreeLayers = [];
+      
+      // Build R-tree
+      rtree = createRTree(points);
+      
+      // Visualize R-tree
+      visualizeRTree(rtree);
+      
+      // Update info panel
+      infoPanel.innerHTML = `<strong>R-Tree Visualization</strong><br>R-Tree built with ${countNodes(rtree)} nodes.<br>Click "Demonstrate Search" to see how search works.`;
+    }
+    
+    // Create a simple R-tree
+    function createRTree(features, maxEntries = 4, depth = 0) {
+      if (features.length <= maxEntries) {
+        return {
+          bbox: calculateFeaturesBBox(features),
+          features: features,
+          children: [],
+          depth: depth
+        };
+      }
+      
+      // Get the bounding box
+      const bbox = calculateFeaturesBBox(features);
+      
+      // Determine split direction (alternating between x and y)
+      const splitOnX = depth % 2 === 0;
+      
+      // Sort by the centroid of the bbox
+      features.sort((a, b) => {
+        if (splitOnX) {
+          return a.geometry.coordinates[0] - b.geometry.coordinates[0];
+        } else {
+          return a.geometry.coordinates[1] - b.geometry.coordinates[1];
+        }
+      });
+      
+      // Split features into groups
+      const groups = [];
+      const groupSize = Math.ceil(features.length / Math.min(maxEntries, 4));
+      
+      for (let i = 0; i < features.length; i += groupSize) {
+        groups.push(features.slice(i, i + groupSize));
+      }
+      
+      // Create child nodes
+      const children = groups.map(group => createRTree(group, maxEntries, depth + 1));
+      
+      return {
+        bbox: bbox,
+        features: [],
+        children: children,
+        depth: depth
+      };
+    }
+    
+    // Calculate bbox for a group of features
+    function calculateFeaturesBBox(features) {
+      // For point features
+      if (features[0].geometry.type === 'Point') {
+        const xs = features.map(f => f.geometry.coordinates[0]);
+        const ys = features.map(f => f.geometry.coordinates[1]);
+        
+        return [
+          Math.min(...xs),
+          Math.min(...ys),
+          Math.max(...xs),
+          Math.max(...ys)
+        ];
+      } 
+      // For other geometry types
+      else {
+        const bboxes = features.map(feature => turf.bbox(feature));
+        
+        // Find min/max for all bboxes
+        const minX = Math.min(...bboxes.map(bbox => bbox[0]));
+        const minY = Math.min(...bboxes.map(bbox => bbox[1]));
+        const maxX = Math.max(...bboxes.map(bbox => bbox[2]));
+        const maxY = Math.max(...bboxes.map(bbox => bbox[3]));
+        
+        return [minX, minY, maxX, maxY];
+      }
+    }
+    
+    // Visualize the R-tree structure
+    function visualizeRTree(rtree) {
+      // Recursively visualize nodes
+      function visualizeNode(node, nodeId = 'root') {
+        const color = depthToColor(node.depth);
+        const sourceId = `rtree-${nodeId}`;
+        const layerId = `rtree-layer-${nodeId}`;
+        
+        // Create a polygon from the bounding box
+        const polygon = turf.bboxPolygon(node.bbox);
+        
+        // Add source and layer
+        map.addSource(sourceId, {
+          type: 'geojson',
+          data: polygon
+        });
+        
+        map.addLayer({
+          id: layerId,
+          type: 'line',
+          source: sourceId,
+          paint: {
+            'line-color': color,
+            'line-width': 2,
+            'line-opacity': 0.7
+          },
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          }
+        });
+        
+        rtreeLayers.push(sourceId);
+        rtreeLayers.push(layerId);
+        
+        // Recursively visualize children
+        if (node.children.length > 0) {
+          node.children.forEach((child, i) => {
+            visualizeNode(child, `${nodeId}-${i}`);
+          });
+        }
+      }
+      
+      visualizeNode(rtree);
+    }
+    
+    // Map depth to color
+    function depthToColor(depth) {
+      const colors = [
+        '#e41a1c', // Root (red)
+        '#377eb8', // Level 1 (blue)
+        '#4daf4a', // Level 2 (green)
+        '#ff7f00'  // Leaf nodes (orange)
+      ];
+      
+      return colors[Math.min(depth, colors.length - 1)];
+    }
+    
+    // Count total nodes in the R-tree
+    function countNodes(node) {
+      let count = 1; // Count this node
+      
+      // Recursively count children
+      if (node.children && node.children.length > 0) {
+        node.children.forEach(child => {
+          count += countNodes(child);
+        });
+      }
+      
+      return count;
+    }
+    
+    // Demonstrate search animation
+    function demonstrateSearch() {
+      if (!rtree) {
+        infoPanel.innerHTML = '<strong>R-Tree Visualization</strong><br>Please build the R-tree first.';
+        return;
+      }
+      
+      // Clear previous animation
+      if (searchAnimation) {
+        clearTimeout(searchAnimation);
+      }
+      
+      // Reset node highlighting
+      rtreeLayers.forEach(layer => {
+        if (layer.includes('layer') && map.getLayer(layer)) {
+          map.setPaintProperty(layer, 'line-width', 2);
+          map.setPaintProperty(layer, 'line-opacity', 0.7);
+        }
+      });
+      
+      // Get a random point to search for
+      const targetIndex = Math.floor(Math.random() * points.length);
+      const targetPoint = points[targetIndex];
+      const targetCoords = targetPoint.geometry.coordinates;
+      
+      // Show marker
+      searchMarker.style.display = 'block';
+      const targetPixel = map.project(targetCoords);
+      searchMarker.style.left = (targetPixel.x - 6) + 'px';
+      searchMarker.style.top = (targetPixel.y - 6) + 'px';
+      
+      // Update info panel
+      infoPanel.innerHTML = `<strong>R-Tree Search</strong><br>Searching for point ${targetPoint.properties.id}...<br>Notice how we only need to check branches that might contain our point.`;
+      
+      // Animate search through the tree
+      function animateSearchNode(node, nodeId = 'root', delay = 0, path = []) {
+        const layerId = `rtree-layer-${nodeId}`;
+        
+        // Check if point is inside this node's bbox
+        const pointInBox = turf.booleanPointInPolygon(
+          targetPoint,
+          turf.bboxPolygon(node.bbox)
+        );
+        
+        if (pointInBox) {
+          path.push(nodeId);
+          
+          // Highlight this node
+          searchAnimation = setTimeout(() => {
+            map.setPaintProperty(layerId, 'line-width', 4);
+            map.setPaintProperty(layerId, 'line-opacity', 1);
+            
+            // If leaf node, check actual points
+            if (node.children.length === 0 && node.features.length > 0) {
+              // Check if target point is in this leaf
+              const foundIndex = node.features.findIndex(p => 
+                p.properties.id === targetPoint.properties.id
+              );
+              
+              if (foundIndex >= 0) {
+                // Found the point
+                searchAnimation = setTimeout(() => {
+                  // Highlight found point
+                  map.setPaintProperty('points-layer', 'circle-opacity', [
+                    'case',
+                    ['==', ['get', 'id'], targetPoint.properties.id],
+                    1,
+                    0.3
+                  ]);
+                  
+                  map.setPaintProperty('points-layer', 'circle-radius', [
+                    'case',
+                    ['==', ['get', 'id'], targetPoint.properties.id],
+                    8,
+                    5
+                  ]);
+                  
+                  map.setPaintProperty('points-layer', 'circle-stroke-width', [
+                    'case',
+                    ['==', ['get', 'id'], targetPoint.properties.id],
+                    2,
+                    0
+                  ]);
+                  
+                  map.setPaintProperty('points-layer', 'circle-stroke-color', '#ffff00');
+                  
+                  // Update info panel
+                  infoPanel.innerHTML = `<strong>R-Tree Search Result</strong><br>Found point ${targetPoint.properties.id} in cluster ${targetPoint.properties.cluster}!<br><br>Visited ${path.length} nodes out of ${countNodes(rtree)} total nodes (${Math.round(path.length/countNodes(rtree)*100)}% of the tree)`;
+                  
+                  // Reset after a while
+                  searchAnimation = setTimeout(() => {
+                    // Reset point highlighting
+                    map.setPaintProperty('points-layer', 'circle-opacity', 0.8);
+                    map.setPaintProperty('points-layer', 'circle-radius', 5);
+                    map.setPaintProperty('points-layer', 'circle-stroke-width', 0);
+                    
+                    // Reset node highlighting
+                    rtreeLayers.forEach(layer => {
+                      if (layer.includes('layer') && map.getLayer(layer)) {
+                        map.setPaintProperty(layer, 'line-width', 2);
+                        map.setPaintProperty(layer, 'line-opacity', 0.7);
+                      }
+                    });
+                    
+                    // Hide marker
+                    searchMarker.style.display = 'none';
+                    
+                  }, 4000);
+                }, 500);
+              }
+            } 
+            // If not leaf, continue traversing children
+            else {
+              // Traverse each child that contains the point
+              for (let i = 0; i < node.children.length; i++) {
+                animateSearchNode(node.children[i], `${nodeId}-${i}`, delay + 500, path);
+              }
+            }
+          }, delay);
+        }
+      }
+      
+      // Start search from root
+      animateSearchNode(rtree);
+    }
+    
+    // Reset visualization
+    function resetVisualization() {
+      // Clear any animations
+      if (searchAnimation) {
+        clearTimeout(searchAnimation);
+        searchAnimation = null;
+      }
+      
+      // Hide marker
+      searchMarker.style.display = 'none';
+      
+      // Remove points
+      if (map.getLayer('points-layer')) {
+        map.removeLayer('points-layer');
+      }
+      if (map.getSource('points')) {
+        map.removeSource('points');
+      }
+      
+      // Remove R-tree visualization layers
+      rtreeLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      // Reset variables
+      rtreeLayers = [];
+      rtree = null;
+      points = [];
+      
+      // Update info panel
+      infoPanel.innerHTML = '<strong>R-Tree Visualization</strong><br>Click "Generate Points" to start.';
+    }
+    
+    // Set up event handlers
+    generateButton.addEventListener('click', generatePoints);
+    buildRTreeButton.addEventListener('click', buildRTree);
+    demonstrateButton.addEventListener('click', demonstrateSearch);
+    resetButton.addEventListener('click', resetVisualization);
+    
+    // Event listener for map movement to reposition the search marker
+    map.on('move', function() {
+      if (searchMarker.style.display === 'block' && points.length > 0) {
+        // Get the current target point
+        const targetPoint = points.find(p => 
+          map.getPaintProperty('points-layer', 'circle-opacity') && 
+          map.getPaintProperty('points-layer', 'circle-radius')[1] === p.properties.id
+        );
+        
+        if (targetPoint) {
+          const targetCoords = targetPoint.geometry.coordinates;
+          const targetPixel = map.project(targetCoords);
+          searchMarker.style.left = (targetPixel.x - 6) + 'px';
+          searchMarker.style.top = (targetPixel.y - 6) + 'px';
+        }
+      }
+    });
+    
+    // Ensure clean up when page changes
+    window.addEventListener('unload', function() {
+      if (searchAnimation) {
+        clearTimeout(searchAnimation);
+      }
+      map.remove();
+    });
+  });
+</script>
