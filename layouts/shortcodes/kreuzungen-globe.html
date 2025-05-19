@@ -63,43 +63,116 @@
 
     return updatedStyle;
   }
-  const viewportWidth = window.innerWidth;
-  let initialZoom;
-  if (viewportWidth < 480) {
-    initialZoom = 1; // Very small screens (mobile)
-  } else if (viewportWidth < 768) {
-    initialZoom = 1.25; // Small screens (larger phones/small tablets)
-  } else {
-    initialZoom = 1.4; // For larger screens the width of the map is capped, 1.4 fits best.
-  }
   
-  // Initialize the map when the DOM is fully loaded
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the map
     const map = new maplibregl.Map({
       container: 'kreuzungen-map',
-      center: [0, 31.4934],
-      zoom: initialZoom,
+      center: [0, 20], // Centered to show more land mass
+      zoom: 1.2, // Base zoom level that works on most devices
     });
+    
+    // Adjust zoom level based on screen size on initial load
+    function adjustMapForScreenSize() {
+      const width = window.innerWidth;
+      if (width < 480) {
+        map.setZoom(0.8); // Lower zoom for very small screens
+      } else if (width < 768) {
+        map.setZoom(1.0); // Slightly higher for medium screens
+      } else {
+        map.setZoom(1.2); // Normal zoom for larger screens
+      }
+    }
+    
+    // Apply initial adjustment
+    map.on('load', adjustMapForScreenSize);
+    
+    // Reapply on window resize
+    window.addEventListener('resize', adjustMapForScreenSize);
+    
+    // Simple rotation state management
+    let isActive = false;
+    let rotationInterval;
+    
+    // Start rotation function
+    function startRotation() {
+      stopRotation(); // Clear any existing interval
+      isActive = false;
+      rotationInterval = setInterval(() => {
+        if (!isActive) {
+          const currentCenter = map.getCenter();
+          map.easeTo({
+            center: [currentCenter.lng + 2, currentCenter.lat],
+            duration: 1000,
+            easing: t => t
+          });
+        }
+      }, 300);
+    }
+    
+    // Stop rotation function
+    function stopRotation() {
+      isActive = true;
+      if (rotationInterval) {
+        clearInterval(rotationInterval);
+        rotationInterval = null;
+      }
+    }
+    
+    // Reset view and restart rotation
+    function resetViewAndRotate() {
+      adjustMapForScreenSize(); // Reset to appropriate zoom level
+      startRotation();
+    }
+    
+    // User interaction handlers
+    map.on('mousedown', stopRotation);
+    map.on('touchstart', stopRotation);
+    map.on('dragstart', stopRotation);
+    
+    // Restart rotation when clicking outside the map
+    document.addEventListener('click', (e) => {
+      if (!document.getElementById('kreuzungen-map').contains(e.target)) {
+        resetViewAndRotate();
+      }
+    });
+    
+    // Check if map is in viewport and reset if not
+    function checkVisibility() {
+      const mapElement = document.getElementById('kreuzungen-map');
+      const rect = mapElement.getBoundingClientRect();
+      const isVisible = (
+        rect.top >= -rect.height &&
+        rect.left >= -rect.width &&
+        rect.bottom <= (window.innerHeight + rect.height) &&
+        rect.right <= (window.innerWidth + rect.width)
+      );
+      
+      if (!isVisible && !isActive) {
+        resetViewAndRotate();
+      }
+    }
+    
+    // Check visibility on scroll
+    document.addEventListener('scroll', checkVisibility);
+    
+    // Start rotation when map loads
+    map.on('load', startRotation);
 
     fetch('https://demotiles.maplibre.org/style.json')
       .then(response => response.json())
       .then(customStyle => {
-        // Fetch the waterways data
         fetch('https://fly.storage.tigris.dev/hydro-xpid/modelled/country.json')
-          .then(response => response.text()) // Fetch as text to handle NDJSON
+          .then(response => response.text())
           .then(text => {
             try {
-              // Split the NDJSON text by newlines and parse each line
               const data = text.split('\n').filter(line => line.trim() !== '').map(line => JSON.parse(line));
-              // Convert waterways data to a dictionary for easy lookup
               const waterwaysDict = data.reduce((acc, country) => {
                 acc[country.country_code_3] = {
-                  waterways_crossed: country.waterway_realtions_crossed, // Add total number of waterway crossings in country
-                  unique_waterways_crossed: country.unique_waterway_realtions_crossed, // Add total number of rivers crossed in a country. 
+                  waterways_crossed: country.waterway_realtions_crossed,
+                  unique_waterways_crossed: country.unique_waterway_realtions_crossed,
                   country_name: country.country,
-                  most_popular_waterway: country.most_popular_waterway || 'N/A', // Add most_popular_waterway
-                  country_code_2: country.country_code_2 // Add 2-letter country code
+                  most_popular_waterway: country.most_popular_waterway || 'N/A',
+                  country_code_2: country.country_code_2
                 };
                 return acc;
               }, {});
@@ -137,8 +210,8 @@
                         .setHTML(`
                           <strong>${getFlagEmoji(countryData.country_code_2)} ${countryData.country_name}</strong><br>
                           Waterways Crossed: ${countryData.waterways_crossed}<br>
-                          Unique Waterways Crossed: ${countryData.unique_waterways_crossed}<br>
-                          Most Popular Waterway: ${countryData.most_popular_waterway}
+                          Unique Waterways: ${countryData.unique_waterways_crossed}<br>
+                          Popular: ${countryData.most_popular_waterway}
                         `)
                         .addTo(map);
                     } else {
@@ -167,7 +240,6 @@
                   if (e.features.length > 0) {
                     const country = e.features[0];
                     const bbox = turf.bbox(country);
-
                     map.fitBounds(bbox, {
                       padding: 40,
                       duration: 2000
@@ -175,10 +247,8 @@
                   }
                 });
               });
-
             } catch (error) {
               console.error('Error parsing JSON:', error);
-              console.log('Raw response text:', text);
             }
           })
           .catch(error => console.error('Error fetching waterways data:', error));

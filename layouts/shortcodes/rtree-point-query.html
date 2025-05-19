@@ -1,0 +1,933 @@
+<link href="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.css" rel="stylesheet" />
+<style>
+  #rtree-point-query-map {
+    width: 100%;
+    height: 500px;
+    margin-bottom: 1.5em;
+    border-radius: 8px;
+  }
+  .maplibregl-popup {
+    max-width: 300px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  }
+  .control-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    z-index: 1;
+  }
+  .control-panel button {
+    margin: 5px;
+    padding: 5px 10px;
+    background: #4a8ec2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+  }
+  .control-panel button:hover {
+    background: #3a7cb2;
+  }
+  .info-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 250px;
+    font-size: 14px;
+  }
+  .legend {
+    position: absolute;
+    bottom: 20px;
+    left: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+  }
+  .legend-color {
+    width: 20px;
+    height: 10px;
+    margin-right: 5px;
+  }
+  .query-marker {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    border: 2px solid white;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    display: none;
+  }
+  .query-point {
+    cursor: crosshair;
+  }
+</style>
+
+<div id="rtree-point-query-map" class="maplibregl-map query-point"></div>
+<div class="query-marker" id="query-marker"></div>
+
+<script src="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const map = new maplibregl.Map({
+      container: 'rtree-point-query-map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [0, 0],
+      zoom: 1,
+      hash: false
+    });
+    
+    // Add navigation controls
+    map.addControl(new maplibregl.NavigationControl());
+    
+    // Create control panel
+    const controlPanel = document.createElement('div');
+    controlPanel.className = 'control-panel';
+    document.getElementById('rtree-point-query-map').appendChild(controlPanel);
+    
+    // Add buttons
+    const generateButton = document.createElement('button');
+    generateButton.textContent = 'Generate Points & R-Tree';
+    controlPanel.appendChild(generateButton);
+    
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset';
+    controlPanel.appendChild(resetButton);
+    
+    // Create info panel
+    const infoPanel = document.createElement('div');
+    infoPanel.className = 'info-panel';
+    infoPanel.innerHTML = '<strong>R-Tree Point Query</strong><br>Click "Generate Points & R-Tree" to create a dataset, then click anywhere on the map to see how an R-tree efficiently finds the nearest point.';
+    document.getElementById('rtree-point-query-map').appendChild(infoPanel);
+    
+    // Create legend
+    const legend = document.createElement('div');
+    legend.className = 'legend';
+    document.getElementById('rtree-point-query-map').appendChild(legend);
+    
+    // Legend title
+    const legendTitle = document.createElement('div');
+    legendTitle.textContent = 'R-Tree Query Legend';
+    legendTitle.style.fontWeight = 'bold';
+    legendTitle.style.marginBottom = '5px';
+    legend.appendChild(legendTitle);
+    
+    // Legend items
+    const colors = [
+      { color: '#e41a1c', label: 'Query Point' },
+      { color: '#377eb8', label: 'Visited Nodes' },
+      { color: '#4daf4a', label: 'Found Point' },
+      { color: '#ff7f00', label: 'Unvisited Nodes' }
+    ];
+    
+    colors.forEach(item => {
+      const legendItem = document.createElement('div');
+      legendItem.className = 'legend-item';
+      
+      const colorBox = document.createElement('div');
+      colorBox.className = 'legend-color';
+      colorBox.style.backgroundColor = item.color;
+      
+      const label = document.createElement('span');
+      label.textContent = item.label;
+      
+      legendItem.appendChild(colorBox);
+      legendItem.appendChild(label);
+      legend.appendChild(legendItem);
+    });
+    
+    // Variables
+    let points = [];
+    let rtree = null;
+    let rtreeLayers = [];
+    let queryLayers = [];
+    let animation = null;
+    let isQueryMode = false;
+    const queryMarker = document.getElementById('query-marker');
+    
+    // Reset visualization
+    function resetVisualization() {
+      // Clear animation
+      if (animation) {
+        clearTimeout(animation);
+        animation = null;
+      }
+      
+      // Hide query marker
+      queryMarker.style.display = 'none';
+      
+      // Remove points
+      if (map.getLayer('points-layer')) {
+        map.removeLayer('points-layer');
+      }
+      if (map.getSource('points')) {
+        map.removeSource('points');
+      }
+      
+      // Remove query point
+      if (map.getLayer('query-point-layer')) {
+        map.removeLayer('query-point-layer');
+      }
+      if (map.getSource('query-point')) {
+        map.removeSource('query-point');
+      }
+      
+      // Remove nearest point
+      if (map.getLayer('nearest-point-layer')) {
+        map.removeLayer('nearest-point-layer');
+      }
+      if (map.getSource('nearest-point')) {
+        map.removeSource('nearest-point');
+      }
+      
+      // Remove R-tree visualization layers
+      rtreeLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      // Remove query visualization layers
+      queryLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      // Reset variables
+      rtreeLayers = [];
+      queryLayers = [];
+      rtree = null;
+      points = [];
+      isQueryMode = false;
+      
+      // Update info panel
+      infoPanel.innerHTML = '<strong>R-Tree Point Query</strong><br>Click "Generate Points & R-Tree" to create a dataset, then click anywhere on the map to see how an R-tree efficiently finds the nearest point.';
+    }
+    
+    // Generate a set of random points and build the R-tree
+    function generatePoints() {
+      resetVisualization();
+      
+      // Generate 50-100 random points in different clusters
+      const numPoints = Math.floor(Math.random() * 50) + 50;
+      points = [];
+      
+      // Create 3-5 clusters
+      const numClusters = Math.floor(Math.random() * 3) + 3;
+      
+      for (let c = 0; c < numClusters; c++) {
+        // Random cluster center
+        const centerLng = Math.random() * 360 - 180;
+        const centerLat = Math.random() * 140 - 70; // Avoid extreme latitudes
+        
+        // Generate points around this center
+        const pointsInCluster = Math.floor(numPoints / numClusters);
+        const spread = Math.random() * 20 + 5;
+        
+        for (let i = 0; i < pointsInCluster; i++) {
+          const lng = centerLng + (Math.random() - 0.5) * spread;
+          const lat = centerLat + (Math.random() - 0.5) * spread;
+          
+          points.push(turf.point([lng, lat], { 
+            id: points.length,
+            cluster: c
+          }));
+        }
+      }
+      
+      // Add source to map
+      map.addSource('points', {
+        type: 'geojson',
+        data: turf.featureCollection(points)
+      });
+      
+      // Add layer to map
+      map.addLayer({
+        id: 'points-layer',
+        type: 'circle',
+        source: 'points',
+        paint: {
+          'circle-radius': 5,
+          'circle-color': [
+            'match',
+            ['get', 'cluster'],
+            0, '#fbb03b',
+            1, '#223b53',
+            2, '#e55e5e',
+            3, '#3bb2d0',
+            4, '#8a2be2',
+            '#ccc'
+          ],
+          'circle-opacity': 0.8
+        }
+      });
+      
+      // Add query point source and layer
+      map.addSource('query-point', {
+        type: 'geojson',
+        data: turf.featureCollection([])
+      });
+      
+      map.addLayer({
+        id: 'query-point-layer',
+        type: 'circle',
+        source: 'query-point',
+        paint: {
+          'circle-radius': 8,
+          'circle-color': '#e41a1c',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+      
+      // Add nearest point source and layer
+      map.addSource('nearest-point', {
+        type: 'geojson',
+        data: turf.featureCollection([])
+      });
+      
+      map.addLayer({
+        id: 'nearest-point-layer',
+        type: 'circle',
+        source: 'nearest-point',
+        paint: {
+          'circle-radius': 8,
+          'circle-color': '#4daf4a',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+      
+      // Calculate bounding box for all points
+      const allPointsCollection = turf.featureCollection(points);
+      const bbox = turf.bbox(allPointsCollection);
+      
+      // Fit map to bounding box
+      map.fitBounds(bbox, { padding: 50 });
+      
+      // Build the R-tree
+      buildRTree();
+      
+      // Enable query mode
+      isQueryMode = true;
+      
+      // Update info panel
+      infoPanel.innerHTML = '<strong>R-Tree Point Query</strong><br>Click anywhere on the map to find the nearest point using the R-tree.';
+    }
+    
+    // Build the R-tree from the points
+    function buildRTree() {
+      const maxEntriesPerNode = 4;
+      
+      // Build a simple R-tree (just for visualization)
+      rtree = {
+        bbox: calculateBBox(points),
+        features: [],
+        children: [],
+        depth: 0
+      };
+      
+      // Add all points
+      for (let point of points) {
+        insertPoint(rtree, point, maxEntriesPerNode);
+      }
+      
+      // Update visualization
+      updateRTreeVisualization();
+    }
+    
+    // Insert a point into the R-tree
+    function insertPoint(node, point, maxEntries) {
+      // If this is a leaf node
+      if (node.children.length === 0) {
+        // If there's room, add the point
+        if (node.features.length < maxEntries) {
+          node.features.push(point);
+          // Update bounding box
+          node.bbox = calculateBBox([...node.features]);
+        } else {
+          // Split the node
+          splitLeafNode(node, point, maxEntries);
+        }
+      } else {
+        // This is a non-leaf node, find the best child to insert into
+        let bestChild = null;
+        let minEnlargement = Infinity;
+        
+        for (let child of node.children) {
+          // Calculate how much the child's bbox would need to be enlarged
+          const childBBox = child.bbox;
+          const pointBBox = calculateBBox([point]);
+          
+          const enlargedBBox = [
+            Math.min(childBBox[0], pointBBox[0]),
+            Math.min(childBBox[1], pointBBox[1]),
+            Math.max(childBBox[2], pointBBox[2]),
+            Math.max(childBBox[3], pointBBox[3])
+          ];
+          
+          const originalArea = (childBBox[2] - childBBox[0]) * (childBBox[3] - childBBox[1]);
+          const enlargedArea = (enlargedBBox[2] - enlargedBBox[0]) * (enlargedBBox[3] - enlargedBBox[1]);
+          const enlargement = enlargedArea - originalArea;
+          
+          if (enlargement < minEnlargement) {
+            minEnlargement = enlargement;
+            bestChild = child;
+          }
+        }
+        
+        // Insert the point into the best child
+        insertPoint(bestChild, point, maxEntries);
+        
+        // Update the node's bounding box
+        node.bbox = calculateBBoxFromChildren(node);
+        
+        // Check if this node needs to be split
+        if (node.children.length > maxEntries) {
+          splitInternalNode(node, maxEntries);
+        }
+      }
+    }
+    
+    // Split a leaf node
+    function splitLeafNode(node, newPoint, maxEntries) {
+      // Add the new point to the features array
+      const allFeatures = [...node.features, newPoint];
+      
+      // Determine split axis (x or y)
+      const splitOnX = node.depth % 2 === 0;
+      
+      // Sort features by x or y coordinate
+      allFeatures.sort((a, b) => {
+        if (splitOnX) {
+          return a.geometry.coordinates[0] - b.geometry.coordinates[0];
+        } else {
+          return a.geometry.coordinates[1] - b.geometry.coordinates[1];
+        }
+      });
+      
+      // Split point - middle of the array
+      const splitIndex = Math.ceil(allFeatures.length / 2);
+      
+      // Create two new leaf nodes
+      const leftFeatures = allFeatures.slice(0, splitIndex);
+      const rightFeatures = allFeatures.slice(splitIndex);
+      
+      // Create the child nodes
+      const leftChild = {
+        bbox: calculateBBox(leftFeatures),
+        features: leftFeatures,
+        children: [],
+        depth: node.depth + 1
+      };
+      
+      const rightChild = {
+        bbox: calculateBBox(rightFeatures),
+        features: rightFeatures,
+        children: [],
+        depth: node.depth + 1
+      };
+      
+      // Update the current node
+      node.features = [];
+      node.children = [leftChild, rightChild];
+      node.bbox = calculateBBoxFromChildren(node);
+    }
+    
+    // Split an internal node
+    function splitInternalNode(node, maxEntries) {
+      // Determine split axis (x or y)
+      const splitOnX = node.depth % 2 === 0;
+      
+      // Sort children by the center of their bounding boxes
+      node.children.sort((a, b) => {
+        const aCenterX = (a.bbox[0] + a.bbox[2]) / 2;
+        const aCenterY = (a.bbox[1] + a.bbox[3]) / 2;
+        
+        const bCenterX = (b.bbox[0] + b.bbox[2]) / 2;
+        const bCenterY = (b.bbox[1] + b.bbox[3]) / 2;
+        
+        if (splitOnX) {
+          return aCenterX - bCenterX;
+        } else {
+          return aCenterY - bCenterY;
+        }
+      });
+      
+      // Split point - middle of the array
+      const splitIndex = Math.ceil(node.children.length / 2);
+      
+      // Create two new nodes at the same level
+      const leftChildren = node.children.slice(0, splitIndex);
+      const rightChildren = node.children.slice(splitIndex);
+      
+      // If this is the root node, create a new root
+      if (node.depth === 0) {
+        // Create left and right nodes
+        const leftNode = {
+          bbox: calculateBBoxFromChildren({ children: leftChildren }),
+          features: [],
+          children: leftChildren,
+          depth: 1
+        };
+        
+        const rightNode = {
+          bbox: calculateBBoxFromChildren({ children: rightChildren }),
+          features: [],
+          children: rightChildren,
+          depth: 1
+        };
+        
+        // Update depths for all children
+        updateNodeDepths(leftNode, 1);
+        updateNodeDepths(rightNode, 1);
+        
+        // Update the root node
+        node.children = [leftNode, rightNode];
+        node.bbox = calculateBBoxFromChildren(node);
+      } else {
+        // This is not the root, so we need to update the parent
+        // This implementation simplifies by just keeping the first half of children
+        node.children = leftChildren;
+        node.bbox = calculateBBoxFromChildren(node);
+        
+        // Create a new sibling node with the second half
+        const siblingNode = {
+          bbox: calculateBBoxFromChildren({ children: rightChildren }),
+          features: [],
+          children: rightChildren,
+          depth: node.depth
+        };
+        
+        // The parent would insert this new node (not implemented in this demo)
+        // For simplicity, we don't handle this case fully in this demo
+      }
+    }
+    
+    // Update depths for all nodes in a subtree
+    function updateNodeDepths(node, depth) {
+      node.depth = depth;
+      
+      for (let child of node.children) {
+        updateNodeDepths(child, depth + 1);
+      }
+    }
+    
+    // Calculate the bounding box for a set of features
+    function calculateBBox(features) {
+      if (features.length === 0) return [0, 0, 0, 0];
+      
+      // For point features
+      const xs = features.map(f => f.geometry.coordinates[0]);
+      const ys = features.map(f => f.geometry.coordinates[1]);
+      
+      return [
+        Math.min(...xs),
+        Math.min(...ys),
+        Math.max(...xs),
+        Math.max(...ys)
+      ];
+    }
+    
+    // Calculate the bounding box from a node's children
+    function calculateBBoxFromChildren(node) {
+      if (node.children.length === 0) return node.bbox;
+      
+      const childBBoxes = node.children.map(child => child.bbox);
+      
+      const minX = Math.min(...childBBoxes.map(bbox => bbox[0]));
+      const minY = Math.min(...childBBoxes.map(bbox => bbox[1]));
+      const maxX = Math.max(...childBBoxes.map(bbox => bbox[2]));
+      const maxY = Math.max(...childBBoxes.map(bbox => bbox[3]));
+      
+      return [minX, minY, maxX, maxY];
+    }
+    
+    // Update the R-tree visualization
+    function updateRTreeVisualization() {
+      // Remove existing R-tree layers
+      rtreeLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      rtreeLayers = [];
+      
+      // If there's an R-tree, visualize it
+      if (rtree) {
+        visualizeNode(rtree);
+      }
+    }
+    
+    // Visualize a node in the R-tree
+    function visualizeNode(node, nodeId = 'root') {
+      const color = '#ff7f00'; // Unvisited node color
+      const sourceId = `rtree-${nodeId}`;
+      const layerId = `rtree-layer-${nodeId}`;
+      
+      // Create a polygon from the bounding box
+      const polygon = turf.bboxPolygon(node.bbox);
+      
+      // Add source and layer
+      map.addSource(sourceId, {
+        type: 'geojson',
+        data: polygon
+      });
+      
+      map.addLayer({
+        id: layerId,
+        type: 'line',
+        source: sourceId,
+        paint: {
+          'line-color': color,
+          'line-width': 2,
+          'line-opacity': 0.7
+        },
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        }
+      }, 'points-layer'); // Insert below points
+      
+      rtreeLayers.push(sourceId);
+      rtreeLayers.push(layerId);
+      
+      // Recursively visualize children
+      if (node.children.length > 0) {
+        node.children.forEach((child, i) => {
+          visualizeNode(child, `${nodeId}-${i}`);
+        });
+      }
+    }
+    
+    // Perform a point query on the R-tree
+    function performQuery(queryPoint) {
+      // Reset query visualization
+      resetQueryVisualization();
+      
+      // Add query point to the map
+      map.getSource('query-point').setData(turf.featureCollection([queryPoint]));
+      
+      // Start the animation
+      animateQuery(rtree, queryPoint, []);
+    }
+    
+    // Reset query visualization
+    function resetQueryVisualization() {
+      // Clear any existing animation
+      if (animation) {
+        clearTimeout(animation);
+        animation = null;
+      }
+      
+      // Clear the nearest point
+      map.getSource('nearest-point').setData(turf.featureCollection([]));
+      
+      // Reset query layers
+      queryLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      queryLayers = [];
+      
+      // Reset R-tree visualization
+      updateRTreeVisualization();
+    }
+    
+    // Animate the query traversal through the R-tree
+    function animateQuery(node, queryPoint, visitedNodeIds, step = 0, bestNode = null) {
+      // Mark this node as visited
+      const nodeId = step === 0 ? 'root' : visitedNodeIds.join('-');
+      visitedNodeIds.push(step);
+      
+      // Update node visualization
+      highlightNode(nodeId);
+      
+      // Update info panel
+      infoPanel.innerHTML = `<strong>R-Tree Point Query</strong><br>Traversing R-tree...<br>Current depth: ${node.depth}<br>Nodes visited: ${visitedNodeIds.length}`;
+      
+      // If this is a leaf node
+      if (node.children.length === 0) {
+        // Find the nearest point in this node
+        let nearestPoint = null;
+        let minDistance = Infinity;
+        
+        for (let feature of node.features) {
+          const distance = turf.distance(
+            queryPoint,
+            feature,
+            { units: 'kilometers' }
+          );
+          
+          if (distance < minDistance) {
+            minDistance = distance;
+            nearestPoint = feature;
+          }
+        }
+        
+        // If we found a nearest point or this is the first leaf
+        if (nearestPoint !== null && (bestNode === null || minDistance < bestNode.distance)) {
+          bestNode = {
+            point: nearestPoint,
+            distance: minDistance
+          };
+        }
+        
+        // If there are no more nodes to visit
+        if (visitedNodeIds.length >= getNodeCount(rtree)) {
+          // End the animation
+          finishQuery(bestNode);
+          return;
+        }
+        
+        // Continue to the next node after a delay
+        animation = setTimeout(() => {
+          // Continue with parent's next child
+          let parentNodeId = visitedNodeIds.slice(0, -1).join('-');
+          if (parentNodeId === '') parentNodeId = 'root';
+          
+          const parentNode = findNodeById(rtree, parentNodeId);
+          
+          if (parentNode) {
+            // Find the next unvisited child
+            let nextChildIndex = -1;
+            for (let i = 0; i < parentNode.children.length; i++) {
+              const childNodeId = `${parentNodeId}-${i}`;
+              if (!visitedNodeIds.includes(childNodeId)) {
+                nextChildIndex = i;
+                break;
+              }
+            }
+            
+            if (nextChildIndex !== -1) {
+              // Continue with the next child
+              animateQuery(
+                parentNode.children[nextChildIndex],
+                queryPoint,
+                visitedNodeIds,
+                nextChildIndex,
+                bestNode
+              );
+            } else {
+              // No more children, move up to parent's parent
+              finishQuery(bestNode);
+            }
+          } else {
+            // No parent found, end the animation
+            finishQuery(bestNode);
+          }
+        }, 1000);
+      } else {
+        // This is an internal node, find the best child
+        let bestChildIndex = 0;
+        let minEnlargement = Infinity;
+        
+        for (let i = 0; i < node.children.length; i++) {
+          const child = node.children[i];
+          const childBBox = child.bbox;
+          
+          // Calculate distance from query point to bbox
+          const queryLng = queryPoint.geometry.coordinates[0];
+          const queryLat = queryPoint.geometry.coordinates[1];
+          
+          // Compute distance from point to bounding box
+          let dx = 0;
+          let dy = 0;
+          
+          if (queryLng < childBBox[0]) dx = childBBox[0] - queryLng;
+          else if (queryLng > childBBox[2]) dx = queryLng - childBBox[2];
+          
+          if (queryLat < childBBox[1]) dy = childBBox[1] - queryLat;
+          else if (queryLat > childBBox[3]) dy = queryLat - childBBox[3];
+          
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < minEnlargement) {
+            minEnlargement = distance;
+            bestChildIndex = i;
+          }
+        }
+        
+        // Continue with the best child after a delay
+        animation = setTimeout(() => {
+          animateQuery(
+            node.children[bestChildIndex],
+            queryPoint,
+            visitedNodeIds,
+            bestChildIndex,
+            bestNode
+          );
+        }, 1000);
+      }
+    }
+    
+    // Finish the query animation
+    function finishQuery(result) {
+      if (result && result.point) {
+        // Show the nearest point
+        map.getSource('nearest-point').setData(turf.featureCollection([result.point]));
+        
+        // Update info panel
+        infoPanel.innerHTML = `<strong>R-Tree Point Query</strong><br>Query complete!<br>Found nearest point ${result.point.properties.id} in cluster ${result.point.properties.cluster}.<br>Distance: ${result.distance.toFixed(2)} km`;
+      } else {
+        // Update info panel
+        infoPanel.innerHTML = '<strong>R-Tree Point Query</strong><br>Query complete!<br>No points found.';
+      }
+    }
+    
+    // Highlight a node as visited
+    function highlightNode(nodeId) {
+      const sourceId = `rtree-${nodeId}`;
+      const layerId = `rtree-layer-${nodeId}`;
+      
+      if (map.getSource(sourceId)) {
+        // Create a new highlighted version
+        const highlightSourceId = `highlight-${nodeId}`;
+        const highlightLayerId = `highlight-layer-${nodeId}`;
+        
+        // Get the original data
+        const originalData = map.getSource(sourceId)._data;
+        
+        // Add highlighted source and layer
+        map.addSource(highlightSourceId, {
+          type: 'geojson',
+          data: originalData
+        });
+        
+        map.addLayer({
+          id: highlightLayerId,
+          type: 'line',
+          source: highlightSourceId,
+          paint: {
+            'line-color': '#377eb8', // Visited node color
+            'line-width': 3,
+            'line-opacity': 0.9
+          },
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          }
+        }, 'rtree-layer-' + nodeId); // Insert below the original layer
+        
+        // Remove the original layer
+        map.removeLayer(layerId);
+        
+        // Track these layers for cleanup
+        queryLayers.push(highlightSourceId);
+        queryLayers.push(highlightLayerId);
+      }
+    }
+    
+    // Find a node by its ID
+    function findNodeById(node, nodeId) {
+      if (nodeId === 'root') return node;
+      
+      const parts = nodeId.split('-');
+      parts.shift(); // Remove 'root'
+      
+      let currentNode = node;
+      for (let part of parts) {
+        const index = parseInt(part);
+        if (currentNode.children && currentNode.children[index]) {
+          currentNode = currentNode.children[index];
+        } else {
+          return null;
+        }
+      }
+      
+      return currentNode;
+    }
+    
+    // Get total count of nodes in the tree
+    function getNodeCount(node) {
+      let count = 1;
+      
+      for (let child of node.children) {
+        count += getNodeCount(child);
+      }
+      
+      return count;
+    }
+    
+    // Handle map click for query
+    map.on('click', function(e) {
+      if (!isQueryMode || !rtree) return;
+      
+      // Create a query point
+      const queryPoint = turf.point([e.lngLat.lng, e.lngLat.lat]);
+      
+      // Show marker
+      const pixelCoords = map.project(e.lngLat);
+      queryMarker.style.left = (pixelCoords.x - 7) + 'px';
+      queryMarker.style.top = (pixelCoords.y - 7) + 'px';
+      queryMarker.style.display = 'block';
+      
+      // Perform the query
+      performQuery(queryPoint);
+    });
+    
+    // Handle window resize to keep the query marker in the right place
+    function updateMarkerPosition() {
+      if (queryMarker.style.display === 'block') {
+        const queryData = map.getSource('query-point')._data;
+        if (queryData && queryData.features.length > 0) {
+          const coords = queryData.features[0].geometry.coordinates;
+          const pixelCoords = map.project(coords);
+          queryMarker.style.left = (pixelCoords.x - 7) + 'px';
+          queryMarker.style.top = (pixelCoords.y - 7) + 'px';
+        }
+      }
+    }
+    
+    // Set up event handlers
+    generateButton.addEventListener('click', generatePoints);
+    resetButton.addEventListener('click', resetVisualization);
+    
+    // Update marker position when the map moves
+    map.on('move', updateMarkerPosition);
+    
+    // Clean up on page leave
+    window.addEventListener('unload', function() {
+      if (animation) {
+        clearTimeout(animation);
+      }
+      map.remove();
+    });
+  });
+</script>

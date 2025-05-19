@@ -1,0 +1,677 @@
+<link href="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.css" rel="stylesheet" />
+<style>
+  #rtree-range-query-map {
+    width: 100%;
+    height: 500px;
+    margin-bottom: 1.5em;
+    border-radius: 8px;
+  }
+  .maplibregl-popup {
+    max-width: 300px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  }
+  .control-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    z-index: 1;
+  }
+  .control-panel button {
+    margin: 5px;
+    padding: 5px 10px;
+    background: #4a8ec2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+  }
+  .control-panel button:hover {
+    background: #3a7cb2;
+  }
+  .info-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 250px;
+    font-size: 14px;
+  }
+  .drawing-box {
+    position: absolute;
+    border: 2px dashed #ff0000;
+    background-color: rgba(255, 0, 0, 0.1);
+    pointer-events: none;
+  }
+</style>
+
+<div id="rtree-range-query-map" class="maplibregl-map"></div>
+
+<script src="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const map = new maplibregl.Map({
+      container: 'rtree-range-query-map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [10.4515, 51.1657], // Center of Germany
+      zoom: 5.5,
+      hash: false
+    });
+    
+    // Add navigation controls
+    map.addControl(new maplibregl.NavigationControl());
+    
+    // Create control panel
+    const controlPanel = document.createElement('div');
+    controlPanel.className = 'control-panel';
+    document.getElementById('rtree-range-query-map').appendChild(controlPanel);
+    
+    // Add buttons
+    const startDemoButton = document.createElement('button');
+    startDemoButton.textContent = 'Start Range Query Demo';
+    controlPanel.appendChild(startDemoButton);
+    
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset';
+    controlPanel.appendChild(resetButton);
+    
+    // Create info panel
+    const infoPanel = document.createElement('div');
+    infoPanel.className = 'info-panel';
+    infoPanel.innerHTML = '<strong>Range Query</strong><br>Draw a box on the map to see how an R-tree efficiently finds rivers that intersect with the query area.';
+    document.getElementById('rtree-range-query-map').appendChild(infoPanel);
+    
+    // Variables to store data
+    let rivers = [];
+    let rtree = null;
+    let rtreeLayers = [];
+    let queryBox = null;
+    let queryLayers = [];
+    let animationTimeout = null;
+    let isDragging = false;
+    let startPoint = null;
+    let currentBox = null;
+    let drawingBox = null;
+    
+    // Reset visualization
+    function resetVisualization() {
+      // Clear any animations
+      if (animationTimeout) {
+        clearTimeout(animationTimeout);
+        animationTimeout = null;
+      }
+      
+      // Remove R-tree visualization layers
+      rtreeLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      // Remove query layers
+      queryLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      // Remove drawing box
+      if (drawingBox) {
+        drawingBox.remove();
+        drawingBox = null;
+      }
+      
+      // Reset variables
+      rtreeLayers = [];
+      queryLayers = [];
+      isDragging = false;
+      startPoint = null;
+      currentBox = null;
+      
+      // Update info panel
+      infoPanel.innerHTML = '<strong>Range Query</strong><br>Draw a box on the map to see how an R-tree efficiently finds rivers that intersect with the query area.';
+    }
+    
+    resetButton.addEventListener('click', resetVisualization);
+    
+    // Create synthetic river data for Germany
+    function createRivers() {
+      // Main rivers of Germany
+      const riverCenters = [
+        { name: 'Rhine', coords: [7.6, 51.5], length: 0.7 },
+        { name: 'Elbe', coords: [11.9, 52.0], length: 0.8 },
+        { name: 'Danube', coords: [12.5, 48.5], length: 0.6 },
+        { name: 'Main', coords: [9.9, 50.0], length: 0.4 },
+        { name: 'Weser', coords: [9.0, 52.2], length: 0.5 },
+        { name: 'Moselle', coords: [7.2, 49.7], length: 0.35 },
+        { name: 'Saale', coords: [11.7, 51.4], length: 0.3 },
+        { name: 'Spree', coords: [13.9, 52.4], length: 0.25 },
+        { name: 'Neckar', coords: [9.2, 49.0], length: 0.35 },
+        { name: 'Havel', coords: [12.4, 52.9], length: 0.3 }
+      ];
+      
+      // Create each river with tributaries
+      rivers = [];
+      
+      riverCenters.forEach(river => {
+        // Create main river
+        const mainRiver = createRiver(river.coords, river.length, 0.3);
+        mainRiver.properties = { name: river.name, type: 'main' };
+        rivers.push(mainRiver);
+        
+        // Create tributaries
+        const tributaryCount = Math.floor(Math.random() * 3) + 2;
+        for (let i = 0; i < tributaryCount; i++) {
+          // Find a point on the main river to branch from
+          const midPoint = Math.floor(mainRiver.geometry.coordinates.length / 2);
+          const startPoint = mainRiver.geometry.coordinates[
+            Math.floor(Math.random() * midPoint) + Math.floor(midPoint / 2)
+          ];
+          
+          // Create a tributary
+          const tributary = createRiver(
+            startPoint, 
+            river.length * (Math.random() * 0.3 + 0.1), 
+            0.15
+          );
+          tributary.properties = { 
+            name: `${river.name} Tributary ${i+1}`, 
+            type: 'tributary' 
+          };
+          rivers.push(tributary);
+        }
+      });
+      
+      return turf.featureCollection(rivers);
+    }
+    
+    // Create a synthetic river LineString
+    function createRiver(startCoords, length, meanderStrength) {
+      const pointCount = Math.floor(Math.random() * 10) + 20;
+      const points = [];
+      
+      // Start point
+      points.push(startCoords);
+      
+      // Random direction (radians)
+      let direction = Math.random() * Math.PI * 2;
+      
+      // Generate points with slight meandering
+      for (let i = 1; i < pointCount; i++) {
+        // Update direction with some randomness
+        direction += (Math.random() - 0.5) * meanderStrength;
+        
+        // Distance for this segment
+        const distance = length / pointCount * (0.8 + Math.random() * 0.4);
+        
+        // Calculate new point
+        const lastPoint = points[i-1];
+        const newPoint = [
+          lastPoint[0] + Math.cos(direction) * distance,
+          lastPoint[1] + Math.sin(direction) * distance
+        ];
+        
+        points.push(newPoint);
+      }
+      
+      return turf.lineString(points);
+    }
+    
+    // Build R-tree for rivers
+    function buildRTree() {
+      // Create a simple R-tree like structure using recursive grouping
+      function createRTree(features, maxEntries = 4, depth = 0) {
+        if (features.length <= maxEntries) {
+          return {
+            bbox: calculateFeaturesBBox(features),
+            features: features,
+            children: [],
+            depth: depth
+          };
+        }
+        
+        // Get the bounding box
+        const bbox = calculateFeaturesBBox(features);
+        
+        // Determine split direction (alternating between x and y)
+        const splitOnX = depth % 2 === 0;
+        
+        // Sort by the centroid of the bbox
+        features.sort((a, b) => {
+          const aBbox = turf.bbox(a);
+          const bBbox = turf.bbox(b);
+          
+          const aCentroid = [
+            (aBbox[0] + aBbox[2]) / 2,
+            (aBbox[1] + aBbox[3]) / 2
+          ];
+          
+          const bCentroid = [
+            (bBbox[0] + bBbox[2]) / 2,
+            (bBbox[1] + bBbox[3]) / 2
+          ];
+          
+          if (splitOnX) {
+            return aCentroid[0] - bCentroid[0];
+          } else {
+            return aCentroid[1] - bCentroid[1];
+          }
+        });
+        
+        // Split features into groups
+        const groups = [];
+        const groupSize = Math.ceil(features.length / Math.min(maxEntries, 4));
+        
+        for (let i = 0; i < features.length; i += groupSize) {
+          groups.push(features.slice(i, i + groupSize));
+        }
+        
+        // Create child nodes
+        const children = groups.map(group => createRTree(group, maxEntries, depth + 1));
+        
+        return {
+          bbox: bbox,
+          features: [],
+          children: children,
+          depth: depth
+        };
+      }
+      
+      // Calculate bbox for a group of features
+      function calculateFeaturesBBox(features) {
+        const bboxes = features.map(feature => turf.bbox(feature));
+        
+        // Find min/max for all bboxes
+        const minX = Math.min(...bboxes.map(bbox => bbox[0]));
+        const minY = Math.min(...bboxes.map(bbox => bbox[1]));
+        const maxX = Math.max(...bboxes.map(bbox => bbox[2]));
+        const maxY = Math.max(...bboxes.map(bbox => bbox[3]));
+        
+        return [minX, minY, maxX, maxY];
+      }
+      
+      // Create R-tree
+      return createRTree(rivers);
+    }
+    
+    // Visualize the R-tree structure
+    function visualizeRTree(rtree) {
+      // Clear existing layers
+      rtreeLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      rtreeLayers = [];
+      
+      // Recursively visualize nodes
+      function visualizeNode(node, nodeId = 'root') {
+        const color = depthToColor(node.depth);
+        const sourceId = `rtree-${nodeId}`;
+        const layerId = `rtree-layer-${nodeId}`;
+        
+        // Create a polygon from the bounding box
+        const polygon = turf.bboxPolygon(node.bbox);
+        
+        // Add source and layer
+        map.addSource(sourceId, {
+          type: 'geojson',
+          data: polygon
+        });
+        
+        map.addLayer({
+          id: layerId,
+          type: 'line',
+          source: sourceId,
+          paint: {
+            'line-color': color,
+            'line-width': 2,
+            'line-opacity': 0.7
+          },
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          }
+        });
+        
+        rtreeLayers.push(sourceId);
+        rtreeLayers.push(layerId);
+        
+        // Recursively visualize children
+        if (node.children.length > 0) {
+          node.children.forEach((child, i) => {
+            visualizeNode(child, `${nodeId}-${i}`);
+          });
+        }
+      }
+      
+      visualizeNode(rtree);
+    }
+    
+    // Map depth to color
+    function depthToColor(depth) {
+      const colors = [
+        '#e41a1c', // Root (red)
+        '#377eb8', // Level 1 (blue)
+        '#4daf4a', // Level 2 (green)
+        '#ff7f00'  // Leaf nodes (orange)
+      ];
+      
+      return colors[Math.min(depth, colors.length - 1)];
+    }
+    
+    // Perform range query animation
+    function performRangeQuery(bbox) {
+      // Clear existing query layers
+      queryLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      queryLayers = [];
+      
+      // Add query box to map
+      const queryBoxPolygon = turf.bboxPolygon(bbox);
+      
+      map.addSource('query-box', {
+        type: 'geojson',
+        data: queryBoxPolygon
+      });
+      
+      map.addLayer({
+        id: 'query-box-line',
+        type: 'line',
+        source: 'query-box',
+        paint: {
+          'line-color': '#ff0000',
+          'line-width': 2,
+          'line-dasharray': [2, 1]
+        }
+      });
+      
+      queryLayers.push('query-box');
+      queryLayers.push('query-box-line');
+      
+      // Update info panel
+      infoPanel.innerHTML = '<strong>Range Query</strong><br>Searching for rivers that intersect with the query box...';
+      
+      // Animate traversal through R-tree
+      function traverseNode(node, nodeId = 'root', delay = 0, path = []) {
+        const layerId = `rtree-layer-${nodeId}`;
+        
+        // Check if the query box intersects this node's bbox
+        const nodeBoxPolygon = turf.bboxPolygon(node.bbox);
+        
+        // Check for intersection between query box and node bounding box
+        const intersects = turf.booleanOverlap(queryBoxPolygon, nodeBoxPolygon) || 
+                           turf.booleanContains(queryBoxPolygon, nodeBoxPolygon) ||
+                           turf.booleanContains(nodeBoxPolygon, queryBoxPolygon) ||
+                           turf.booleanCrosses(queryBoxPolygon, nodeBoxPolygon);
+        
+        if (intersects) {
+          path.push(nodeId);
+          
+          // Highlight this node
+          animationTimeout = setTimeout(() => {
+            map.setPaintProperty(layerId, 'line-width', 4);
+            map.setPaintProperty(layerId, 'line-opacity', 1);
+            
+            // Update info panel
+            infoPanel.innerHTML = `<strong>Range Query</strong><br>Checking node at depth ${node.depth}...`;
+            
+            // If leaf node, check actual rivers
+            if (node.children.length === 0 && node.features.length > 0) {
+              // Check each river in this leaf
+              const matchingRivers = [];
+              
+              for (let i = 0; i < node.features.length; i++) {
+                const river = node.features[i];
+                
+                // Check if river intersects with query box
+                // For simplicity, we're using the river's bbox, but in a real app
+                // you'd do a proper linestring-to-polygon intersection test
+                const riverBbox = turf.bbox(river);
+                const riverBboxPolygon = turf.bboxPolygon(riverBbox);
+                
+                if (turf.booleanOverlap(queryBoxPolygon, riverBboxPolygon) || 
+                   turf.booleanContains(queryBoxPolygon, riverBboxPolygon) ||
+                   turf.booleanContains(riverBboxPolygon, queryBoxPolygon) ||
+                   turf.booleanCrosses(queryBoxPolygon, riverBboxPolygon)) {
+                  matchingRivers.push(river);
+                }
+              }
+              
+              // Display results
+              animationTimeout = setTimeout(() => {
+                if (matchingRivers.length > 0) {
+                  // Highlight the matching rivers
+                  map.addSource('matching-rivers', {
+                    type: 'geojson',
+                    data: turf.featureCollection(matchingRivers)
+                  });
+                  
+                  map.addLayer({
+                    id: 'matching-rivers-layer',
+                    type: 'line',
+                    source: 'matching-rivers',
+                    paint: {
+                      'line-color': '#ff7f00',
+                      'line-width': 4
+                    },
+                    layout: {
+                      'line-join': 'round',
+                      'line-cap': 'round'
+                    }
+                  });
+                  
+                  queryLayers.push('matching-rivers');
+                  queryLayers.push('matching-rivers-layer');
+                  
+                  // Update info panel
+                  infoPanel.innerHTML = `<strong>Range Query Result</strong><br>Found ${matchingRivers.length} matching rivers<br>Main rivers: ${matchingRivers.filter(r => r.properties.type === 'main').map(r => r.properties.name).join(', ') || 'None'}<br><br>Visited ${path.length} nodes out of ${countNodes(rtree)} total nodes (${Math.round(path.length/countNodes(rtree)*100)}% of the tree)`;
+                } else {
+                  // Update info panel
+                  infoPanel.innerHTML = '<strong>Range Query Result</strong><br>No rivers intersect with the query box.';
+                }
+                
+                // Reset node highlighting after a delay
+                animationTimeout = setTimeout(() => {
+                  rtreeLayers.forEach(layer => {
+                    if (layer.includes('layer') && map.getLayer(layer)) {
+                      map.setPaintProperty(layer, 'line-width', 2);
+                      map.setPaintProperty(layer, 'line-opacity', 0.7);
+                    }
+                  });
+                }, 2000);
+              }, 500);
+            } 
+            // If not leaf, continue traversing children
+            else {
+              // Traverse each child that intersects with the query box
+              for (let i = 0; i < node.children.length; i++) {
+                traverseNode(node.children[i], `${nodeId}-${i}`, delay + 300, path);
+              }
+            }
+          }, delay);
+        }
+      }
+      
+      // Start traversal from root
+      traverseNode(rtree);
+    }
+    
+    // Count total nodes in the R-tree
+    function countNodes(node) {
+      let count = 1; // Count this node
+      
+      // Recursively count children
+      if (node.children && node.children.length > 0) {
+        node.children.forEach(child => {
+          count += countNodes(child);
+        });
+      }
+      
+      return count;
+    }
+    
+    // Setup mouse event handling for drawing box
+    function setupBoxDrawing() {
+      // Create drawing box element
+      drawingBox = document.createElement('div');
+      drawingBox.className = 'drawing-box';
+      drawingBox.style.display = 'none';
+      document.getElementById('rtree-range-query-map').appendChild(drawingBox);
+      
+      // Mouse down event - start drawing
+      map.on('mousedown', function(e) {
+        // Only start drawing if left button is pressed
+        if (e.originalEvent.button === 0) {
+          startPoint = map.project(e.lngLat);
+          drawingBox.style.left = startPoint.x + 'px';
+          drawingBox.style.top = startPoint.y + 'px';
+          drawingBox.style.width = '0px';
+          drawingBox.style.height = '0px';
+          drawingBox.style.display = 'block';
+          isDragging = true;
+          
+          // Prevent default behavior to avoid map drag
+          e.originalEvent.preventDefault();
+          
+          // Update info panel
+          infoPanel.innerHTML = '<strong>Range Query</strong><br>Drawing query box...';
+        }
+      });
+      
+      // Mouse move event - update box size
+      map.on('mousemove', function(e) {
+        if (isDragging && startPoint) {
+          const currentPoint = map.project(e.lngLat);
+          const minX = Math.min(startPoint.x, currentPoint.x);
+          const maxX = Math.max(startPoint.x, currentPoint.x);
+          const minY = Math.min(startPoint.y, currentPoint.y);
+          const maxY = Math.max(startPoint.y, currentPoint.y);
+          
+          drawingBox.style.left = minX + 'px';
+          drawingBox.style.top = minY + 'px';
+          drawingBox.style.width = (maxX - minX) + 'px';
+          drawingBox.style.height = (maxY - minY) + 'px';
+          
+          // Compute the current box in geographic coordinates
+          const sw = map.unproject([minX, maxY]);
+          const ne = map.unproject([maxX, minY]);
+          currentBox = [sw.lng, sw.lat, ne.lng, ne.lat];
+        }
+      });
+      
+      // Mouse up event - finish drawing
+      map.on('mouseup', function(e) {
+        if (isDragging && startPoint) {
+          isDragging = false;
+          drawingBox.style.display = 'none';
+          
+          // Make sure we have a valid box
+          if (currentBox && 
+              currentBox[0] !== currentBox[2] && 
+              currentBox[1] !== currentBox[3]) {
+            // Perform range query with the drawn box
+            performRangeQuery(currentBox);
+          } else {
+            // Update info panel
+            infoPanel.innerHTML = '<strong>Range Query</strong><br>Please draw a valid box on the map.';
+          }
+          
+          currentBox = null;
+          startPoint = null;
+        }
+      });
+      
+      // Mouse leave event - cancel drawing
+      map.getCanvas().addEventListener('mouseleave', function() {
+        if (isDragging) {
+          isDragging = false;
+          drawingBox.style.display = 'none';
+          currentBox = null;
+          startPoint = null;
+          
+          // Update info panel
+          infoPanel.innerHTML = '<strong>Range Query</strong><br>Drawing cancelled. Please draw a box on the map.';
+        }
+      });
+    }
+    
+    // Start the demonstration
+    startDemoButton.addEventListener('click', function() {
+      resetVisualization();
+      
+      // Create rivers and add to map
+      const riversCollection = createRivers();
+      
+      map.addSource('rivers', {
+        type: 'geojson',
+        data: riversCollection
+      });
+      
+      map.addLayer({
+        id: 'rivers-layer',
+        type: 'line',
+        source: 'rivers',
+        paint: {
+          'line-color': '#0080ff',
+          'line-width': 2,
+          'line-opacity': 0.8
+        },
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        }
+      });
+      
+      queryLayers.push('rivers');
+      queryLayers.push('rivers-layer');
+      
+      // Build R-tree
+      rtree = buildRTree();
+      
+      // Visualize R-tree
+      visualizeRTree(rtree);
+      
+      // Setup box drawing
+      setupBoxDrawing();
+      
+      // Update info panel
+      infoPanel.innerHTML = '<strong>Range Query</strong><br>Draw a box on the map to perform a range query.';
+    });
+    
+    // Ensure clean up when page changes
+    window.addEventListener('unload', function() {
+      if (animationTimeout) {
+        clearTimeout(animationTimeout);
+      }
+      map.remove();
+    });
+  });
+</script>
