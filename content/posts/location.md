@@ -1,6 +1,6 @@
 ---
 type: posts
-title: "Where you at? Location fusion: when gps alone doesn't cut it!  📍"
+title: "Where you at? When gps alone doesn't cut it!  📍"
 subtitle: "Navigating through the world of location data and all that shizz"
 date: 2024-07-09T23:28:25+02:00
 lastmod: 2024-07-09T23:28:25+02:00
@@ -32,29 +32,30 @@ license: ""
 
 Sometimes I pause for a moment and enjoy the simple things in life.
 
-The fact that there are satellites 4500m above are head that we can openly use to triangulate our position, and that we are all walking round with this tech readily available at the mere consent is pretty mind blowing
+The fact that there are satellites flying around above head that we can openly/freely use to triangulate our position, and that I am walking around with a smartphone in my pocket that can pick up on the satellite signals and do the maths to show where I am on a map at the mere press of a consent button is pretty mind blowing.
 
-I won't explain *the magic involved/how* these systems work together as there is a incredible blog post titled [GPS](https://ciechanow.ski/gps/) from the master [Bartosz Ciechanowski](https://ciechanow.ski) that goes into way more depth then I could. I recommend to take some time out and read it. If you haven't come across Bartosz' technical writing before then you are in for a treat!
+[Screen recording of accepting a consent and the globe zooming to a cool position, maybe with a video of me being at brandenbrug tor]
 
-Triangulating positions is incredibly useful for all sorts of things, like locating your position on a map and calculating your speed and distance traveled.
+I won't explain *the magic involved* in how these systems work together as there is a incredible blog post titled [GPS](https://ciechanow.ski/gps/) from the master [Bartosz Ciechanowski](https://ciechanow.ski) that goes into way more depth then I could. I recommend to take some time out and read it. If you haven't come across Bartosz' technical writing and self-rolled visualizations before, then my friend, you are in for a treat!
+
+[Insert either a screen shot of Batosz gps post, or ask him for permission to reuse one of the animations]
+
+Knowing the exact position of your device is incredibly useful for all sorts of things:
+
+* showing your position on a map and ensuring you didn't take the wrong hiking path
+* telling your uber driver where to pick you up you had a big night and can't read the street sign
+* Finding the device when you inevitably lose it 
 
 [Screenrecording of Komoot in action]()
 
-However there are some situations where GPS alone doesn't get the job done. If you are in a dense concrete jungle, a mountainous region, in a tunnel, or even just in a building with thick walls, then the signals coming from the satellite will be affected. Yet another case of how the environment you are based in can have a big impact on your position in life.
-
-[Tunnel example]
-
-[Industrial sky scraper example]
-
-However we can do better! thanks to the other sensors on our smart phones, we can improve things, and combine the strengths of a whole team of sensors to get a better result.
-
 ## The problem with ~~GPS~~ GNSS 🛰️
 
-GPS is short for Global Positioning System... However there is some confusion in this naming here, "GPS" specifically refers to the USA owned "brand" of satellites. Calling all satellite navigation systems "GPS" is like calling every phone an "iPhone"... technically wrong, but everyone calls it this. It is what it is. Now that is out the way we can move on.
+GPS is short for Global Positioning System... However there is some confusion in this naming here, "GPS" specifically refers to the USA owned "brand" of satellites. Calling all satellite navigation systems "GPS" is like calling every phone an "iPhone" or every pen a "biro"... technically wrong, but everyone calls it this. It is what it is. Now that is out the way we can move on.
 
-GPS is a specific system of US satellites, like the country, it can sometimes seem like it's the only system that matters. But GNSS which stands for global navigation satellite system is actually the whole family of different states satellite systems and they work collectively  (united in the pursuit of finding you the nearest coffee shop). These are free to the public to use, and what you connect with
 
 {{< admonition type=tip title="The extended GNSS family" open=false >}}
+
+GPS is a specific system of US satellites, like the country, it can sometimes seem like it's the only system that matters. But GNSS which stands for global navigation satellite system is actually the whole family of different states satellite systems and they work collectively  (united in the pursuit of finding you the nearest coffee shop). These are free to the public to use, and what you connect with
 
 #### 🇺🇸 GPS (USA)
 
@@ -119,28 +120,168 @@ GPS is a specific system of US satellites, like the country, it can sometimes se
 
 {{< /admonition >}}
 
-## The sensors
+~~GPS~~ GNSS is great, when it works and can be extremely accurate TODO: reference some videos about high precision gps., allowing a precision of <1m.
 
-A modern day smart phone can have the following sensors:
+However there are many situations where GPS simply doesn't get the job done. If you are in a dense concrete jungle, a mountainous region, in a tunnel, or even just in a building with thick walls, then the signals coming from the satellite will be affected.
+
+Yet another case of how the environment you are based in can have a big impact on your  "position" in life.
+
+[TODO: Tunnel example]
+
+[TODO: Industrial sky scraper example]
+
+[TODO: Mountain example]
+
+However we can do better! Thanks to the other sensors on our smart phones, we can improve things and get around these physical limitations of ~~GPS~~ GNSS.
+
+## Do you "sense" where this is going? 🛜
+
+
+A modern day smart phone is packed full of many sensors:
 
 - GPS
+- Network
+- WiFi
 - Accelerometer
 - Gyroscope
 - Magnetometer
 - Barometer
-- Network
-- WiFi
 - Bluetooth
+
 
 There are more, but these are the main ones that get used for location tracking.
 
+### Network Locating 📶
+
+The cell towers/antennas that we use to talk to each other get internet from, a good source of location data as they do not move and our devices can defer how far they are from each one.
+
+{{< admonition 
+
+
+[TODO: insert a map contating cell towers from https://www.opencellid.org/#zoom=12&lat=52.522&lon=13.4651]
+
+Add an amimation of triangulating a position with 3 cell towers.
+
+The concept is exactly the same as with satellites in space but with antennas on the surface of earth. Take at least 3 of these antennas, calculate how far you are away from each antenna, use the calculated distance and the known location of the antenna to triangulate the location. Boom!  Because of the number of antennas scattered around and type of signal used, these can get location data in sitatuions that GPS fails to . Network location still suffers from environmental features (eg. when your out of signal you have no chance) and is TODO: check: not as precise as the holy grail of  working gps data.
+
+
+
+### Wifi location 
+
+WIFI. There has been talks in conspiracy theorist circles about how the governments and big corps are tracking you with frequencies. I try to avoid the tin foil hats and prefer my rose tinted glasses. Anyhow, the friendly people at Google have spent a lot of resources mapping out where wifi routers are. They came up with some ground truth data as a sub project of driving cameras around for the street view
+
+
+
+## The sensors
+
+## We can use 
+
+
 ## Combining Sensors 
 
-We can fuse the data from all of these sensors to get a better result. This is known as sensor fusion.
 
-It's quite simple in theory, but in practice it can be quite complex.
+Each sensor has it's pros and cons... They are literally designed for different things. For example, GPS is great for getting a location when you are outside and have a clear view of the sky, but it doesn't work well indoors or in dense urban areas. On the other hand, WiFi can give you a location indoors, but it won't work when your in the mountains and there are no WiFi routers around.
+
+
+{{< admonition type=tip title="Turn up the power?" open=false >}}
+
+The whole is greater than the sum of the parts?
+
+--- Aristotle (apparently) 👴
+
+{{< /admonition >}}
+
+{{< admonition type=tip title="The power of teamwork" open=false >}}
+
+Alone we can do so little; together we can do so much.
+
+--- Helen Keller 👩‍🎤
+
+{{< /admonition >}}
+
+{{< admonition type=tip title="The triangle inequality" open=false >}}
+
+The sum of the lengths of any two sides of a triangle is greater than the length of the third side.
+
+--- Euclid:  📐
+
+{{< /admonition >}}
+
+{{< admonition type=tip title="The power of sensor fusion" open=false >}}
+
+{{< /admonition >}}
+
+But if we combine the strong points of the different sensors we can always get a better result then a single sensor alone. TODO: insert some qoute about teamwork. 
+
+We can combine or fuse the location data from all of these sensors to get a better result. This is known as sensor fusion.
+
+It's quite simple in theory, but in practice it can be quite complex. However, as it is a thing which is very useful for many applications, there are open api's baked into our devices that do all the complicated stuff. This allows people like me, a lone wolf developer without much time or resources, to benefit from the combined sensors and have very good location data. 
+
+There are a few apps which nicely demonstrate this. Gnss Logger is one of them from the team at Google. It has multiple screens displaying:
+
+* A list of staellites your phone can connect to 
+* a plot of the satelites overhead that the phone is listening to.
+* a map, with 
+
+In the android world, we can use the `FusedLocationProviderClient` API, which is part of the Google Play Services. This API combines the data from the different sensors and provides a single location result. It uses a combination of GPS, WiFi, and cell tower data to get the best possible location.
+
+
+
+TODO: check this is correct...
+
+Thanks to the
+[https://android.googlesource.com/platform/frameworks/native/+/refs/heads/main/services/sensorservice/Fusion.cpp]
+
+In the Apple world, we can use the `core-location` framework.
+
+Thanks to these, it is very easy for a single app developer to 
+
+## Acturate location
+
+This section should talk about the different ways of getting a location.. Nothing about tracking a location with time, simply a point.. multiple points speed
+
+
+## A higher frequency gives us more infomation
+
+When we are tracking a location, we want to get the best possible results. This means that we want to get the most accurate location possible. But a single location point doesn't describe a journey, it is just a point in space. To understand a journey, we need to track the location over time. This means that we need to get multiple location points. The higher the frequency of the location updates, the more points we will have, and the more accurate our understanding of the journey will match reality.
+
+[TODO:: add a maplibre visulation of a biker riding around a route, enable a slider to change the frequency of the updates, and for each value, show the points which would have been recorded at that given frequency, connect the points with a line to show how the recorded track would change with the frequency]
+
+[TODO: add a graph showing the distance between points, and then the derivative to show the speed, and then the second derivative to show the acceleration. Mention how the higher the frequency, the more infomation we have to approximate the reality of the movement and gain insight into the actual journey of the person or object being tracked.]
+
+TODO: add latex equations for how to calculate speed and acceleration from the location data. delta x over delta t, and then delta v over delta t.
+
+Acceleration is the rate of change of velocity. At any point on a trajectory, the magnitude of the acceleration is given by the rate of change of velocity in both magnitude and direction at that point. The true acceleration at time t is found in the limit as time interval Δt → 0 of Δv/Δt.
+
+In real life, we can only approximate this by taking a finite time interval Δt and measuring the change in velocity over that time interval. When we have a high frequency of location updates, we can get a better approximation of the acceleration, which can be useful for understanding the movement of the object being tracked.
+
+
+TODO: talk about how understanding things like acceleration enables us to do things like detect when a person is riding, or stopping, and how that can be combined with other geospatial data to create a more complete picture of the real world that we are aproximating with our digital sensors.
+
+TODO: Use the use case of the alleycat race with the denkmal in Berlin and combine it with open street map data to show how the location tracking can be used.
+
+When we are tracking a location, we want to get the best possible results. This means that we want to get the most accurate location possible, and we want to do this as often as possible. The more often we get a location, the more accurate our results will be.
+
+## Turn up the frequency
+
+Accurate location, ok we got it, but 
+
+Let's go on a journey, not some phiospical journey, but a litteral one.
+
+TODO: add animation of something on a map, the frequency should map some points. 
+
+You can see that the higher the frequency, the 
 
 ## Lets talk about (Battery) life 🪫
+
+Now here is a picture of a gps tracker that I attached to my bike on a long distance mountain bike ride through the mountains of greece. The race took me a week and I didn't turn it off once or charge it. In fact it should work for more then 10 days without charging.
+
+Now why is that so? It just some standard aa batteries, and not only tracked my location, but also sent the data to a server so my mum could follow my progress along on a map (love ya mum).
+
+It did that by being smart about things, and how often it used them. The creators of these little devices know that battery life is important (as well as it working in muddy conditions), they made sure to optimize use the sensors in a way that would not drain the battery too quickly. It was more important to them that the device lasted the whole week, then that it was update the map every second. One producer of these devices is [Trackimo](https://trackimo.com/), and they have a great product that does just that.
+
+When you are building a location tracking app, you have to be smart about how you use the sensors. You can use the sensors in a way that will not drain the battery too quickly, and you can also use the sensors in a way that will give you the best results for your situation.
+
 
 More sensors on, means more battery usage. The sensors are all constantly sending data to the CPU, and the CPU is constantly processing that data.
 
@@ -235,6 +376,18 @@ When you are using the location API, you can configure the settings to get the b
 [https://developer.android.com/develop/sensors-and-location/location/permissions#background](https://developer.android.com/develop/sensors-and-location/location/permissions#background)
 
 
+### Lets test this on the ground (truth) 🏟 ️
+
+So to test things out, we need some measurements and some ground truth. How can we do that? Take advantage of some football fields!
+
+I got some satellite images of the local football fields, and I can use these to get some ground truth data. I can then compare the location data from my phone with the ground truth data to see how accurate it is.
+
+[TODO: add a map with the satellite images of the football fields, and lines with the different location data from the different location providers and a legend]
+
+[add a animation of the location data from my phone compared to the ground truth data, have the colors match the lines on the map, and with a legend and compare ]
+
+[TODO: add graphs of the location data from my phone compared to the ground truth data, have the colors match the lines on the map, and with a legend and compare ]
+
 ## Conclusion
 
 High grade location tracking is a complex topic, but given the tools we have at our disposal, it is possible to get a very accurate location.
@@ -251,3 +404,9 @@ We are living at a great time, and we have some incredible tech in our pockets a
 [^gpx-wiki]: https://en.wikipedia.org/wiki/GPS_Exchange_Format
 [^gpx-spec]: https://www.topografix.com/gpx.asp
 [^gnss]: https://en.wikipedia.org/wiki/GNSS_augmentation
+[^apple-core-location]: https://developer.apple.com/documentation/corelocation
+[^android-fused-location]: https://developer.android.com/develop/sensors-and-location/location
+[^android-sensor-fusion]: https://developer.android.com/reference/android/hardware/SensorManager#SENSOR_DELAY_FASTEST
+[^kmp-location-provider]: https://medium.com/rapido-labs/building-a-kotlin-multiplatform-mobile-sdk-for-location-related-services-488a2855ab23
+[^research-paper-on-multi-sensor-fusion-for-autonomous-last-mile-delivery]: https://www.researchgate.net/publication/335542466_Multi_Sensor_Fusion_for_Navigation_and_Mapping_in_Autonomous_Vehicles_Accurate_Localization_in_Urban_Environments
+[^gsm-localisation]: https://en.wikipedia.org/wiki/GSM_localisation
