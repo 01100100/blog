@@ -1,0 +1,506 @@
+<link
+    href="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.css"
+    rel="stylesheet"
+/>
+<style>
+    .frequency-container {
+        margin: 2rem 0;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border: 1px solid #cbd5e1;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .frequency-header {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #1e40af;
+    }
+
+    .frequency-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .frequency-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 0.875rem;
+    }
+
+    #frequency-map {
+        width: 100%;
+        height: 500px;
+    }
+
+    .frequency-controls {
+        padding: 1.5rem;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .control-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .control-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .control-label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .frequency-slider {
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: #e2e8f0;
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .frequency-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .frequency-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .frequency-slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .metric-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+
+    .metric-card:hover {
+        background: #f1f5f9;
+        transform: translateY(-1px);
+    }
+
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2563eb;
+        display: block;
+        line-height: 1.2;
+    }
+
+    .metric-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.25rem;
+    }
+
+    .frequency-display {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        color: #1e40af;
+        font-weight: 600;
+        text-align: center;
+        margin-top: 0.5rem;
+    }
+
+    .legend {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #374151;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 3px;
+        border-radius: 2px;
+    }
+
+    .original-route {
+        background: #ff7cfd;
+    }
+
+    .sampled-route {
+        background: #6644ef;
+    }
+
+    @media (max-width: 768px) {
+        .frequency-controls {
+            padding: 1rem;
+        }
+
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .legend {
+            gap: 1rem;
+        }
+    }
+</style>
+
+<div class="frequency-container">
+    <div class="frequency-header">
+        <h3>🛰️ GPS Tracking Frequency Impact</h3>
+        <p>
+            See how sampling frequency affects route accuracy in real mountain
+            terrain
+        </p>
+    </div>
+
+    <div id="frequency-map"></div>
+
+    <div class="frequency-controls">
+        <div class="control-group">
+            <label class="control-label" for="frequency-slider">
+                GPS Sampling Frequency
+            </label>
+            <input
+                type="range"
+                id="frequency-slider"
+                class="frequency-slider"
+                min="1"
+                max="200"
+                value="1"
+                step="1"
+            >
+            <div id="frequency-display" class="frequency-display">
+                Every point (highest accuracy)
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <span id="point-count" class="metric-value">0</span>
+                <div class="metric-label">GPS Points</div>
+            </div>
+            <div class="metric-card">
+                <span id="distance-diff" class="metric-value">0%</span>
+                <div class="metric-label">Distance Error</div>
+            </div>
+            <div class="metric-card">
+                <span id="data-reduction" class="metric-value">0%</span>
+                <div class="metric-label">Data Reduction</div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color original-route"></div>
+                <span>Original Route (All Points)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color sampled-route"></div>
+                <span>Sampled Route (Reduced Frequency)</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script
+>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let map;
+        let originalTrackPoints = [];
+        let originalDistance = 0;
+
+        // Initialize map
+        function initMap() {
+            map = new maplibregl.Map({
+                container: "frequency-map",
+                style: "https://tiles.openfreemap.org/styles/liberty",
+                center: [11.414, 47.185],
+                zoom: 14,
+                pitch: 0,
+                bearing: 0,
+            });
+
+            map.on("load", loadGPXData);
+        }
+
+        // Parse GPX data
+        function parseGPX(gpxText) {
+            const parser = new DOMParser();
+            const gpxDoc = parser.parseFromString(gpxText, "text/xml");
+            const trackPoints = gpxDoc.getElementsByTagName("trkpt");
+
+            const points = [];
+            for (let i = 0; i < trackPoints.length; i++) {
+                const point = trackPoints[i];
+                const lat = parseFloat(point.getAttribute("lat"));
+                const lon = parseFloat(point.getAttribute("lon"));
+                points.push([lon, lat]);
+            }
+            return points;
+        }
+
+        // Load GPX data
+        async function loadGPXData() {
+            try {
+                const response = await fetch(
+                    "/media/innsbruck-bends.gpx",
+                );
+                const gpxText = await response.text();
+                originalTrackPoints = parseGPX(gpxText);
+
+                if (originalTrackPoints.length > 0) {
+                    // Calculate original distance
+                    const originalLine = turf.lineString(
+                        originalTrackPoints,
+                    );
+                    originalDistance = turf.length(originalLine, {
+                        units: "meters",
+                    });
+
+                    // Fit map to track bounds
+                    const bounds = new maplibregl.LngLatBounds();
+                    originalTrackPoints.forEach((point) =>
+                        bounds.extend(point)
+                    );
+                    map.fitBounds(bounds, { padding: 50 });
+
+                    // Add sources and layers
+                    addMapLayers();
+
+                    // Initialize with first frequency
+                    updateVisualization(1);
+                }
+            } catch (error) {
+                console.error("Error loading GPX data:", error);
+            }
+        }
+
+        // Add map layers
+        function addMapLayers() {
+            // Original route
+            map.addSource("original-route", {
+                type: "geojson",
+                data: turf.lineString(originalTrackPoints),
+            });
+
+            map.addLayer({
+                id: "original-route-line",
+                type: "line",
+                source: "original-route",
+                paint: {
+                    "line-color": "#ff7cfd",
+                    "line-width": 4,
+                    "line-opacity": 0.8,
+                },
+            });
+
+            // Sampled route
+            map.addSource("sampled-route", {
+                type: "geojson",
+                data: turf.lineString(originalTrackPoints),
+            });
+
+            map.addLayer({
+                id: "sampled-route-line",
+                type: "line",
+                source: "sampled-route",
+                paint: {
+                    "line-color": "#6644ef",
+                    "line-width": 6,
+                    "line-opacity": 0.9,
+                },
+            });
+
+            // GPS points
+            map.addSource("gps-points", {
+                type: "geojson",
+                data: {
+                    type: "FeatureCollection",
+                    features: [],
+                },
+            });
+
+            map.addLayer({
+                id: "gps-points-layer",
+                type: "circle",
+                source: "gps-points",
+                paint: {
+                    "circle-color": "#ffffff",
+                    "circle-radius": 2,
+                    "circle-stroke-color": "#ffffff",
+                    "circle-stroke-width": 0.1,
+                    "circle-opacity": 0.2,
+                    "circle-stroke-opacity": 0.8,
+                },
+            });
+        }
+
+        // Sample points based on frequency
+        function samplePoints(points, frequency) {
+            if (frequency === 1) return points;
+
+            const sampled = [];
+            for (let i = 0; i < points.length; i += frequency) {
+                sampled.push(points[i]);
+            }
+
+            // Always include the last point to complete the route
+            if (
+                sampled[sampled.length - 1] !==
+                    points[sampled.length - 1]
+            ) {
+                sampled.push(points[sampled.length - 1]);
+            }
+
+            return sampled;
+        }
+
+        // Update visualization based on frequency
+        function updateVisualization(frequency) {
+            const sampledPoints = samplePoints(
+                originalTrackPoints,
+                frequency,
+            );
+
+            // Update sampled route
+            if (sampledPoints.length >= 2) {
+                const sampledLine = turf.lineString(sampledPoints);
+                map.getSource("sampled-route").setData(sampledLine);
+
+                // Calculate sampled distance
+                const sampledDistance = turf.length(sampledLine, {
+                    units: "meters",
+                });
+                const distanceError =
+                    Math.abs(originalDistance - sampledDistance) /
+                    originalDistance * 100;
+
+                // Update GPS points
+                const pointFeatures = sampledPoints.map((point) => ({
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: point,
+                    },
+                }));
+
+                map.getSource("gps-points").setData({
+                    type: "FeatureCollection",
+                    features: pointFeatures,
+                });
+
+                // Update metrics
+                updateMetrics(
+                    sampledPoints.length,
+                    distanceError,
+                    frequency,
+                );
+            }
+
+            // Update frequency display
+            updateFrequencyDisplay(frequency);
+        }
+
+        // Update metrics display
+        function updateMetrics(pointCount, distanceError, frequency) {
+            document.getElementById("point-count").textContent =
+                pointCount;
+            document.getElementById("distance-diff").textContent =
+                distanceError.toFixed(1) + "%";
+
+            const dataReduction =
+                (1 - pointCount / originalTrackPoints.length) * 100;
+            document.getElementById("data-reduction").textContent =
+                dataReduction.toFixed(0) + "%";
+        }
+
+        // Update frequency display text
+        function updateFrequencyDisplay(frequency) {
+            const display = document.getElementById(
+                "frequency-display",
+            );
+            if (frequency === 1) {
+                display.textContent = "Every point (highest accuracy)";
+            } else {
+                display.textContent = `Every ${frequency}${
+                    getOrdinalSuffix(frequency)
+                } point`;
+            }
+        }
+
+        // Get ordinal suffix for numbers
+        function getOrdinalSuffix(number) {
+            const j = number % 10;
+            const k = number % 100;
+            if (j === 1 && k !== 11) return "st";
+            if (j === 2 && k !== 12) return "nd";
+            if (j === 3 && k !== 13) return "rd";
+            return "th";
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            const slider = document.getElementById("frequency-slider");
+            slider.addEventListener("input", function (e) {
+                const frequency = parseInt(e.target.value);
+                updateVisualization(frequency);
+            });
+        }
+
+        // Initialize everything
+        initMap();
+        setupEventListeners();
+    });
+</script>

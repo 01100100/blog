@@ -155,8 +155,6 @@ There are more, but these are the main ones that get used for location tracking.
 
 The cell towers/antennas that we use to talk to each other get internet from, a good source of location data as they do not move and our devices can defer how far they are from each one.
 
-{{< admonition 
-
 
 [TODO: insert a map contating cell towers from https://www.opencellid.org/#zoom=12&lat=52.522&lon=13.4651]
 
@@ -245,7 +243,7 @@ This section should talk about the different ways of getting a location.. Nothin
 
 When we are tracking a location, we want to get the best possible results. This means that we want to get the most accurate location possible. But a single location point doesn't describe a journey, it is just a point in space. To understand a journey, we need to track the location over time. This means that we need to get multiple location points. The higher the frequency of the location updates, the more points we will have, and the more accurate our understanding of the journey will match reality.
 
-[TODO:: add a maplibre visulation of a biker riding around a route, enable a slider to change the frequency of the updates, and for each value, show the points which would have been recorded at that given frequency, connect the points with a line to show how the recorded track would change with the frequency]
+{{< location-frequency >}}
 
 [TODO: add a graph showing the distance between points, and then the derivative to show the speed, and then the second derivative to show the acceleration. Mention how the higher the frequency, the more infomation we have to approximate the reality of the movement and gain insight into the actual journey of the person or object being tracked.]
 
