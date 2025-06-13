@@ -33,17 +33,62 @@
 
     #frequency-map {
         width: 100%;
-        height: 500px;
+        height: 400px;
     }
 
     .frequency-controls {
-        padding: 1.5rem;
+        padding: 0.75rem;
         background: white;
         border-top: 1px solid #e2e8f0;
     }
 
+    .controls-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .slider-container {
+        flex: 1;
+    }
+
+    .view-toggle {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 0.25rem;
+        display: flex;
+        gap: 2px;
+    }
+
+    .view-toggle-btn {
+        background: transparent;
+        border: none;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .view-toggle-btn.active {
+        background: #2563eb;
+        color: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .view-toggle-btn:hover:not(.active) {
+        background: #f1f5f9;
+        color: #374151;
+    }
+
     .control-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.75rem;
     }
 
     .control-group:last-child {
@@ -62,8 +107,8 @@
 
     .frequency-slider {
         width: 100%;
-        height: 6px;
-        border-radius: 3px;
+        height: 8px;
+        border-radius: 4px;
         background: #e2e8f0;
         outline: none;
         -webkit-appearance: none;
@@ -75,13 +120,13 @@
     .frequency-slider::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
         cursor: pointer;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        border: 3px solid white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         transition: all 0.2s ease;
     }
 
@@ -102,16 +147,16 @@
 
     .metrics-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 0.75rem;
+        margin-top: 0.75rem;
     }
 
     .metric-card {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 1rem;
+        border-radius: 6px;
+        padding: 0.5rem;
         text-align: center;
         transition: all 0.2s ease;
     }
@@ -122,19 +167,19 @@
     }
 
     .metric-value {
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.1rem;
+        font-weight: 600;
         color: #2563eb;
         display: block;
-        line-height: 1.2;
+        line-height: 1.1;
     }
 
     .metric-label {
-        font-size: 0.75rem;
+        font-size: 0.65rem;
         color: #64748b;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin-top: 0.25rem;
+        margin-top: 0.15rem;
     }
 
     .frequency-display {
@@ -175,12 +220,19 @@
     }
 
     .sampled-route {
-        background: #6644ef;
+        background: linear-gradient(
+            90deg,
+            #6644ef 40%,
+            transparent 40%,
+            transparent 60%,
+            #6644ef 60%
+        );
+        background-size: 8px 3px;
     }
 
     @media (max-width: 768px) {
         .frequency-controls {
-            padding: 1rem;
+            padding: 0.75rem;
         }
 
         .metrics-grid {
@@ -190,63 +242,88 @@
 
         .legend {
             gap: 1rem;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .frequency-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .frequency-header p {
+            font-size: 0.8rem;
+        }
+
+        #frequency-map {
+            height: 300px;
         }
     }
 </style>
 
 <div class="frequency-container">
-    <div class="frequency-header">
-        <h3>🛰️ GPS Tracking Frequency Impact</h3>
-        <p>
-            See how sampling frequency affects route accuracy in real mountain
-            terrain
-        </p>
-    </div>
-
     <div id="frequency-map"></div>
 
     <div class="frequency-controls">
-        <div class="control-group">
-            <label class="control-label" for="frequency-slider">
-                GPS Sampling Frequency
-            </label>
-            <input
-                type="range"
-                id="frequency-slider"
-                class="frequency-slider"
-                min="1"
-                max="200"
-                value="1"
-                step="1"
+        <div class="controls-row">
+            <div class="slider-container">
+                <input
+                    type="range"
+                    id="frequency-slider"
+                    class="frequency-slider"
+                    min="1"
+                    max="50"
+                    value="1"
+                    step="1"
+                >
+            </div>
+
+            <div class="view-toggle">
+                <button class="view-toggle-btn active" id="view-2d">2D</button>
+                <button class="view-toggle-btn" id="view-3d">3D</button>
+            </div>
+        </div>
+
+        <div class="metrics-container">
+            <!-- Frequency and Interval Grid -->
+            <div
+                class="metrics-grid"
+                style="grid-template-columns: 1fr 1fr; margin-bottom: 0.75rem"
             >
-            <div id="frequency-display" class="frequency-display">
-                Every point (highest accuracy)
+                <div class="metric-card">
+                    <span id="frequency-hz" class="metric-value">0.5</span>
+                    <div class="metric-label">Frequency (Hz)</div>
+                </div>
+                <div class="metric-card">
+                    <span id="time-interval" class="metric-value">2</span>
+                    <div class="metric-label">Interval (seconds)</div>
+                </div>
             </div>
-        </div>
 
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <span id="point-count" class="metric-value">0</span>
-                <div class="metric-label">GPS Points</div>
+            <!-- Performance Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span id="point-count" class="metric-value">0</span>
+                    <div class="metric-label">GPS Points</div>
+                </div>
+                <div class="metric-card">
+                    <span id="distance-diff" class="metric-value">0%</span>
+                    <div class="metric-label">Distance Error</div>
+                </div>
+                <div class="metric-card">
+                    <span id="data-reduction" class="metric-value">0%</span>
+                    <div class="metric-label">Data Reduction</div>
+                </div>
             </div>
-            <div class="metric-card">
-                <span id="distance-diff" class="metric-value">0%</span>
-                <div class="metric-label">Distance Error</div>
-            </div>
-            <div class="metric-card">
-                <span id="data-reduction" class="metric-value">0%</span>
-                <div class="metric-label">Data Reduction</div>
-            </div>
-        </div>
 
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color original-route"></div>
-                <span>Original Route (All Points)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color sampled-route"></div>
-                <span>Sampled Route (Reduced Frequency)</span>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color original-route"></div>
+                    <span>Original Route (All Points)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color sampled-route"></div>
+                    <span>Sampled Route (Reduced Frequency)</span>
+                </div>
             </div>
         </div>
     </div>
@@ -319,7 +396,7 @@
                     // Add sources and layers
                     addMapLayers();
 
-                    // Initialize with first frequency
+                    // Initialize with lowest frequency (slider value 1 = highest skip interval)
                     updateVisualization(1);
                 }
             } catch (error) {
@@ -357,9 +434,11 @@
                 type: "line",
                 source: "sampled-route",
                 paint: {
-                    "line-color": "#6644ef",
-                    "line-width": 6,
+                    "line-color": "#1d4ed8",
+
+                    "line-width": 4,
                     "line-opacity": 0.9,
+                    "line-dasharray": [0.2, 0.2],
                 },
             });
 
@@ -377,41 +456,61 @@
                 type: "circle",
                 source: "gps-points",
                 paint: {
-                    "circle-color": "#ffffff",
-                    "circle-radius": 2,
+                    "circle-color": "#6644ef",
+                    "circle-radius": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        12,
+                        3,
+                        16,
+                        6,
+                    ],
                     "circle-stroke-color": "#ffffff",
-                    "circle-stroke-width": 0.1,
-                    "circle-opacity": 0.2,
-                    "circle-stroke-opacity": 0.8,
+                    "circle-stroke-width": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        12,
+                        1,
+                        16,
+                        2,
+                    ],
+                    "circle-opacity": 0.9,
+                    "circle-stroke-opacity": 1,
                 },
             });
         }
 
-        // Sample points based on frequency
-        function samplePoints(points, frequency) {
-            if (frequency === 1) return points;
+        // Sample points based on frequency - simplified approach
+        function samplePoints(points, sliderValue) {
+            // Invert slider: 1 = lowest freq (skip 50), 50 = highest freq (skip 1)
+            const skipInterval = 51 - sliderValue;
+
+            if (skipInterval === 1) return points; // Show all points
 
             const sampled = [];
-            for (let i = 0; i < points.length; i += frequency) {
+            for (let i = 0; i < points.length; i += skipInterval) {
                 sampled.push(points[i]);
             }
 
             // Always include the last point to complete the route
             if (
+                sampled.length > 0 &&
                 sampled[sampled.length - 1] !==
-                    points[sampled.length - 1]
+                    points[points.length - 1]
             ) {
-                sampled.push(points[sampled.length - 1]);
+                sampled.push(points[points.length - 1]);
             }
 
             return sampled;
         }
 
         // Update visualization based on frequency
-        function updateVisualization(frequency) {
+        function updateVisualization(sliderValue) {
             const sampledPoints = samplePoints(
                 originalTrackPoints,
-                frequency,
+                sliderValue,
             );
 
             // Update sampled route
@@ -445,16 +544,30 @@
                 updateMetrics(
                     sampledPoints.length,
                     distanceError,
-                    frequency,
+                    sliderValue,
                 );
             }
-
-            // Update frequency display
-            updateFrequencyDisplay(frequency);
         }
 
         // Update metrics display
-        function updateMetrics(pointCount, distanceError, frequency) {
+        function updateMetrics(pointCount, distanceError, sliderValue) {
+            const baseFreq = 0.5; // GPX recorded at 0.5 Hz (every 2 seconds)
+            const skipInterval = 51 - sliderValue; // Invert slider value
+            const actualFreq = baseFreq / skipInterval;
+            const secondsInterval = skipInterval * 2; // Original is every 2 seconds
+
+            // Update frequency and interval cards
+            if (actualFreq >= 0.01) {
+                document.getElementById("frequency-hz").textContent =
+                    actualFreq.toFixed(3);
+            } else {
+                document.getElementById("frequency-hz").textContent =
+                    actualFreq.toFixed(3);
+            }
+            document.getElementById("time-interval").textContent =
+                secondsInterval;
+
+            // Update other metrics
             document.getElementById("point-count").textContent =
                 pointCount;
             document.getElementById("distance-diff").textContent =
@@ -463,39 +576,49 @@
             const dataReduction =
                 (1 - pointCount / originalTrackPoints.length) * 100;
             document.getElementById("data-reduction").textContent =
-                dataReduction.toFixed(0) + "%";
-        }
-
-        // Update frequency display text
-        function updateFrequencyDisplay(frequency) {
-            const display = document.getElementById(
-                "frequency-display",
-            );
-            if (frequency === 1) {
-                display.textContent = "Every point (highest accuracy)";
-            } else {
-                display.textContent = `Every ${frequency}${
-                    getOrdinalSuffix(frequency)
-                } point`;
-            }
-        }
-
-        // Get ordinal suffix for numbers
-        function getOrdinalSuffix(number) {
-            const j = number % 10;
-            const k = number % 100;
-            if (j === 1 && k !== 11) return "st";
-            if (j === 2 && k !== 12) return "nd";
-            if (j === 3 && k !== 13) return "rd";
-            return "th";
+                dataReduction.toFixed(2) + "%";
         }
 
         // Set up event listeners
         function setupEventListeners() {
             const slider = document.getElementById("frequency-slider");
             slider.addEventListener("input", function (e) {
-                const frequency = parseInt(e.target.value);
-                updateVisualization(frequency);
+                const sliderValue = parseInt(e.target.value);
+                updateVisualization(sliderValue);
+            });
+
+            // View toggle event listeners
+            const view2dBtn = document.getElementById("view-2d");
+            const view3dBtn = document.getElementById("view-3d");
+
+            view2dBtn.addEventListener("click", function () {
+                set2DView();
+                view2dBtn.classList.add("active");
+                view3dBtn.classList.remove("active");
+            });
+
+            view3dBtn.addEventListener("click", function () {
+                set3DView();
+                view3dBtn.classList.add("active");
+                view2dBtn.classList.remove("active");
+            });
+        }
+
+        // Set 2D view
+        function set2DView() {
+            map.easeTo({
+                pitch: 0,
+                bearing: 0,
+                duration: 1000,
+            });
+        }
+
+        // Set 3D view
+        function set3DView() {
+            map.easeTo({
+                pitch: 45,
+                bearing: -17.6,
+                duration: 1000,
             });
         }
 
