@@ -87,6 +87,62 @@
         color: #374151;
     }
 
+    .fullscreen-btn {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 0.5rem;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+    }
+
+    .fullscreen-btn:hover {
+        background: #f1f5f9;
+        color: #374151;
+        border-color: #cbd5e1;
+    }
+
+    .fullscreen-btn.active {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
+
+    .frequency-container.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999;
+        margin: 0;
+        border-radius: 0;
+        background: white;
+        border: none;
+        box-shadow: none;
+    }
+
+    .frequency-container.fullscreen #frequency-map {
+        height: calc(100vh - 120px);
+    }
+
+    .frequency-container.fullscreen .frequency-controls {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid #e2e8f0;
+        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
     .control-group {
         margin-bottom: 0.75rem;
     }
@@ -257,6 +313,30 @@
         #frequency-map {
             height: 300px;
         }
+
+        .frequency-container.fullscreen #frequency-map {
+            height: calc(100vh - 140px);
+        }
+
+        .controls-row {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .controls-row .slider-container {
+            order: 2;
+        }
+
+        .controls-row .view-toggle,
+        .controls-row .fullscreen-btn {
+            order: 1;
+        }
+
+        .controls-row > div:last-child {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
     }
 </style>
 
@@ -281,6 +361,22 @@
                 <button class="view-toggle-btn active" id="view-2d">2D</button>
                 <button class="view-toggle-btn" id="view-3d">3D</button>
             </div>
+
+            <button class="fullscreen-btn" id="fullscreen-btn">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"
+                    >
+                    </path>
+                </svg>
+            </button>
         </div>
 
         <div class="metrics-container">
@@ -373,6 +469,7 @@
             try {
                 const response = await fetch(
                     "/media/innsbruck-bends.gpx",
+                    // "/media/Shredie_Ride_2025-07-08_10-10-56.gpx",
                 );
                 const gpxText = await response.text();
                 originalTrackPoints = parseGPX(gpxText);
@@ -602,6 +699,82 @@
                 view3dBtn.classList.add("active");
                 view2dBtn.classList.remove("active");
             });
+
+            // Fullscreen toggle event listener
+            const fullscreenBtn = document.getElementById(
+                "fullscreen-btn",
+            );
+            const container = document.querySelector(
+                ".frequency-container",
+            );
+
+            fullscreenBtn.addEventListener("click", function () {
+                if (container.classList.contains("fullscreen")) {
+                    exitFullscreen();
+                } else {
+                    enterFullscreen();
+                }
+            });
+
+            // ESC key to exit fullscreen
+            document.addEventListener("keydown", function (e) {
+                if (
+                    e.key === "Escape" &&
+                    container.classList.contains("fullscreen")
+                ) {
+                    exitFullscreen();
+                }
+            });
+        }
+
+        // Enter fullscreen mode
+        function enterFullscreen() {
+            const container = document.querySelector(
+                ".frequency-container",
+            );
+            const fullscreenBtn = document.getElementById(
+                "fullscreen-btn",
+            );
+
+            container.classList.add("fullscreen");
+            fullscreenBtn.classList.add("active");
+
+            // Update fullscreen button icon to exit fullscreen
+            fullscreenBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 0 2-2h3M3 16h3a2 2 0 0 0 2 2v3"></path>
+                </svg>
+            `;
+
+            // Resize map after transition
+            setTimeout(() => {
+                map.resize();
+            }, 100);
+        }
+
+        // Exit fullscreen mode
+        function exitFullscreen() {
+            const container = document.querySelector(
+                ".frequency-container",
+            );
+            const fullscreenBtn = document.getElementById(
+                "fullscreen-btn",
+            );
+
+            container.classList.remove("fullscreen");
+            fullscreenBtn.classList.remove("active");
+
+            // Update fullscreen button icon to enter fullscreen
+            fullscreenBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+            `;
+
+            // Resize map after transition
+            setTimeout(() => {
+                map.resize();
+            }, 100);
         }
 
         // Set 2D view

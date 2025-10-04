@@ -28,11 +28,21 @@ license: ""
 
 <!--more-->
 
+## Introduction 👋
+
+I am trying to make a bike navigation app, to plan routes and help me navigate called [www.shredie.com](http://www.shredie.com). Not sure if it will go anywhere, but I am having fun learning somethings whilst building it.
+
 ## The modern miracle 🌎
 
 Sometimes I pause for a moment and enjoy the simple things in life.
 
 The fact that there are satellites flying around above head that we can openly/freely use to triangulate our position, and that I am walking around with a smartphone in my pocket that can pick up on the satellite signals and do the maths to show where I am on a map at the mere press of a consent button is pretty mind blowing.
+
+Knowing the exact position of your device is incredibly useful for all sorts of things:
+
+* showing your position on a map and ensuring you didn't take the wrong hiking path
+* telling your uber driver where to pick you up you had a big night and can't read the street sign
+* Finding the device when you inevitably lose it
 
 [Screen recording of accepting a consent and the globe zooming to a cool position, maybe with a video of me being at brandenbrug tor]
 
@@ -40,11 +50,6 @@ I won't explain *the magic involved* in how these systems work together as there
 
 [Insert either a screen shot of Batosz gps post, or ask him for permission to reuse one of the animations]
 
-Knowing the exact position of your device is incredibly useful for all sorts of things:
-
-* showing your position on a map and ensuring you didn't take the wrong hiking path
-* telling your uber driver where to pick you up you had a big night and can't read the street sign
-* Finding the device when you inevitably lose it 
 
 [Screenrecording of Komoot in action]()
 
@@ -408,3 +413,19 @@ We are living at a great time, and we have some incredible tech in our pockets a
 [^kmp-location-provider]: https://medium.com/rapido-labs/building-a-kotlin-multiplatform-mobile-sdk-for-location-related-services-488a2855ab23
 [^research-paper-on-multi-sensor-fusion-for-autonomous-last-mile-delivery]: https://www.researchgate.net/publication/335542466_Multi_Sensor_Fusion_for_Navigation_and_Mapping_in_Autonomous_Vehicles_Accurate_Localization_in_Urban_Environments
 [^gsm-localisation]: https://en.wikipedia.org/wiki/GSM_localisation
+[^anvil-how-sensor-fusion-improves-location]: https://anvil.so/post/how-sensor-fusion-improves-localization-accuracy
+[^https://velmurugan-murugesan.medium.com/how-to-calculate-device-moving-speed-programmatically-using-android-11b5e6c67f8a]:https://velmurugan-murugesan.medium.com/how-to-calculate-device-moving-speed-programmatically-using-android-11b5e6c67f8a
+[^wiki-sensor-fusion]: https://en.wikipedia.org/wiki/Sensor_fusion
+[^wiki-location-based-service]: https://en.wikipedia.org/wiki/Location-based_service
+[^android-location-developer-guide]: https://developer.android.com/develop/sensors-and-location]
+[^android-position-sesnors]: https://developer.android.com/develop/sensors-and-location/sensors/sensors_position
+[^android-location-permissions]: https://developer.android.com/develop/sensors-and-location/location/permissions
+[^android-fused-location-provider]: https://developer.android.com/develop/sensors-and-location/location/fused-location-provider
+[^fused-orientation-provider]:https://android-developers.googleblog.com/2024/03/introducing-fused-orientation-provider-api.html
+[^wiki-kallman-filter]: https://en.wikipedia.org/wiki/Kalman_filter
+[^android-motion-sensors]: https://developer.android.com/develop/sensors-and-location/sensors/sensors_motion
+[^wiki-mobile-phone-tracking]: https://en.wikipedia.org/wiki/Mobile_phone_tracking
+[^galileo]: https://en.wikipedia.org/wiki/Galileo_(satellite_navigation)
+[^galileo-hitas-the-spot-paper]: https://insidegnss.com/galileo-hits-the-spot/
+[^open-cell-id]: https://wiki.opencellid.org/wiki/What_is_OpenCellID
+[^abd-kmm-location-github]: https://github.com/line/abc-kmm-location
