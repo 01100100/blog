@@ -29,20 +29,53 @@ license: ""
 
 I listened to a very interesting talk from @javi called "Mercator is your friend". It was great and talked about, amongst other things, how different map projections distort the world in different ways. How the measured properties associated with projecting a 3d globe onto a 2d plane change with different projections. And finally, how Mercator has it's flaws like us all, but is a great projection fit for many roles.
 
-Afterwards, Konstantin Käfer, the OG behind Mapbox-gl (and the forked Maplibre GL) made a very good point, that thanks to the mapping libs, we can change between projections on the fly, and are not constrained to a single projection. it's a solid point and made me think a little about how you could use the interactivity in web maps to demonstrate how the projections differ in there representation of the world.
+Afterwards, Konstantin Käfer, the OG behind Mapbox-gl (and the forked Maplibre GL) made a very good point, that thanks to the mapping libs, we can change between projections on the fly, and are not constrained to a single projection. It is a solid point, one made me think a little about how you could use the interactivity in web maps to demonstrate how the projections differ in there representation of the world.
 
-This is not a new idea, Geraradus Mercator would have pondered this in the 16th century.  
+Pondering over how different projections represent the world differently is not new, [Geraradus Mercator](https://en.wikipedia.org/wiki/Gerardus_Mercator) has a amazing story and would have pondered this in the 16th century.
+
 you can date it back to the 19th century, when a French mathematican called Nicolas Auguste Tissot
 
 In modern times we can visualize all this maths with the help of some [WebGL](https://en.wikipedia.org/wiki/WebGL) magic, and 
 
-I am aware of the ongoing work in the Maplibre Project to make a globe projection and was checking out the pre-realse version when I had an idea!
+I am aware of the ongoing work in the Maplibre Project to make a `globe` projection and was checking out the pre-realse version when I had an idea!
 
 I would make a nice side-by-side map and show how the viewport from one map, or better yet the bounds that the map projection has inside the viewport, is represented on the other map by highlighting an area. Any interactivity by moving and zooming should by synced such that the shape changes on the fly, giving a idea of how the mapping between the two projections distorts space. It's easier to understand when you see it, at least I hope, take a peak below to see if it makes sense.
 
 So I started out with an idea and some vanilla-js. Maplibre has a really nice docs website, complete with many examples that show you how to build basic things. I took some inspiration from [Sync movement of multiple maps](https://maplibre.org/maplibre-gl-js/docs/examples/sync-move/) and created two maps side by side, synced with the 
 
-To style the maps I used the MapLibre Demo Style and monkey patched it with a extra [Graticul](https://en.wikipedia.org/wiki/Graticule_(cartography)) layer as "hand rails" to accent the effect.  I also patched a version of the style to use the `globe` projection. I added a control to toggle projecting one maps bounds onto the other and voila, this was the result!
+To style the maps I used the MapLibre Demo Style and monkey patched it with a extra [Graticul](https://en.wikipedia.org/wiki/Graticule_(cartography)) layer as "hand rails" to accent the distortion.  I also patched a version of the style to use the `vertical-perspective` projection.
+
+{{< admonition type=tip >}}
+
+So what is the MapLibre `globe` projection?
+
+If you check out the [MapLibre Style Spec](https://maplibre.org/maplibre-style-spec/) docs it states that there are [two projections currently implemented](https://maplibre.org/maplibre-style-spec/types/#projectiondefinition):
+
+- mercator: Web Mercator projection
+- vertical-perspective: Vertical Perspective projection
+
+**However** you can also use the `globe` value with results in a preset combination of both. When the map is zoomed out, it uses the vertical-perspective to achieve the globe effect, but at higher zoom levels we use the Mercator. At some point (Zoom levels 10 - 12) in between we smoothly blend between the two with some linear interpolation.
+
+```ts
+type: ["interpolate", ["linear"], ["zoom"],
+    10,"vertical-perspective",
+    12,"mercator"
+]
+```
+
+TODO: add screen grab of the console logging the projection type when the map is zoomed in using the "globe".
+
+{{< /admonition >}}
+
+{{< admonition type=tip >}}
+
+
+{{< /admonition >}}
+
+
+
+
+I added a control to toggle projecting one maps bounds onto the other and voila, this was the result!
 
 ```html
 <!DOCTYPE html>
@@ -322,7 +355,7 @@ To style the maps I used the MapLibre Demo Style and monkey patched it with a ex
                 }
 
 
-                const globeStyle = { ...gridStyle, projection: { type: 'globe' } };
+                const globeStyle = { ...gridStyle, projection: { type: 'vertical-perspective' } };
 
                 const tileBase64 = 'GvwKeAIKBWxpbmVzKIAgGgV3aWR0aCIGCgR3aWRlIggKBm5hcnJvdxIRGAISAgAAIgkJgECAQAoA5T8SDxgCEgIAACIHCQAACoBAABIQGAISAgAAIggJAIBACgDlPxIQGAISAgABIggJAOQBCoBAABIRGAISAgABIgkJ5AGAQAoA5T8SEBgCEgIAASIICQDIAwqAQAASERgCEgIAASIJCcgDgEAKAOU/EhAYAhICAAEiCAkAqgUKgEAAEhAYAhICAAEiCAkAjgcKgEAAEhEYAhICAAEiCQmqBYBACgDlPxIRGAISAgABIgkJjgeAQAoA5T8SEBgCEgIAASIICQDyCAqAQAASEBgCEgIAASIICQDWCgqAQAASEBgCEgIAASIICQC4DAqAQAASEBgCEgIAASIICQCcDgqAQAASERgCEgIAASIJCfIIgEAKAOU/EhEYAhICAAEiCQnWCoBACgDlPxIRGAISAgABIgkJuAyAQAoA5T8SERgCEgIAASIJCZwOgEAKAOU/EhAYAhICAAAiCAkAgBAKgEAAEhAYAhICAAEiCAkA5BEKgEAAEhAYAhICAAEiCAkAyBMKgEAAEhAYAhICAAEiCAkAqhUKgEAAEhAYAhICAAEiCAkAjhcKgEAAEhAYAhICAAEiCAkA8hgKgEAAEhAYAhICAAEiCAkA1hoKgEAAEhAYAhICAAEiCAkAuBwKgEAAEhAYAhICAAEiCAkAnB4KgEAAEhEYAhICAAAiCQmAEIBACgDlPxIRGAISAgABIgkJ5BGAQAoA5T8SERgCEgIAASIJCcgTgEAKAOU/EhEYAhICAAEiCQmqFYBACgDlPxIRGAISAgABIgkJjheAQAoA5T8SERgCEgIAASIJCfIYgEAKAOU/EhEYAhICAAEiCQnWGoBACgDlPxIRGAISAgABIgkJuByAQAoA5T8SERgCEgIAASIJCZwegEAKAOU/EhAYAhICAAAiCAkAgCAKgEAAEhAYAhICAAEiCAkA5CEKgEAAEhAYAhICAAEiCAkAyCMKgEAAEhAYAhICAAEiCAkAqiUKgEAAEhAYAhICAAEiCAkAjicKgEAAEhAYAhICAAEiCAkA8igKgEAAEhAYAhICAAEiCAkA1ioKgEAAEhAYAhICAAEiCAkAuCwKgEAAEhAYAhICAAEiCAkAnC4KgEAAEhAYAhICAAAiCAkAgDAKgEAAEhAYAhICAAEiCAkA5DEKgEAAEhAYAhICAAEiCAkAyDMKgEAAEhAYAhICAAEiCAkAqjUKgEAAEhAYAhICAAEiCAkAjjcKgEAAEhAYAhICAAEiCAkA8jgKgEAAEhAYAhICAAEiCAkA1joKgEAAEhAYAhICAAEiCAkAuDwKgEAAEhAYAhICAAEiCAkAnD4KgEAAEhEYAhICAAAiCQmAIIBACgDlPxIRGAISAgABIgkJ5CGAQAoA5T8SERgCEgIAASIJCcgjgEAKAOU/EhEYAhICAAEiCQmqJYBACgDlPxIRGAISAgABIgkJjieAQAoA5T8SERgCEgIAASIJCfIogEAKAOU/EhEYAhICAAEiCQnWKoBACgDlPxIRGAISAgABIgkJuCyAQAoA5T8SERgCEgIAASIJCZwugEAKAOU/EhEYAhICAAAiCQmAMIBACgDlPxIRGAISAgABIgkJ5DGAQAoA5T8SERgCEgIAASIJCcgzgEAKAOU/EhEYAhICAAEiCQmqNYBACgDlPxIRGAISAgABIgkJjjeAQAoA5T8SERgCEgIAASIJCfI4gEAKAOU/EhEYAhICAAEiCQnWOoBACgDlPxIRGAISAgABIgkJuDyAQAoA5T8SERgCEgIAASIJCZw+gEAKAOU/EhAYAhICAAAiCAkAgEAKgEAA';
 
@@ -361,7 +394,7 @@ To style the maps I used the MapLibre Demo Style and monkey patched it with a ex
 </html>
 ```
 
-That almost works. As you can see the globe view was really well implemented and it didnt take much to get it to work when projecting the Mercator viewport onto the globe. You could be mistaken to think that the other way round works, its almost there but there is a hiccup. The viewport of the Globe projection returned by `map.getBounds()` doesn't take into bits in the map which are clipped by the horizon. Aka the bits on the back of the globe that you can't see. 
+That works... Almost! As you can see the globe view was really well implemented and it didn't take much to get it to work when projecting the Mercator viewport onto the globe. There is a slight hiccup when changing the "pitch" of the map. You could be mistaken to think that the other way round works, its almost there but there is a hiccup. The viewport of the Globe projection returned by `map.getBounds()` doesn't take into bits in the map which are clipped by the horizon. Aka the bits on the back of the globe that you can't see.
 
 Intuition playing with the maps gives the feeling that the shaped should be clipped at a max of 180*. When you zoom out, the polygon on the Mercator
 
@@ -373,16 +406,18 @@ I needed a solution. time to bust out the maths.
 
 ## Going into the code
 
-Now that I am getting into the logic of the Maplibre codebase, I want to work in typeScript and have the ability to ctrl + click around in vscode to get to different parts of the globe code. I also want to keep the output as a optimized static site. Therefore I turned to the big gun of next-js for this little air-rifle pellet of a "webapp". I ran `npx create-next-app --ts` and got to work porting the code.
+Now that I am getting into the logic of the MapLibre codebase, I want to work in typeScript and have the ability to ctrl + click around in vscode to get to different parts of the globe code. I also want to keep the output as a optimized static site. Therefore I turned to the big gun of next-js for this little air-rifle pellet of a "webapp". I ran `npx create-next-app --ts` and got to work porting the code.
 
+I installed the pre-release version of MapLibre and added the types to the project. I also added the `@types/maplibre-gl` to the project. I then copied the code from the html file 
 TODO: link to the repo
 
 TODO: screenshot of vscode with highlighting and defentions ect..
 
 ## The maths
 
-I read up on the [https://en.wikipedia.org/wiki/Orthographic_projection](https://en.wikipedia.org/wiki/Orthographic_projection) to refresh my maths (been drinking too much gpts) and understand how the globe projection works.
+I read up on the [Orthographic map projection](https://en.wikipedia.org/wiki/Orthographic_projection) to refresh my maths (been drinking too much gpts) and understand how the globe projection works.
 
+The orthographic projection is a perspective projection where the camera is placed at an infinite distance from the object. This means that the rays of light that are projected onto the object are parallel. The result is that the object is projected onto a plane that is perpendicular to the rays of light. This is the same as projecting the object onto a plane that is perpendicular to the camera.
 Also, thanks to a great developer, there was a lot of useful knowledge in the docs for the globe branch of Maplibre.
 
 This gave me two options:
@@ -390,6 +425,14 @@ This gave me two options:
 1. I could use the `map.getZoom()` and `map.getCenter()` to calculate the bounds of the viewport and project them onto
 2. I could go down the rabbit hole and learn about shaders, and update the code that is used to render the globe to create a geojson polygon from that.
 
+## Time to Shave the Yak
+
+I decide I would engage in some yak shaving, as a exercise to expand my understanding of computer graphics. I have a loose idea of how computers render 3d objects, with the help of shaders and textures. I also recall back to the MA2002: Matrix Algebra Module that I studied in my second year of university when I learnt that basically everything can be represented by a matrix, and you can rotate and translate objects in 3d space with simple matrix operations... But this brain has got a bit rusty since then, 
+
+
+TODO: add a area value for the size in km2 of the polygon projected onto the globe.
+
 ref: [https://d3js.org/d3-geo/projection](https://d3js.org/d3-geo/projection)
 ref: [https://github.com/maplibre/maplibre-gl-compare](https://github.com/maplibre/maplibre-gl-compare)
 ref: [https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#getbounds](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#getbounds)
+ref: [https://seths.blog/2005/03/dont_shave_that/](https://seths.blog/2005/03/dont_shave_that/)
