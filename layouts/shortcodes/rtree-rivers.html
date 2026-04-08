@@ -1,0 +1,537 @@
+<link href="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.css" rel="stylesheet" />
+<style>
+  #rtree-rivers-map {
+    width: 100%;
+    height: 500px;
+    margin-bottom: 1.5em;
+    border-radius: 8px;
+  }
+  .maplibregl-popup {
+    max-width: 300px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  }
+  .control-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    z-index: 1;
+  }
+  .control-panel button {
+    margin: 5px;
+    padding: 5px 10px;
+    background: #4a8ec2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .control-panel button:hover {
+    background: #3a7cb2;
+  }
+  .legend {
+    position: absolute;
+    bottom: 20px;
+    left: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+  }
+  .legend-color {
+    width: 20px;
+    height: 10px;
+    margin-right: 5px;
+  }
+</style>
+
+<div id="rtree-rivers-map" class="maplibregl-map"></div>
+
+<script src="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map centered on Germany
+    const map = new maplibregl.Map({
+      container: 'rtree-rivers-map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [10.4515, 51.1657], // Center of Germany
+      zoom: 6,
+      hash: false
+    });
+    
+    // Add navigation controls
+    map.addControl(new maplibregl.NavigationControl());
+    
+    // Create control panel
+    const controlPanel = document.createElement('div');
+    controlPanel.className = 'control-panel';
+    document.getElementById('rtree-rivers-map').appendChild(controlPanel);
+    
+    // Add button to show R-tree
+    const showRTreeButton = document.createElement('button');
+    showRTreeButton.textContent = 'Show R-Tree Index';
+    controlPanel.appendChild(showRTreeButton);
+    
+    // Add button to start search demonstration
+    const demonstrateSearchButton = document.createElement('button');
+    demonstrateSearchButton.textContent = 'Demonstrate Search';
+    controlPanel.appendChild(demonstrateSearchButton);
+    
+    // Add button to clear visualization
+    const clearButton = document.createElement('button');
+    clearButton.textContent = 'Clear Visualization';
+    controlPanel.appendChild(clearButton);
+    
+    // Create legend
+    const legend = document.createElement('div');
+    legend.className = 'legend';
+    legend.style.display = 'none'; // Hidden initially
+    document.getElementById('rtree-rivers-map').appendChild(legend);
+    
+    // Legend title
+    const legendTitle = document.createElement('div');
+    legendTitle.textContent = 'R-Tree Hierarchy';
+    legendTitle.style.fontWeight = 'bold';
+    legendTitle.style.marginBottom = '5px';
+    legend.appendChild(legendTitle);
+    
+    // Legend items
+    const colors = [
+      { color: '#e41a1c', label: 'Root Node' },
+      { color: '#377eb8', label: 'Level 1' },
+      { color: '#4daf4a', label: 'Level 2' },
+      { color: '#984ea3', label: 'Level 3' },
+      { color: '#ff7f00', label: 'Leaf Nodes' }
+    ];
+    
+    colors.forEach(item => {
+      const legendItem = document.createElement('div');
+      legendItem.className = 'legend-item';
+      
+      const colorBox = document.createElement('div');
+      colorBox.className = 'legend-color';
+      colorBox.style.backgroundColor = item.color;
+      
+      const label = document.createElement('span');
+      label.textContent = item.label;
+      
+      legendItem.appendChild(colorBox);
+      legendItem.appendChild(label);
+      legend.appendChild(legendItem);
+    });
+    
+    // Variables to store data
+    let rivers = [];
+    let rtree = null;
+    let rtreeLayers = [];
+    let searchBoxLayer = null;
+    let searchInterval = null;
+    
+    // Load German rivers data when the map loads
+    map.on('load', function() {
+      // Simulate loading German rivers data
+      // In a real app, you would fetch this from a GeoJSON source
+      createSyntheticRivers();
+      
+      // Add rivers to the map
+      map.addSource('rivers', {
+        type: 'geojson',
+        data: turf.featureCollection(rivers)
+      });
+      
+      map.addLayer({
+        id: 'rivers-layer',
+        type: 'line',
+        source: 'rivers',
+        paint: {
+          'line-color': '#0080ff',
+          'line-width': 2,
+          'line-opacity': 0.8
+        }
+      });
+    });
+    
+    // Create synthetic river data for Germany
+    function createSyntheticRivers() {
+      // Main rivers of Germany
+      const riverCenters = [
+        { name: 'Rhine', coords: [7.6, 51.5], length: 0.7 },
+        { name: 'Elbe', coords: [11.9, 52.0], length: 0.8 },
+        { name: 'Danube', coords: [12.5, 48.5], length: 0.6 },
+        { name: 'Main', coords: [9.9, 50.0], length: 0.4 },
+        { name: 'Weser', coords: [9.0, 52.2], length: 0.5 },
+        { name: 'Moselle', coords: [7.2, 49.7], length: 0.35 },
+        { name: 'Saale', coords: [11.7, 51.4], length: 0.3 },
+        { name: 'Spree', coords: [13.9, 52.4], length: 0.25 },
+        { name: 'Neckar', coords: [9.2, 49.0], length: 0.35 },
+        { name: 'Havel', coords: [12.4, 52.9], length: 0.3 }
+      ];
+      
+      // Create each river with tributaries
+      riverCenters.forEach(river => {
+        // Create main river
+        const mainRiver = createRiver(river.coords, river.length, 0.3);
+        mainRiver.properties = { name: river.name, type: 'main' };
+        rivers.push(mainRiver);
+        
+        // Create tributaries
+        const tributaryCount = Math.floor(Math.random() * 3) + 2;
+        for (let i = 0; i < tributaryCount; i++) {
+          // Find a point on the main river to branch from
+          const midPoint = Math.floor(mainRiver.geometry.coordinates.length / 2);
+          const startPoint = mainRiver.geometry.coordinates[
+            Math.floor(Math.random() * midPoint) + Math.floor(midPoint / 2)
+          ];
+          
+          // Create a tributary
+          const tributary = createRiver(
+            startPoint, 
+            river.length * (Math.random() * 0.3 + 0.1), 
+            0.15
+          );
+          tributary.properties = { 
+            name: `${river.name} Tributary ${i+1}`, 
+            type: 'tributary' 
+          };
+          rivers.push(tributary);
+        }
+      });
+    }
+    
+    // Create a synthetic river LineString
+    function createRiver(startCoords, length, meanderStrength) {
+      const pointCount = Math.floor(Math.random() * 10) + 20;
+      const points = [];
+      
+      // Start point
+      points.push(startCoords);
+      
+      // Random direction (radians)
+      let direction = Math.random() * Math.PI * 2;
+      
+      // Generate points with slight meandering
+      for (let i = 1; i < pointCount; i++) {
+        // Update direction with some randomness
+        direction += (Math.random() - 0.5) * meanderStrength;
+        
+        // Distance for this segment
+        const distance = length / pointCount * (0.8 + Math.random() * 0.4);
+        
+        // Calculate new point
+        const lastPoint = points[i-1];
+        const newPoint = [
+          lastPoint[0] + Math.cos(direction) * distance,
+          lastPoint[1] + Math.sin(direction) * distance
+        ];
+        
+        points.push(newPoint);
+      }
+      
+      return turf.lineString(points);
+    }
+    
+    // Clear visualization
+    function clearVisualization() {
+      // Remove R-tree visualization layers
+      rtreeLayers.forEach(layer => {
+        if (map.getLayer(layer)) {
+          map.removeLayer(layer);
+        }
+        if (map.getSource(layer)) {
+          map.removeSource(layer);
+        }
+      });
+      
+      // Remove search box
+      if (searchBoxLayer) {
+        if (map.getLayer('search-box-layer')) {
+          map.removeLayer('search-box-layer');
+        }
+        if (map.getSource('search-box')) {
+          map.removeSource('search-box');
+        }
+        searchBoxLayer = null;
+      }
+      
+      // Clear interval
+      if (searchInterval) {
+        clearInterval(searchInterval);
+        searchInterval = null;
+      }
+      
+      // Hide legend
+      legend.style.display = 'none';
+      
+      rtreeLayers = [];
+    }
+    
+    clearButton.addEventListener('click', clearVisualization);
+    
+    // Build and visualize the R-tree
+    showRTreeButton.addEventListener('click', function() {
+      if (rivers.length === 0) {
+        alert('River data not loaded yet');
+        return;
+      }
+      
+      clearVisualization();
+      
+      // Build R-tree
+      buildRTree();
+      
+      // Show legend
+      legend.style.display = 'block';
+    });
+    
+    // Build R-tree for the rivers
+    function buildRTree() {
+      // Create a simple R-tree like structure using recursive grouping
+      function createRTree(features, maxEntries = 4, depth = 0) {
+        if (features.length <= maxEntries) {
+          return {
+            bbox: calculateFeaturesBBox(features),
+            features: features,
+            children: [],
+            depth: depth
+          };
+        }
+        
+        // Get the bounding box
+        const bbox = calculateFeaturesBBox(features);
+        
+        // Determine split direction (alternating between x and y)
+        const splitOnX = depth % 2 === 0;
+        
+        // Sort by the centroid of the bbox
+        features.sort((a, b) => {
+          const aBbox = turf.bbox(a);
+          const bBbox = turf.bbox(b);
+          
+          const aCentroid = [
+            (aBbox[0] + aBbox[2]) / 2,
+            (aBbox[1] + aBbox[3]) / 2
+          ];
+          
+          const bCentroid = [
+            (bBbox[0] + bBbox[2]) / 2,
+            (bBbox[1] + bBbox[3]) / 2
+          ];
+          
+          if (splitOnX) {
+            return aCentroid[0] - bCentroid[0];
+          } else {
+            return aCentroid[1] - bCentroid[1];
+          }
+        });
+        
+        // Split features into groups
+        const groups = [];
+        const groupSize = Math.ceil(features.length / Math.min(maxEntries, 4));
+        
+        for (let i = 0; i < features.length; i += groupSize) {
+          groups.push(features.slice(i, i + groupSize));
+        }
+        
+        // Create child nodes
+        const children = groups.map(group => createRTree(group, maxEntries, depth + 1));
+        
+        return {
+          bbox: bbox,
+          features: [],
+          children: children,
+          depth: depth
+        };
+      }
+      
+      // Calculate bbox for a group of features
+      function calculateFeaturesBBox(features) {
+        const bboxes = features.map(feature => turf.bbox(feature));
+        
+        // Find min/max for all bboxes
+        const minX = Math.min(...bboxes.map(bbox => bbox[0]));
+        const minY = Math.min(...bboxes.map(bbox => bbox[1]));
+        const maxX = Math.max(...bboxes.map(bbox => bbox[2]));
+        const maxY = Math.max(...bboxes.map(bbox => bbox[3]));
+        
+        return [minX, minY, maxX, maxY];
+      }
+      
+      // Create R-tree
+      rtree = createRTree(rivers);
+      
+      // Visualize R-tree
+      visualizeRTree(rtree);
+    }
+    
+    // Visualize the R-tree structure
+    function visualizeRTree(node, nodeId = 'root') {
+      const color = depthToColor(node.depth);
+      const sourceId = `rtree-${nodeId}`;
+      const layerId = `rtree-layer-${nodeId}`;
+      
+      // Create a polygon from the bounding box
+      const polygon = turf.bboxPolygon(node.bbox);
+      
+      // Add source and layer
+      map.addSource(sourceId, {
+        type: 'geojson',
+        data: polygon
+      });
+      
+      map.addLayer({
+        id: layerId,
+        type: 'line',
+        source: sourceId,
+        paint: {
+          'line-color': color,
+          'line-width': 2,
+          'line-opacity': 0.7
+        }
+      });
+      
+      rtreeLayers.push(sourceId);
+      rtreeLayers.push(layerId);
+      
+      // Recursively visualize children
+      node.children.forEach((child, i) => {
+        visualizeRTree(child, `${nodeId}-${i}`);
+      });
+    }
+    
+    // Map depth to color
+    function depthToColor(depth) {
+      const colors = [
+        '#e41a1c', // Root (red)
+        '#377eb8', // Level 1 (blue)
+        '#4daf4a', // Level 2 (green)
+        '#984ea3', // Level 3 (purple)
+        '#ff7f00'  // Leaf nodes (orange)
+      ];
+      
+      return colors[Math.min(depth, colors.length - 1)];
+    }
+    
+    // Demonstrate searching with a moving box
+    demonstrateSearchButton.addEventListener('click', function() {
+      if (!rtree) {
+        alert('Please show the R-tree index first');
+        return;
+      }
+      
+      // Clear any existing search visualization
+      if (searchInterval) {
+        clearInterval(searchInterval);
+      }
+      
+      if (searchBoxLayer) {
+        if (map.getLayer('search-box-layer')) {
+          map.removeLayer('search-box-layer');
+        }
+        if (map.getSource('search-box')) {
+          map.removeSource('search-box');
+        }
+      }
+      
+      // Create a search box
+      const center = map.getCenter();
+      const bounds = map.getBounds();
+      const width = (bounds.getEast() - bounds.getWest()) / 5;
+      const height = (bounds.getNorth() - bounds.getSouth()) / 5;
+      
+      const searchBox = turf.bboxPolygon([
+        center.lng - width/2,
+        center.lat - height/2,
+        center.lng + width/2,
+        center.lat + height/2
+      ]);
+      
+      // Add search box to map
+      map.addSource('search-box', {
+        type: 'geojson',
+        data: searchBox
+      });
+      
+      map.addLayer({
+        id: 'search-box-layer',
+        type: 'line',
+        source: 'search-box',
+        paint: {
+          'line-color': '#ff0000',
+          'line-width': 3,
+          'line-dasharray': [2, 1]
+        }
+      });
+      
+      searchBoxLayer = searchBox;
+      
+      // Animate the search box movement
+      let step = 0;
+      const radius = width * 2;
+      
+      searchInterval = setInterval(() => {
+        // Move the search box in a circular pattern
+        const angle = (step % 360) * (Math.PI / 180);
+        const x = center.lng + radius * Math.cos(angle) * 0.3;
+        const y = center.lat + radius * Math.sin(angle) * 0.3;
+        
+        const newBox = turf.bboxPolygon([
+          x - width/2,
+          y - height/2,
+          x + width/2,
+          y + height/2
+        ]);
+        
+        map.getSource('search-box').setData(newBox);
+        
+        // Highlight intersecting nodes
+        highlightIntersectingNodes(newBox, rtree);
+        
+        step += 3;
+      }, 100);
+    });
+    
+    // Highlight nodes that intersect with the search box
+    function highlightIntersectingNodes(searchBox, node, nodeId = 'root') {
+      const layerId = `rtree-layer-${nodeId}`;
+      
+      // Check if the search box intersects this node
+      const nodeBox = turf.bboxPolygon(node.bbox);
+      const intersects = turf.booleanOverlap(searchBox, nodeBox) || 
+                         turf.booleanContains(searchBox, nodeBox) ||
+                         turf.booleanContains(nodeBox, searchBox);
+      
+      // Highlight or reset the node
+      if (intersects) {
+        map.setPaintProperty(layerId, 'line-width', 3);
+        map.setPaintProperty(layerId, 'line-opacity', 1);
+      } else {
+        map.setPaintProperty(layerId, 'line-width', 2);
+        map.setPaintProperty(layerId, 'line-opacity', 0.7);
+      }
+      
+      // Recursively check children if this node intersects
+      if (intersects && node.children.length > 0) {
+        node.children.forEach((child, i) => {
+          highlightIntersectingNodes(searchBox, child, `${nodeId}-${i}`);
+        });
+      }
+    }
+    
+    // Ensure clean up when page changes
+    window.addEventListener('unload', function() {
+      if (searchInterval) {
+        clearInterval(searchInterval);
+      }
+      map.remove();
+    });
+  });
+</script>
