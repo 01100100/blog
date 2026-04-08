@@ -1,0 +1,58 @@
+➜  blog git:(location) ✗ tree static -h         
+[ 512]  static
+├── [ 128]  admin
+│   ├── [2.4K]  config.yml
+│   └── [ 527]  index.html
+├── [ 53K]  android-chrome-192x192.png
+├── [332K]  android-chrome-512x512.png
+├── [ 47K]  apple-touch-icon.png
+├── [ 246]  browserconfig.xml
+├── [475K]  favicon_package_v0.16.zip
+├── [1.2K]  favicon-16x16.png
+├── [2.4K]  favicon-32x32.png
+├── [ 12K]  favicon.ico
+├── [ 384]  media
+│   ├── [1.1M]  fullloaded_snow.jpg
+│   ├── [ 160]  huttenblock
+│   │   ├── [370K]  mockup.jpeg
+│   │   ├── [370K]  previewed.zip
+│   │   └── [2.1M]  screenshot.png
+│   ├── [ 98K]  innsbruck-bends.gpx
+│   ├── [  96]  kreuzungen
+│   │   └── [2.8M]  screenshot.png
+│   ├── [ 160]  location
+│   │   ├── [5.0M]  bike-race-tracker.JPG
+│   │   ├── [816K]  image.png
+│   │   └── [816K]  kotline-multiplatfrom-wizard.png
+│   ├── [ 160]  maphopping
+│   │   ├── [ 23M]  all_maps_greenwich.gif
+│   │   ├── [ 53M]  maphopping_skiguru_komoot.gif
+│   │   └── [ 12M]  mapswap.gif
+│   ├── [ 224]  maploading
+│   │   ├── [264K]  map_race.jpeg
+│   │   ├── [361K]  map_timing.jpeg
+│   │   ├── [332K]  painting_map.jpeg
+│   │   ├── [665K]  screenshot_frame.png
+│   │   └── [430K]  slowloading.gif
+│   ├── [101K]  Shredie_Ride_2025-07-08_10-10-56.gpx
+│   ├── [ 608]  sotm
+│   │   ├── [919K]  aero-positions.png
+│   │   ├── [2.6M]  aero-trustini.png
+│   │   ├── [492K]  bartape.png
+│   │   ├── [121K]  heat.png
+│   │   ├── [271K]  ironman.png
+│   │   ├── [1.6M]  komoot-route-planner.png
+│   │   ├── [2.5M]  phone-mount.png
+│   │   ├── [1.2M]  polish-road.jpg
+│   │   ├── [1.5M]  ride-poland-wide.gif
+│   │   ├── [ 24M]  ride-poland.gif
+│   │   ├── [332K]  santini-pad.png
+│   │   ├── [476K]  sklep.jpg
+│   │   ├── [1.3M]  sunshine.jpg
+│   │   ├── [851K]  trustini.jpg
+│   │   ├── [195K]  unicorn.jpeg
+│   │   ├── [ 91K]  width_rolling_resistance.png
+│   │   └── [ 25M]  windy.gif
+│   └── [566K]  transbalkans.jpg
+├── [ 30K]  mstile-150x150.png
+└── [ 426]  site.webmanifest

@@ -28,7 +28,7 @@ mainSections = ["posts", "projects"]
 [params.home.profile]
 enable = true
 # URL of avatar shown in home page
-avatarURL = "media/transbalkans.jpg"
+avatarURL = "media/transbalkans.webp"
 # URL the avatar links to
 avatarLinkURL = ""
 # title = "This is me riding the TransBalkanRace in 2023"

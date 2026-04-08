@@ -1,14 +1,14 @@
 ---
 type: posts
-title: "High grade geospatial processing (feat. R-Tree's ) 🌲⚡️"
-subtitle: "From Browser fast to Blazing fast: DuckDB Rips 🦆💨"
+title: "High grade geospatial processing (feat. crazy fast ducks) 🦆🔥"
+subtitle: "From Browser fast to Blazing fast: R-Tree rips 💨"
 date: 2025-05-10T09:00:00+02:00
 lastmod: 2025-05-10T09:00:00+02:00
 draft: false
 authors: []
-description: "From Browser fast to Blazing fast: DuckDB Rips 🦆💨 A high speed journey processing Geospatial 🌎"
+description: "From Browser Fast to Blazing Fast: R-Tree rips 💨 A high speed journey processing Geospatial"
 
-tags: []
+tags: ["duckdb", "rtree", "geospatial", "performance", "optimization"]
 categories: []
 series: []
 
@@ -16,7 +16,7 @@ hiddenFromHomePage: false
 hiddenFromSearch: false
 
 featuredImage: ""
-featuredImagePreview: "/media/performance/kreuzungen-benchmark.gif"
+featuredImagePreview: "/media/performance/kreuzungen-benchmark.avif"
 
 toc:
   enable: true
@@ -32,7 +32,7 @@ license: ""
 
 So last year, I created a web app called [kreuzungen.world](https://kreuzungen.world) that calculates the number of waterways crossed by a gpx route. It was a fun little project to build and led to some interesting encounters.
 
-{{< image src="/media/performance/kreuzungen-screenrecording.gif" caption="Kreuzungen - the app that started it all" >}}
+{{< image src="/media/performance/kreuzungen-screenrecording.avif" caption="Kreuzungen - the app that started it all" >}}
 
 The app was built using javascript in a way that required no backend.. Thats right, all the data fetching and processing was done in the browser. (No server costs 💸).
 
@@ -48,7 +48,7 @@ What's been surprisingly rewarding is seeing people actually use it! From Japan 
 
 I want to point out my genuine surprise at how fast the browser does the geospatial processing... It just works, even on old devices, the performance is good enough. We are talking a couple of seconds for most routes. Including fetching the waterway data via OSM, render the calculated intersecting waterways on a vector map. Waterway fans are happy, I am happy too 😁
 
-{{< image src="/media/performance/kreuzungen-loading.gif" caption="Demonstrating the performance of the waterway detection" >}}
+{{< image src="/media/performance/kreuzungen-loading.avif" caption="Demonstrating the performance of the waterway detection" >}}
 
 But, I am not completely satisfied... Recently I have had a craving for speed in my life, don't know why, but I feel it. And fittingly I decided to revisit this problem and see how fast I could push this thing 🚴
 
@@ -114,7 +114,7 @@ Let me walk you through the pipeline, which is at the heart of the solution, tha
 
 4. **Build database for querying**: I leverage [dbt](https://github.com/duckdb/dbt-duckdb) with the DuckDB adapter. This framework brings structure to data transformation workflows. It nicely separates the data transformation logic from the data engineering configuration. Makes a setup that's easy to maintain and extend and minimizes boilerplate code.
 
-{{< image src="/media/performance/datapipeline.gif" caption="The whole of Andorra in downloaded, filtered and optimized to serve in <10 seconds" >}}
+{{< image src="/media/performance/datapipeline.avif" caption="The whole of Andorra in downloaded, filtered and optimized to serve in <10 seconds" >}}
 
 #### R-Tree Indexing 🌳
 
@@ -130,7 +130,7 @@ CREATE INDEX waterways_geom_idx ON waterways USING RTREE (geom);
 
 This single line of code provides dramatic performance improvements for spatial queries.
 
-![R-tree use wikipedia](/media/performance/stree.png)
+![R-tree use wikipedia](/media/performance/stree.webp)
 
 Imagine trying to find a group of friends at a festival... good luck if you have to search through the entire crowd. But if you know they will be at the beach stage, you can skip out the masses and search through only the people in the near vicinity. The R-Tree index is an ordering of data such that you quickly narrow down the search space to just the relevant geometries.
 
@@ -225,7 +225,7 @@ This query uses the created index to quickly identify potential intersections, t
 
 To measure the performance gains, I created a benchmarking script (`benchmark.py`) that tests different GPX files against the API. The results showed a drastic improvement:
 
-{{< image src="/media/performance/kreuzungen-benchmark.gif" caption="Seeing the performance increase 🧑‍💻" >}}
+{{< image src="/media/performance/kreuzungen-benchmark.avif" caption="Seeing the performance increase 🧑‍💻" >}}
 
 You can see the performance of the API in action. The benchmark script runs 10 different GPX files, each with varying lengths and complexities, and measures the time taken to process each file, and it runs before the old browser-based solution even finishes a single route.
 
