@@ -43,6 +43,7 @@ Knowing the exact position of your device is incredibly useful for all sorts of 
 * showing your position on a map and ensuring you didn't take the wrong hiking path
 * telling your uber driver where to pick you up you had a big night and can't read the street sign
 * Finding the device when you inevitably lose it
+* Linking you to a crime scene because you were in the wrong place at the wrong time (or right place at the right time depending on your perspective) and [Geofence warrant](https://en.wikipedia.org/wiki/Geofence_warrant)
 
 [Screen recording of accepting a consent and the globe zooming to a cool position, maybe with a video of me being at brandenbrug tor]
 
@@ -127,7 +128,7 @@ GPS is a specific system of US satellites, like the country, it can sometimes se
 
 ~~GPS~~ GNSS is great, when it works and can be extremely accurate TODO: reference some videos about high precision gps., allowing a precision of <1m.
 
-However there are many situations where GPS simply doesn't get the job done. If you are in a dense concrete jungle, a mountainous region, in a tunnel, or even just in a building with thick walls, then the signals coming from the satellite will be affected.
+However there are many situations where GPS simply doesn't get the job done. If you are in a dense concrete jungle, a mountainous region, in a tunnel, or even just in a building with thick walls, then the signals coming from the satellite will be affected. There is also the cases of jamming and spoofing, which are super interesting topics in their own right, but for now we will focus on the physical limitations of the system and how we can work around them.
 
 Yet another case of how the environment you are based in can have a big impact on your  "position" in life.
 
@@ -171,7 +172,7 @@ The concept is exactly the same as with satellites in space but with antennas on
 
 ### Wifi location 
 
-WIFI. There has been talks in conspiracy theorist circles about how the governments and big corps are tracking you with frequencies. I try to avoid the tin foil hats and prefer my rose tinted glasses. Anyhow, the friendly people at Google have spent a lot of resources mapping out where wifi routers are. They came up with some ground truth data as a sub project of driving cameras around for the street view
+WIFI. There has been talks in conspiracy theorist circles about how the governments and big corps are tracking you with frequencies. I try to avoid the tin foil hats and prefer my rose tinted glasses. Anyhow, the friendly people at Google have spent a lot of resources mapping out where wifi routers are. They came up with some ground truth data as a sub project of driving cameras around for the street view [https://en.wikipedia.org/wiki/Privacy_concerns_with_Google#Wi-Fi_networks_information_collection](https://en.wikipedia.org/wiki/Privacy_concerns_with_Google#Wi-Fi_networks_information_collection) but now rely using an Android device's Wi-Fi positioning system to enhance the grid and add to the. 
 
 
 
