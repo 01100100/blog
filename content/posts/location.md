@@ -328,7 +328,7 @@ When you are tracking location, you will want to store the data somewhere. This 
 
 I whipped up a fresh kotlin multi platform project for android and ios with the help of the wizard. I went for compose for the UI, downloaded it, unzipped it and loaded it up in andorid studio.
 
-![Kotlin MMP wizard](/media/location/image.png)
+![Kotlin MMP wizard](/media/location/image.webp)
 
 
 I then added the location permission to the manifest, and added the location dependency to the build.gradle file.
