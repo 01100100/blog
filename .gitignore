@@ -4,9 +4,3 @@
 /assets/jsconfig.json
 hugo_stats.json
 /.hugo_build.lock
-# Obsidian local state (vault config itself is committed)
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-.obsidian/cache
-.trash/
-.DS_Store
