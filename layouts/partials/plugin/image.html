@@ -1,0 +1,63 @@
+{{- /* Netlify Image CDN optimized image partial */ -}}
+{{- $src := .Src -}}
+{{- $height := "" -}}
+{{- $width := "" -}}
+{{- $suffixList := slice ".jpeg" ".jpg" ".png" ".gif" ".bmp" ".tif" ".tiff" ".webp" ".avif" -}}
+{{- with dict "Path" .Src "Resources" .Resources | partial "function/resource.html" -}}
+    {{- $src = .RelPermalink -}}
+    {{- if and
+        (eq .ResourceType "image")
+        (dict "Path" $src "Suffixes" $suffixList | partial "function/suffixValidation.html")
+        -}}
+        {{- $height = .Height -}}
+        {{- $width = .Width -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $small := .SrcSmall | default $src -}}
+{{- with dict "Path" .SrcSmall "Resources" .Resources | partial "function/resource.html" -}}
+    {{- $small = .RelPermalink -}}
+{{- end -}}
+
+{{- $large := .SrcLarge | default $src -}}
+{{- with dict "Path" .SrcLarge "Resources" .Resources | partial "function/resource.html" -}}
+    {{- $large = .RelPermalink -}}
+{{- end -}}
+
+{{- $alt := .Alt | default .Title | default $src -}}
+{{- $loading := .Loading | default "lazy" -}}
+{{- $fetchpriority := .Fetchpriority | default "" -}}
+
+{{- with .Height -}}
+    {{- $height = . -}}
+{{- end -}}
+
+{{- with .Width -}}
+    {{- $width = . -}}
+{{- end -}}
+
+{{- /* Netlify Image CDN srcset */ -}}
+{{- $cdnSrcset := printf "/.netlify/images?url=%s&w=400&fm=avif&q=80 400w, /.netlify/images?url=%s&w=800&fm=avif&q=80 800w, /.netlify/images?url=%s&w=1200&fm=avif&q=80 1200w" $src $src $src -}}
+
+{{- if .Linked -}}
+    <a class="lightgallery" href="{{ $large | safeURL }}" title="{{ .Title | default $alt }}" data-thumbnail="{{ $small | safeURL }}"{{ with .Caption }} data-sub-html="<h2>{{ . }}</h2>{{ with $.Title }}<p>{{ . }}</p>{{ end }}"{{ end }}{{ with .Rel }} rel="{{ . }}"{{ end }}>
+        <img
+            {{ with .Class }}class="{{ . }}"{{ end }}
+            loading="{{ $loading }}"
+            {{ with $fetchpriority }}fetchpriority="{{ . }}"{{ end }}
+            src="/.netlify/images?url={{ $src | safeURL }}&w=800&fm=avif&q=80"
+            srcset="{{ $cdnSrcset }}"
+            sizes="(max-width: 480px) 400px, (max-width: 960px) 800px, 1200px"
+            alt="{{ $alt }}"{{ with $height }} height="{{ . }}"{{ end }}{{ with $width }} width="{{ . }}"{{ end }}>
+    </a>
+{{- else -}}
+    <img
+        {{ with .Class }}class="{{ . }}"{{ end }}
+        loading="{{ $loading }}"
+        {{ with $fetchpriority }}fetchpriority="{{ . }}"{{ end }}
+        src="/.netlify/images?url={{ $src | safeURL }}&w=800&fm=avif&q=80"
+        srcset="{{ $cdnSrcset }}"
+        sizes="(max-width: 480px) 400px, (max-width: 960px) 800px, 1200px"
+        alt="{{ $alt }}"
+        title="{{ .Title | default $alt }}"{{ with $height }} height="{{ . }}"{{ end }}{{ with $width }} width="{{ . }}"{{ end }}>
+{{- end -}}
